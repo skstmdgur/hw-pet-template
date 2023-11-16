@@ -127,6 +127,7 @@ export class CommandRunner implements IHPetCommandRunner {
 
   /**
    * command: connect
+   *
    * Function to connect to the hardware.
    * Check the connection status in ricConnector.setEventListener().
    * An essential function that must be implemented.
@@ -155,6 +156,7 @@ export class CommandRunner implements IHPetCommandRunner {
 
   /**
    * command: getStateInfo
+   *
    * This function is a wrapper for ricConnector.sendRICRESTMsg().
    * The return value is automatically sent to the parent frame (CODINY)
    * @returns RICStateInfo
@@ -165,6 +167,7 @@ export class CommandRunner implements IHPetCommandRunner {
 
   /**
    * command: sendREST
+   *
    * This function is a wrapper for ricConnector.sendRICRESTMsg().
    * However, it includes an additional parameter called afterDelayMs.
    * @param cmd - RIC REST command
@@ -197,7 +200,8 @@ export class CommandRunner implements IHPetCommandRunner {
   }
 
   /**
-   * command: streamSoundFile()
+   * command: streamSoundFile
+   *
    * Plays a sound
    * Plays a file from the public/assets/sounds/ folder
    * e.g., completed_tone_low_br.mp3
@@ -208,7 +212,7 @@ export class CommandRunner implements IHPetCommandRunner {
   }
 
   /**
-   * command: startCheckCorrectRIC()
+   * command: startCheckCorrectRIC
    */
   startCheckCorrectRIC = async (): Promise<void> => {
     const availableColours = [
@@ -220,14 +224,14 @@ export class CommandRunner implements IHPetCommandRunner {
   }
 
   /**
-   * command: acceptCheckCorrectRIC()
+   * command: acceptCheckCorrectRIC
    */
   acceptCheckCorrectRIC = async (): Promise<void> => {
     await this.ricConnector.checkCorrectRICStop(true)
   }
 
   /**
-   * command: rejectCheckCorrectRIC()
+   * command: rejectCheckCorrectRIC
    */
   rejectCheckCorrectRIC = async (): Promise<void> => {
     await this.ricConnector.checkCorrectRICStop(false)

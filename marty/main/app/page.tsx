@@ -1,7 +1,8 @@
 'use client'
 
-import { HW_ID } from '@/constant'
+import { HW_ID, HW_NAME } from '@/constant'
 import { CommandRunner } from '@/hw/CommandRunner'
+import log from '@/log'
 import type { ConnectionState } from '@ktaicoder/hw-pet'
 import { HPet, HPetEvents } from '@ktaicoder/hw-pet'
 import { Box, ButtonBase, Typography } from '@mui/material'
@@ -16,14 +17,14 @@ export default function Page() {
 
   const [commandRunner, setCommandRunner] = useState<CommandRunner>()
 
-  // 연결하기 버튼 클릭 핸들러
+  // Click handler for the Connect button
   const handleClickConnectBtn = () => {
     const runner = commandRunner
     if (!runner) return
     runner.connect()
   }
 
-  // 연결 끊기 버튼 클릭 핸들러
+  // Click handler for the Disconnect button
   const handleClickDisconnectBtn = () => {
     const runner = commandRunner
     if (!runner) {
@@ -39,7 +40,7 @@ export default function Page() {
     })
 
     pet.once(HPetEvents.COMMAND_RUNNER_STARTED, (runner: CommandRunner) => {
-      console.log(HPetEvents.COMMAND_RUNNER_STARTED, runner)
+      log.debug(HPetEvents.COMMAND_RUNNER_STARTED, runner)
       setCommandRunner(runner)
       pet.on(HPetEvents.CONNECTION_STATE_CHANGED, setConnectionState)
     })
@@ -107,7 +108,7 @@ export default function Page() {
           mt: 1,
         }}
       >
-        Marty
+        {HW_NAME.en}
       </Typography>
       <Box
         sx={{
