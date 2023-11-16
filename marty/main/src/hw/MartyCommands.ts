@@ -8,8 +8,13 @@ import {
 import type { RICStateInfo } from '@robotical/ricjs'
 import { RICConnector } from '@robotical/ricjs'
 import type EventEmitter from 'eventemitter3'
-import { connectBLE, errmsg } from './marty-util'
-import { sleepAsync } from '@/utls/misc'
+import * as helper from './marty-helper'
+import { errmsg, sleepAsync } from '@/utls/misc'
+import config from '@/config'
+import log from '@/log'
+
+const DEBUG = config.isDebug
+const BASE_PATH = config.basePath
 
 /**
  * Class for sending commands to the hardware.
@@ -61,6 +66,7 @@ export class MartyCommands implements IHPetCommandRunner {
           } else if (eventName === 'CONNECTION_FAILED') {
             this.updateConnectionState_('disconnected')
           }
+          // "CONN_STREAMING_ISSUE" maybe need
         }
       }
     )
@@ -74,6 +80,7 @@ export class MartyCommands implements IHPetCommandRunner {
    */
   destroy = async () => {
     // how do i unregister ricConnectors's event listeners?
+    this.ricConnector.setEventListener(null)
   }
 
   /**
@@ -96,6 +103,8 @@ export class MartyCommands implements IHPetCommandRunner {
   }
 
   /**
+   * command: getConnectionState
+   *
    * get current connection state
    * An essential function that must be implemented.
    * The return value is automatically sent to the parent frame (CODINY)
@@ -106,6 +115,8 @@ export class MartyCommands implements IHPetCommandRunner {
   }
 
   /**
+   * command: getHwId
+   *
    * get hardware id
    * An essential function that must be implemented.
    * The return value is automatically sent to the parent frame (CODINY)
@@ -116,17 +127,20 @@ export class MartyCommands implements IHPetCommandRunner {
   }
 
   /**
+   * command: connect
    * Function to connect to the hardware.
    * Check the connection status in ricConnector.setEventListener().
    * An essential function that must be implemented.
    * @returns The return value is meaningless.
    */
   connect = async (): Promise<boolean> => {
-    await connectBLE(this.ricConnector)
+    await helper.connectBLE(this.ricConnector)
     return true
   }
 
   /**
+   * command: disconnect
+   *
    * Function to disconnect from the hardware.
    * An essential function that must be implemented.
    * @returns The return value is meaningless.
@@ -141,34 +155,80 @@ export class MartyCommands implements IHPetCommandRunner {
   }
 
   /**
-   * example command getRICStateInfo()
+   * command: getStateInfo
    * This function is a wrapper for ricConnector.sendRICRESTMsg().
    * The return value is automatically sent to the parent frame (CODINY)
    * @returns RICStateInfo
    */
-  getRICStateInfo = async (): Promise<RICStateInfo> => {
+  getStateInfo = async (): Promise<RICStateInfo> => {
     return this.ricConnector.getRICStateInfo()
   }
 
   /**
-   * example command : sendRICRESTMsg()
+   * command: sendREST
    * This function is a wrapper for ricConnector.sendRICRESTMsg().
    * However, it includes an additional parameter called afterDelayMs.
-   * @param cmd - Command
-   * @param afterDelayMs - Time to wait after executing the command, no waiting if the value is 0
+   * @param cmd - RIC REST command
    * @param param - Parameters for the cmd
+   * @param afterDelayMs - Time to wait after executing the command, no waiting if the value is 0
    * @returns The return value of ricConnector.sendRICRESTMsg()
    */
-  sendRICRESTMsg = async (
+  sendREST = async (
     cmd: string,
-    afterDelayMs: number,
-    param?: object
+    param?: object | null,
+    afterDelayMs?: number
   ): Promise<any> => {
     const result = await this.ricConnector.sendRICRESTMsg(cmd, param || {})
-    if (afterDelayMs > 0) {
+    if (typeof afterDelayMs === 'number' && afterDelayMs > 0) {
       await sleepAsync(afterDelayMs)
     }
 
     return result
+  }
+
+  /**
+   * command: sendFile()
+   * 파일 전송
+   * public/assets/files/ 폴더의 파일을 전송합니다
+   * ex) soundtest_44100_48kbps.mp3, soundtest_44100_192kbps.mp3
+   * @param fileName - fileName
+   */
+  sendFile = async (fileName: string): Promise<void> => {
+    await helper.sendFile(this.ricConnector, fileName)
+  }
+
+  /**
+   * command: streamSoundFile()
+   * 소리 재생
+   * public/assets/sounds/ 폴더의 파일을 재생합니다
+   * ex) completed_tone_low_br.mp3
+   * @param fileName - fileName
+   */
+  streamSoundFile = async (fileName: string): Promise<void> => {
+    await helper.streamSoundFile(this.ricConnector, fileName)
+  }
+
+  /**
+   * command: streamSoundFile()
+   * 소리 재생
+   * public/assets/sounds/ 폴더의 파일을 재생합니다
+   * ex) completed_tone_low_br.mp3
+   * @param fileName - fileName
+   */
+  startCheckCorrectRIC = async (): Promise<void> => {
+    const availableColours = [
+      { led: '#202000', lcd: '#FFFF00' },
+      { led: '#880000', lcd: '#FF0000' },
+      { led: '#000040', lcd: '#0080FF' },
+    ]
+    await this.ricConnector.checkCorrectRICStart(availableColours)
+  }
+
+  acceptCheckCorrectRIC = async (): Promise<void> => {
+    await this.ricConnector.checkCorrectRICStop(true)
+  }
+
+  rejectCheckCorrectRIC = async (): Promise<void> => {
+    await this.ricConnector.checkCorrectRICStop(false)
   }
 }
