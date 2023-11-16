@@ -15,7 +15,7 @@ Marty
 - typescript@^4.9.5
 - @mui/material@5
 
-## 빌드 및 실행
+## Build and Run
 
 ```sh
 pnpm install
@@ -23,10 +23,10 @@ pnpm install
 # run dev mode
 pnpm dev
 
-# open http://localhost:3000
+# open url http://localhost:3000
 ```
 
-## 몇 가지 명령어 예시
+## Some Command Examples
 
 ```js
 // rest
@@ -55,29 +55,39 @@ hw.acceptCheckCorrectRIC()
 hw.rejectCheckCorrectRIC()
 ```
 
-## 폴더 구조
+## Folder Structure
 
-- `main`
-  - 코디니 서비스에서 임베딩할 iframe의 내용을 담고 있습니다.
-  - NextJS로 작성된 웹 페이지의 소스 코드를 포함합니다.
-- `sub/eslint-config-custom`
-  - eslint 설정을 포함하고 있습니다.
-- `sub/tsconfig`
-  - typescript 설정을 포함하고 있습니다.
+- `main/`
+  - Contains the content of the iframe to be embedded in the Codiny service.
+  - Includes the source code of the web page written in NextJS.
+- `sub/eslint-config-custom/`
+  - Contains eslint configurations.
+- `sub/tsconfig/`
+  - Contains TypeScript configurations.
+- `blockcoding/`
+  - Contains the javascriptGenerator code of the Block used in the AI Codiny block coding.
+  - The code in this folder is for reference when registering blocks in the `AI Codiny block factory`. It is convenient to write the code here and copy-paste it into the `block factory`.
 
-## 수정할 소스 코드
+## Source Code Modification
 
-sub 폴더는 수정할 필요가 없습니다. 수정이 필요한 부분은 main 폴더의 소스코드입니다. 하나씩 수정할 부분을 살펴보겠습니다.
+- There is no need to modify the `sub/` folder.
+- The parts to be modified in the source code of the `main/` folder are as follows:
+  - `main/public/logo.png` - Register hardware image
+  - `main/src/constants.ts` - Set hardware ID and name
+  - `main/src/hw/CommandRunner.ts` - Add hardware control commands
 
-### 로고 파일
+That's all.
 
-- 로고파일을 교체하기 위해서 아래의 경로에 파일을 저장하세요. 파일명은 `logo.png` 로 작성해주세요.
-  - `main/public/logo.png`
-  - 로고 파일의 크기는 높이는 `200px`로 고정입니다. 이미지의 너비는 `150~300px`이 적당합니다.
+### Registering Hardware Image
 
-### 하드웨어 ID 및 이름 설정
+To replace the logo file, save the file at the following path with the filename `logo.png`:
 
-- `main/src/constant.ts` 파일을 수정해주세요.
+- `main/public/logo.png`
+- The height of the logo file is fixed at `200px`. The width of the image is appropriate between `150~300px`.
+
+### Setting Hardware ID and Name
+
+Please modify the main/src/constants.ts file.
 
 ```js
 // file: src/constant.ts
@@ -96,11 +106,11 @@ export const HW_NAME = {
 }
 ```
 
-### 연결 및 명령 추가
+### Adding Hardware Control Commands
 
-- `CommandRunner.ts` 파일에 연결 및 제어 명령과 관련된 내용이 포함되어 있습니다. 이 파일을 수정하여 추가 명령어들을 작성해주세요.
+The `CommandRunner.ts` file contains content related to connection and control commands. Please modify this file to write additional commands.
 
-아래는 반드시 구현해야 하는 최소 내용을 정리했습니다.
+Below is a summary of the minimum content that must be implemented:
 
 ```js
 // file: main/src/hw/CommandRunner.ts
@@ -186,11 +196,12 @@ export class CommandRunner implements IHPetCommandRunner {
 
 ```
 
-#### 연결 상태 리스너
+#### Connection State Listener
 
-- 연결 상태 리스너와 같은 이벤트 리스너들은 `init()`에서 등록하는 것이 좋습니다.
-- 이벤트 리스너의 등록을 해제할 때는 `destroy()`에서 작성하세요.
-- 예를 들면, 아래와 같이 할 수 있습니다.
+- Event listeners such as connection state listeners are recommended to be registered in the `init()` function.
+- Write the code to unregister event listeners in the `destroy()` function.
+
+For example, you can do it as follows:
 
 ```js
 export class CommandRunner implements IHPetCommandRunner {
@@ -222,9 +233,9 @@ export class CommandRunner implements IHPetCommandRunner {
 
 ```
 
-#### Command 추가
+#### Adding a Command
 
-마티에서 필요한 명령을 `CommandRunner.ts`에 추가하세요. 예를 들면 다음과 같이 할 수 있습니다.
+Add the necessary commands to `CommandRunner.ts`. For example, you can do it as follows:
 
 ```js
 // file: main/src/hw/CommandRunner.ts
@@ -257,7 +268,7 @@ export class CommandRunner implements IHPetCommandRunner {
     param?: object | null,
     afterDelayMs?: number
   ): Promise<any> => {
-    const result = await this.ricConnector.sendRICRESTMsg(cmd, param || {})
+    const result = await this.ricConnector.sendRICRESTMsg(cmd, param ?? {})
     if (typeof afterDelayMs === 'number' && afterDelayMs > 0) {
       await sleepAsync(afterDelayMs)
     }
@@ -286,33 +297,7 @@ export class CommandRunner implements IHPetCommandRunner {
   streamSoundFile = async (fileName: string): Promise<void> => {
     await helper.streamSoundFile(this.ricConnector, fileName)
   }
-
-  /**
-   * command: startCheckCorrectRIC
-   */
-  startCheckCorrectRIC = async (): Promise<void> => {
-    const availableColours = [
-      { led: '#202000', lcd: '#FFFF00' },
-      { led: '#880000', lcd: '#FF0000' },
-      { led: '#000040', lcd: '#0080FF' },
-    ]
-    await this.ricConnector.checkCorrectRICStart(availableColours)
-  }
-
-  /**
-   * command: acceptCheckCorrectRIC
-   */
-  acceptCheckCorrectRIC = async (): Promise<void> => {
-    await this.ricConnector.checkCorrectRICStop(true)
-  }
-
-  /**
-   * command: rejectCheckCorrectRIC
-   */
-  rejectCheckCorrectRIC = async (): Promise<void> => {
-    await this.ricConnector.checkCorrectRICStop(false)
-  }
 }
-
-
 ```
+
+End.
