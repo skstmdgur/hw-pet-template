@@ -1,4 +1,3 @@
-/* eslint-disable turbo/no-undeclared-env-vars */
 import log from './log'
 
 const basePath: string = process.env.NEXT_PUBLIC_BASE_PATH ?? '/'

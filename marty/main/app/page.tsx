@@ -4,8 +4,8 @@ import type { ConnectionState } from '@ktaicoder/hw-pet'
 import { HPet, HPetEvents } from '@ktaicoder/hw-pet'
 import { Box, ButtonBase, Typography } from '@mui/material'
 import { useEffect, useState } from 'react'
-import { MartyCommands } from '../src/hw/MartyCommands'
-import { HW_ID } from './constant'
+import { MartyCommands } from '@/hw/MartyCommands'
+import { HW_ID } from '@/constant'
 
 export default function Page() {
   const [connectionState, setConnectionState] =
@@ -13,14 +13,14 @@ export default function Page() {
 
   const [commandRunner, setCommandRunner] = useState<MartyCommands>()
 
-  // 연결하기 버튼 클릭
+  // 연결하기 버튼 클릭 핸들러
   const handleClickConnectBtn = () => {
     const runner = commandRunner
     if (!runner) return
     runner.connect()
   }
 
-  // 연결 끊기 버튼 클릭
+  // 연결 끊기 버튼 클릭 핸들러
   const handleClickDisconnectBtn = () => {
     const runner = commandRunner
     if (!runner) {
@@ -94,7 +94,7 @@ export default function Page() {
           },
         }}
       >
-        <img src="/marty_v2.webp" alt="" />
+        <img src="./logo.png" alt="" />
       </Box>
       <Typography
         variant="h6"
@@ -118,7 +118,7 @@ export default function Page() {
           },
         }}
       >
-        <img src="/bluetooth.svg" alt="" />
+        <img src="./bluetooth.svg" alt="" />
       </Box>
 
       {connectionState === 'connected' && (
