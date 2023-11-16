@@ -33,8 +33,8 @@ importers:
         specifier: ^11.11.0
         version: 11.11.0(@emotion/react@11.11.1)(@types/react@18.2.37)(react@18.2.0)
       '@ktaicoder/hw-pet':
-        specifier: ^1.2.0
-        version: 1.2.0
+        specifier: latest
+        version: 1.2.2
       '@mui/material':
         specifier: ^5.14.18
         version: 5.14.18(@emotion/react@11.11.1)(@emotion/styled@11.11.0)(@types/react@18.2.37)(react-dom@18.2.0)(react@18.2.0)
@@ -44,6 +44,9 @@ importers:
       eventemitter3:
         specifier: ^5.0.1
         version: 5.0.1
+      minilog:
+        specifier: ^3.1.0
+        version: 3.1.0
       next:
         specifier: ^13.4.19
         version: 13.5.6(react-dom@18.2.0)(react@18.2.0)
@@ -57,6 +60,9 @@ importers:
       '@next/eslint-plugin-next':
         specifier: ^13.4.19
         version: 13.5.6
+      '@types/minilog':
+        specifier: ^2.0.32
+        version: 2.0.32
       '@types/node':
         specifier: ^17.0.12
         version: 17.0.45
@@ -544,10 +550,11 @@ packages:
       '@jridgewell/sourcemap-codec': 1.4.15
     dev: true
 
-  /@ktaicoder/hw-pet@1.2.0:
-    resolution: {integrity: sha512-8qvw+7z/knZoO49BRUKrWV+6GDF1SUaZ9/1a+ya3uMZzVHcpJ5lLZ1wKbR7o/4ra1e0xFNyl7cZlMEXL5SLpaw==}
+  /@ktaicoder/hw-pet@1.2.2:
+    resolution: {integrity: sha512-K2sOtKjfx9oNdS3edJ19s+qbRwytjeoX4qz5gObObA6k6+HKkXJB8j25jFyJigf7Rb6GcCf67/3yx4/p2mFU9A==}
     dependencies:
       eventemitter3: 5.0.1
+      minilog: 3.1.0
     dev: false
 
   /@microsoft/tsdoc-config@0.16.2:
@@ -874,6 +881,10 @@ packages:
 
   /@types/json5@0.0.29:
     resolution: {integrity: sha512-dRLjCWHYg4oaA77cxO64oO+7JwCwnIzkZPdrrC71jQmQtlhM556pwKo5bUzqvZndkVbeFLIIi+9TC40JNF5hNQ==}
+    dev: true
+
+  /@types/minilog@2.0.32:
+    resolution: {integrity: sha512-jRUDP4RuRfnwI69rinI1mtzvRpOUnYKq8rn7jTDpaUXV5kzQUG9Uy1mv+U6konl0xPKZlgQnYX4DQU9f5l96NA==}
     dev: true
 
   /@types/node@17.0.45:
@@ -2877,6 +2888,10 @@ packages:
     engines: {node: '>= 8'}
     dev: true
 
+  /microee@0.0.6:
+    resolution: {integrity: sha512-/LdL3jiBWDJ3oQIRLgRhfeCZNE3patM1LiwCC124+/HHn10sI/G2OAyiMfTNzH5oYWoZBk0tRZADAUOv+0Wt0A==}
+    dev: false
+
   /micromatch@4.0.5:
     resolution: {integrity: sha512-DMy+ERcEW2q8Z2Po+WNXuw3c5YaUSFjAO5GsJqfEl7UjvtIuFKO6ZrKvcItdy98dwFI2N1tg3zNIdKaQT+aNdA==}
     engines: {node: '>=8.6'}
@@ -2899,6 +2914,12 @@ packages:
     resolution: {integrity: sha512-I9jwMn07Sy/IwOj3zVkVik2JTvgpaykDZEigL6Rx6N9LbMywwUSMtxET+7lVoDLLd3O3IXwJwvuuns8UB/HeAg==}
     engines: {node: '>=4'}
     dev: true
+
+  /minilog@3.1.0:
+    resolution: {integrity: sha512-Xfm4jWjWzSAduvEWtuZX/8TMkxfJlCfH7XvikCZe3ptojYTBq1eoEs3rh9/3LNLOckUP86m+8l8+Iw5NU/pBww==}
+    dependencies:
+      microee: 0.0.6
+    dev: false
 
   /minimatch@3.1.2:
     resolution: {integrity: sha512-J7p63hRiAjw1NDEww1W7i37+ByIrOWO5XQQAzZ3VOcL0PNybwpfmV/N05zFAzwQ9USyEcX6t3UO+K5aqBQOIHw==}
