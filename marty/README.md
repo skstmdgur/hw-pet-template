@@ -188,8 +188,8 @@ export class CommandRunner implements IHPetCommandRunner {
 
 #### 연결 상태 리스너
 
-- 연결 상태 리스너는 `init()`에서 작성하는 것이 좋습니다.
-- 리스너의 등록을 해제할 때는 `destroy()`에서 작성하세요.
+- 연결 상태 리스너와 같은 이벤트 리스너들은 `init()`에서 등록하는 것이 좋습니다.
+- 이벤트 리스너의 등록을 해제할 때는 `destroy()`에서 작성하세요.
 - 예를 들면, 아래와 같이 할 수 있습니다.
 
 ```js
@@ -277,7 +277,7 @@ export class CommandRunner implements IHPetCommandRunner {
   }
 
   /**
-   * command: streamSoundFile()
+   * command: streamSoundFile
    * Plays a sound
    * Plays a file from the public/assets/sounds/ folder
    * e.g., completed_tone_low_br.mp3
@@ -288,7 +288,7 @@ export class CommandRunner implements IHPetCommandRunner {
   }
 
   /**
-   * command: startCheckCorrectRIC()
+   * command: startCheckCorrectRIC
    */
   startCheckCorrectRIC = async (): Promise<void> => {
     const availableColours = [
@@ -300,14 +300,14 @@ export class CommandRunner implements IHPetCommandRunner {
   }
 
   /**
-   * command: acceptCheckCorrectRIC()
+   * command: acceptCheckCorrectRIC
    */
   acceptCheckCorrectRIC = async (): Promise<void> => {
     await this.ricConnector.checkCorrectRICStop(true)
   }
 
   /**
-   * command: rejectCheckCorrectRIC()
+   * command: rejectCheckCorrectRIC
    */
   rejectCheckCorrectRIC = async (): Promise<void> => {
     await this.ricConnector.checkCorrectRICStop(false)
