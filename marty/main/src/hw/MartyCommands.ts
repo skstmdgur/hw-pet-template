@@ -14,7 +14,6 @@ import config from '@/config'
 import log from '@/log'
 
 const DEBUG = config.isDebug
-const BASE_PATH = config.basePath
 
 /**
  * Class for sending commands to the hardware.
@@ -187,11 +186,11 @@ export class MartyCommands implements IHPetCommandRunner {
   }
 
   /**
-   * command: sendFile()
-   * 파일 전송
-   * public/assets/files/ 폴더의 파일을 전송합니다
-   * ex) soundtest_44100_48kbps.mp3, soundtest_44100_192kbps.mp3
-   * @param fileName - fileName
+   * command: sendFile
+   * Sends a file
+   * Transmits a file from the public/assets/files/ folder
+   * e.g., soundtest_44100_48kbps.mp3, soundtest_44100_192kbps.mp3
+   * @param fileName - The name of the file to be sent
    */
   sendFile = async (fileName: string): Promise<void> => {
     await helper.sendFile(this.ricConnector, fileName)
@@ -199,21 +198,17 @@ export class MartyCommands implements IHPetCommandRunner {
 
   /**
    * command: streamSoundFile()
-   * 소리 재생
-   * public/assets/sounds/ 폴더의 파일을 재생합니다
-   * ex) completed_tone_low_br.mp3
-   * @param fileName - fileName
+   * Plays a sound
+   * Plays a file from the public/assets/sounds/ folder
+   * e.g., completed_tone_low_br.mp3
+   * @param fileName - The name of the file to be played
    */
   streamSoundFile = async (fileName: string): Promise<void> => {
     await helper.streamSoundFile(this.ricConnector, fileName)
   }
 
   /**
-   * command: streamSoundFile()
-   * 소리 재생
-   * public/assets/sounds/ 폴더의 파일을 재생합니다
-   * ex) completed_tone_low_br.mp3
-   * @param fileName - fileName
+   * command: startCheckCorrectRIC()
    */
   startCheckCorrectRIC = async (): Promise<void> => {
     const availableColours = [
@@ -224,10 +219,16 @@ export class MartyCommands implements IHPetCommandRunner {
     await this.ricConnector.checkCorrectRICStart(availableColours)
   }
 
+  /**
+   * command: acceptCheckCorrectRIC()
+   */
   acceptCheckCorrectRIC = async (): Promise<void> => {
     await this.ricConnector.checkCorrectRICStop(true)
   }
 
+  /**
+   * command: rejectCheckCorrectRIC()
+   */
   rejectCheckCorrectRIC = async (): Promise<void> => {
     await this.ricConnector.checkCorrectRICStop(false)
   }
