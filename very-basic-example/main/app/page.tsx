@@ -1,29 +1,31 @@
 'use client'
 
+import log from '@/log'
 import type { ConnectionState } from '@ktaicoder/hw-pet'
 import { HPet, HPetEvents } from '@ktaicoder/hw-pet'
 import { Box, ButtonBase, Typography } from '@mui/material'
 import { useEffect, useState } from 'react'
-import { VeryBasicCommands } from '../src/hw/VeryBasicCommands'
-import { HW_ID, HW_NAME } from './constant'
+import { HW_ID, HW_NAME } from '../src/constant'
+import { CommandRunner } from '../src/hw/CommandRunner'
 
-const commandRunnerClass = VeryBasicCommands
-const hardwareName = HW_NAME.en
+const LOGO_IMG_URL = 'logo.png'
+
+const BLUETOOTH_IMG_URL = 'bluetooth.svg'
 
 export default function Page() {
   const [connectionState, setConnectionState] =
     useState<ConnectionState>('disconnected')
 
-  const [commandRunner, setCommandRunner] = useState<VeryBasicCommands>()
+  const [commandRunner, setCommandRunner] = useState<CommandRunner>()
 
-  // 연결하기 버튼 클릭
+  // Click handler for the Connect button
   const handleClickConnectBtn = () => {
     const runner = commandRunner
     if (!runner) return
     runner.connect()
   }
 
-  // 연결 끊기 버튼 클릭
+  // Click handler for the Disconnect button
   const handleClickDisconnectBtn = () => {
     const runner = commandRunner
     if (!runner) {
@@ -35,10 +37,11 @@ export default function Page() {
   useEffect(() => {
     const pet = new HPet({
       hwId: HW_ID,
-      commandRunnerClass,
+      commandRunnerClass: CommandRunner,
     })
 
-    pet.once(HPetEvents.COMMAND_RUNNER_STARTED, (runner: VeryBasicCommands) => {
+    pet.once(HPetEvents.COMMAND_RUNNER_STARTED, (runner: CommandRunner) => {
+      log.debug(HPetEvents.COMMAND_RUNNER_STARTED, runner)
       setCommandRunner(runner)
       pet.on(HPetEvents.CONNECTION_STATE_CHANGED, setConnectionState)
     })
@@ -96,7 +99,7 @@ export default function Page() {
           },
         }}
       >
-        <img src="/marty_v2.webp" alt="" />
+        <img src={LOGO_IMG_URL} alt="" />
       </Box>
       <Typography
         variant="h6"
@@ -107,7 +110,7 @@ export default function Page() {
           mt: 1,
         }}
       >
-        {hardwareName}
+        {HW_NAME.en}
       </Typography>
       <Box
         sx={{
@@ -115,12 +118,9 @@ export default function Page() {
           justifyContent: 'center',
           alignItems: 'center',
           p: 1,
-          '& img': {
-            width: '24px',
-          },
         }}
       >
-        <img src="/bluetooth.svg" alt="" />
+        <img src={BLUETOOTH_IMG_URL} alt="" width={24} height={24} />
       </Box>
 
       {connectionState === 'connected' && (

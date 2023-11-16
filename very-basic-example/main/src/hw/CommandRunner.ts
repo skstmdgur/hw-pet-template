@@ -1,3 +1,4 @@
+import log from '@/log'
 import {
   HPetEvents,
   type ConnectionState,
@@ -15,9 +16,9 @@ import { fakeConnect, fakeDisconnect } from './command-util'
  *
  * Lifecycle methods: init(), destroy()
  * Mandatory implementation methods: getConnectionState(), getHwId(), connect(), disconnect()
- * Additional commands are the remaining methods other than the ones mentioned above (e.g., sendRICRESTMsg).
+ * Additional commands are the remaining methods other than the ones mentioned above (e.g., echo).
  */
-export class VeryBasicCommands implements IHPetCommandRunner {
+export class CommandRunner implements IHPetCommandRunner {
   private connectionState: ConnectionState = 'disconnected'
   private hwId: string
   private toParent: IParentSender
@@ -36,7 +37,7 @@ export class VeryBasicCommands implements IHPetCommandRunner {
    * Initialization tasks, such as registering event listeners, can be performed here.
    */
   init = async (): Promise<void> => {
-    console.log('VeryBasicCommands.init()')
+    log.debug('CommandRunner.init()')
   }
 
   /**
@@ -46,7 +47,7 @@ export class VeryBasicCommands implements IHPetCommandRunner {
    * Cleanup tasks, such as unregistering event listeners, can be performed here.
    */
   destroy = async () => {
-    console.log('VeryBasicCommands.destroy()')
+    log.debug('CommandRunner.destroy()')
   }
 
   /**
@@ -69,6 +70,8 @@ export class VeryBasicCommands implements IHPetCommandRunner {
   }
 
   /**
+   * command: getConnectionState
+   *
    * get current connection state
    * An essential function that must be implemented.
    * The return value is automatically sent to the parent frame (CODINY)
@@ -79,6 +82,8 @@ export class VeryBasicCommands implements IHPetCommandRunner {
   }
 
   /**
+   * command: getHwId
+   *
    * get hardware id
    * An essential function that must be implemented.
    * The return value is automatically sent to the parent frame (CODINY)
@@ -89,7 +94,10 @@ export class VeryBasicCommands implements IHPetCommandRunner {
   }
 
   /**
+   * command: connect
+   *
    * Function to connect to the hardware.
+   * Check the connection status in ricConnector.setEventListener().
    * An essential function that must be implemented.
    * @returns The return value is meaningless.
    */
@@ -102,6 +110,8 @@ export class VeryBasicCommands implements IHPetCommandRunner {
   }
 
   /**
+   * command: disconnect
+   *
    * Function to disconnect from the hardware.
    * An essential function that must be implemented.
    * @returns The return value is meaningless.
@@ -116,7 +126,8 @@ export class VeryBasicCommands implements IHPetCommandRunner {
   }
 
   /**
-   * example command foo
+   * command: foo
+   *
    * The return value is automatically sent to the parent frame (CODINY)
    * @returns 'bar'
    */
@@ -125,9 +136,10 @@ export class VeryBasicCommands implements IHPetCommandRunner {
   }
 
   /**
-   * example command echo
-   * @param what - string to echo
+   * command: echo
+   *
    * The return value is automatically sent to the parent frame (CODINY)
+   * @param what - string to echo
    * @returns echo string
    */
   echo = async (what: string): Promise<string> => {
