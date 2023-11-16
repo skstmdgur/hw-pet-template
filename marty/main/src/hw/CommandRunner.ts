@@ -177,7 +177,7 @@ export class CommandRunner implements IHPetCommandRunner {
     param?: object | null,
     afterDelayMs?: number
   ): Promise<any> => {
-    const result = await this.ricConnector.sendRICRESTMsg(cmd, param || {})
+    const result = await this.ricConnector.sendRICRESTMsg(cmd, param ?? {})
     if (typeof afterDelayMs === 'number' && afterDelayMs > 0) {
       await sleepAsync(afterDelayMs)
     }

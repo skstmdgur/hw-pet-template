@@ -115,12 +115,9 @@ export default function Page() {
           justifyContent: 'center',
           alignItems: 'center',
           p: 1,
-          '& img': {
-            width: '24px',
-          },
         }}
       >
-        <img src={BLUETOOTH_IMG_URL} alt="" />
+        <img src={BLUETOOTH_IMG_URL} alt="" width={24} height={24} />
       </Box>
 
       {connectionState === 'connected' && (
