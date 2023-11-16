@@ -13,7 +13,7 @@
     "@emotion/cache": "^11.11.0",
     "@emotion/react": "^11.11.1",
     "@emotion/styled": "^11.11.0",
-    "@ktaicoder/hw-pet": "latest",
+    "@ktaicoder/hw-pet": "^1.2.2",
     "@mui/material": "^5.14.18",
     "@robotical/ricjs": "^1.16.4",
     "bufferutil": "^4.0.8",
