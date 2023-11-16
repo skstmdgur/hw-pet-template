@@ -24,7 +24,7 @@ const DEBUG = config.isDebug
  * Mandatory implementation methods: getConnectionState(), getHwId(), connect(), disconnect()
  * Additional commands are the remaining methods other than the ones mentioned above (e.g., sendRICRESTMsg).
  */
-export class MartyCommands implements IHPetCommandRunner {
+export class CommandRunner implements IHPetCommandRunner {
   private connectionState: ConnectionState = 'disconnected'
   private hwId: string
   private toParent: IParentSender

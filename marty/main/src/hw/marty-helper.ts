@@ -1,8 +1,8 @@
-import type { RICConnector } from '@robotical/ricjs'
 import config from '@/config'
-import { RICChannelWebBLE } from '@robotical/ricjs'
-import { errmsg } from '@/utls/misc'
 import log from '@/log'
+import { errmsg } from '@/utls/misc'
+import type { RICConnector } from '@robotical/ricjs'
+import { RICChannelWebBLE } from '@robotical/ricjs'
 
 const basePath = config.basePath
 
@@ -98,29 +98,4 @@ export async function streamSoundFile(
   }
 
   ricConnector.streamAudio(audioData, true, audioDuration)
-}
-
-export async function startCheckCorrectRIC(
-  ricConnector: RICConnector
-): Promise<void> {
-  const availableColours = [
-    { led: '#202000', lcd: '#FFFF00' },
-    { led: '#880000', lcd: '#FF0000' },
-    { led: '#000040', lcd: '#0080FF' },
-  ]
-
-  // Set the colours to display on LEDs
-  globalThis.ricConnector.checkCorrectRICStart(availableColours)
-}
-
-export async function acceptCheckCorrectRIC(
-  ricConnector: RICConnector
-): Promise<void> {
-  await ricConnector.checkCorrectRICStop(true)
-}
-
-export async function rejectCheckCorrectRIC(
-  ricConnector: RICConnector
-): Promise<void> {
-  await ricConnector.checkCorrectRICStop(false)
 }

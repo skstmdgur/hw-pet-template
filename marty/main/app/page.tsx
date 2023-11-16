@@ -1,17 +1,20 @@
 'use client'
 
+import { HW_ID } from '@/constant'
+import { CommandRunner } from '@/hw/CommandRunner'
 import type { ConnectionState } from '@ktaicoder/hw-pet'
 import { HPet, HPetEvents } from '@ktaicoder/hw-pet'
 import { Box, ButtonBase, Typography } from '@mui/material'
 import { useEffect, useState } from 'react'
-import { MartyCommands } from '@/hw/MartyCommands'
-import { HW_ID } from '@/constant'
+
+const LOGO_IMG_URL = 'logo.png'
+const BLUETOOTH_IMG_URL = 'bluetooth.svg'
 
 export default function Page() {
   const [connectionState, setConnectionState] =
     useState<ConnectionState>('disconnected')
 
-  const [commandRunner, setCommandRunner] = useState<MartyCommands>()
+  const [commandRunner, setCommandRunner] = useState<CommandRunner>()
 
   // 연결하기 버튼 클릭 핸들러
   const handleClickConnectBtn = () => {
@@ -24,7 +27,6 @@ export default function Page() {
   const handleClickDisconnectBtn = () => {
     const runner = commandRunner
     if (!runner) {
-      alert(1)
       return
     }
     runner.disconnect()
@@ -33,10 +35,10 @@ export default function Page() {
   useEffect(() => {
     const pet = new HPet({
       hwId: HW_ID,
-      commandRunnerClass: MartyCommands,
+      commandRunnerClass: CommandRunner,
     })
 
-    pet.once(HPetEvents.COMMAND_RUNNER_STARTED, (runner: MartyCommands) => {
+    pet.once(HPetEvents.COMMAND_RUNNER_STARTED, (runner: CommandRunner) => {
       console.log(HPetEvents.COMMAND_RUNNER_STARTED, runner)
       setCommandRunner(runner)
       pet.on(HPetEvents.CONNECTION_STATE_CHANGED, setConnectionState)
@@ -94,7 +96,7 @@ export default function Page() {
           },
         }}
       >
-        <img src="./logo.png" alt="" />
+        <img src={LOGO_IMG_URL} alt="" />
       </Box>
       <Typography
         variant="h6"
@@ -118,7 +120,7 @@ export default function Page() {
           },
         }}
       >
-        <img src="./bluetooth.svg" alt="" />
+        <img src={BLUETOOTH_IMG_URL} alt="" />
       </Box>
 
       {connectionState === 'connected' && (
