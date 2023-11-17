@@ -33,7 +33,7 @@ pnpm lint
 
 ### eslint Rules Recommended
 
-It is not mandatory, but please adhere to `eslint rules`` to avoid potential bugs.
+It is not mandatory, but please adhere to `eslint rules` to avoid potential bugs.
 
 If you want to modify eslint rules, you can do so in the `main/.eslintrc.js` file.
 Of course, you can also `disable` eslint rules.
@@ -85,13 +85,11 @@ Please fix it using other methods, such as using interfaces.
 
 ![import-type](./arts/import-type.png)
 
-위의 `eslint warning`은 아래와 같이 수정할 수 있습니다.
+The above `eslint warning` can be fixed as follows.
 
 ```javascript
 import type { PystatusMsgType } from "@robotical/ricjs/src/RICTypes";
 ```
-
-타입스크립트는 자바스크립트로 transpile 되면서 타입 정보가 제거 되므로 `dependency-cycle` 문제가 발생하지 않습니다. 그래서 위와 같이 타입만 사용할 때는 `import type` 을 사용하는 것이 좋습니다.
 
 When TypeScript is transpiled into JavaScript, type information is removed. Therefore, when importing only types, dependency-cycle issues do not occur. Thus, it is advisable to use import type when dealing exclusively with types.
 
