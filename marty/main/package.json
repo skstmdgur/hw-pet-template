@@ -16,6 +16,7 @@
     "@ktaicoder/hw-pet": "^1.2.2",
     "@mui/material": "^5.14.18",
     "@robotical/ricjs": "^1.16.4",
+    "@robotical/ricjs-robotical-addons": "^1.2.8",
     "bufferutil": "^4.0.8",
     "clsx": "^2.0.0",
     "eventemitter3": "^5.0.1",
@@ -23,6 +24,8 @@
     "next": "^13.4.19",
     "react": "^18.2.0",
     "react-dom": "^18.2.0",
+    "semver": "^7.5.4",
+    "soundtouchjs": "^0.1.30",
     "utf-8-validate": "^6.0.3"
   },
   "devDependencies": {
