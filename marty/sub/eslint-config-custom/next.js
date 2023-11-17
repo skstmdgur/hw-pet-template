@@ -42,7 +42,7 @@ module.exports = {
     'import/no-extraneous-dependencies': 'off',
     'no-new': 'off',
     'no-alert': 'off',
-    camelcase: 'off',
+    camelcase: 'off',    
     '@typescript-eslint/no-empty-function': 'off',
     'no-nested-ternary': 'off',
     '@typescript-eslint/consistent-type-definitions': 'warn',
@@ -92,5 +92,14 @@ module.exports = {
     'func-names': 'off',
     '@typescript-eslint/no-unsafe-return': 'off',
     '@typescript-eslint/no-implied-eval': 'off',
+    // added rules
+    '@typescript-eslint/prefer-includes': 'off',
+    'no-prototype-builtins': 'off',
+    '@typescript-eslint/array-type': 'off',
+    'no-promise-executor-return': 'off',
+    'no-implicit-coercion': 'off',
+    'no-else-return': 'off',
+    '@typescript-eslint/consistent-indexed-object-style': 'off',
+    'no-case-declarations': 'off',
   },
 }
