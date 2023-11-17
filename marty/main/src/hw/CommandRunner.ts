@@ -6,12 +6,12 @@ import {
   type IParentSender,
 } from '@ktaicoder/hw-pet'
 import type { RICStateInfo } from '@robotical/ricjs'
-import { RICConnector } from '@robotical/ricjs'
 import type EventEmitter from 'eventemitter3'
 import * as helper from './marty-helper'
 import { errmsg, sleepAsync } from '@/utls/misc'
 import config from '@/config'
-import log from '@/log'
+import { MartyBlocks } from './marty/MartyBlocks'
+import martyConnector from './marty/MartyConnector'
 
 const DEBUG = config.isDebug
 
@@ -24,18 +24,17 @@ const DEBUG = config.isDebug
  * Mandatory implementation methods: getConnectionState(), getHwId(), connect(), disconnect()
  * Additional commands are the remaining methods other than the ones mentioned above (e.g., sendRICRESTMsg).
  */
-export class CommandRunner implements IHPetCommandRunner {
+export class CommandRunner extends MartyBlocks implements IHPetCommandRunner {
   private connectionState: ConnectionState = 'disconnected'
   private hwId: string
   private toParent: IParentSender
-  private ricConnector: RICConnector
   private events: EventEmitter
 
   constructor(options: IHPetContext) {
+    super();
     this.hwId = options.hwId
     this.toParent = options.toParent
     this.events = options.events
-    this.ricConnector = new RICConnector()
   }
 
   /**
@@ -45,7 +44,7 @@ export class CommandRunner implements IHPetCommandRunner {
    * Initialization tasks, such as registering event listeners, can be performed here.
    */
   init = async (): Promise<void> => {
-    this.ricConnector.setEventListener(
+    martyConnector._ricConnector.setEventListener(
       (eventType, eventEnum, eventName, data) => {
         console.log('XXX [RIC Event]', {
           eventType,
@@ -79,7 +78,7 @@ export class CommandRunner implements IHPetCommandRunner {
    */
   destroy = async () => {
     // how do i unregister ricConnectors's event listeners?
-    this.ricConnector.setEventListener(null)
+    martyConnector._ricConnector.setEventListener(null)
   }
 
   /**
@@ -134,7 +133,7 @@ export class CommandRunner implements IHPetCommandRunner {
    * @returns The return value is meaningless.
    */
   connect = async (): Promise<boolean> => {
-    await helper.connectBLE(this.ricConnector)
+    await helper.connectBLE(martyConnector._ricConnector)
     return true
   }
 
@@ -147,7 +146,7 @@ export class CommandRunner implements IHPetCommandRunner {
    */
   disconnect = async () => {
     try {
-      await this.ricConnector.disconnect()
+      await martyConnector._ricConnector.disconnect()
     } catch (err) {
       console.log('disconnect fail', errmsg(err))
     }
@@ -162,7 +161,7 @@ export class CommandRunner implements IHPetCommandRunner {
    * @returns RICStateInfo
    */
   getStateInfo = async (): Promise<RICStateInfo> => {
-    return this.ricConnector.getRICStateInfo()
+    return martyConnector._ricConnector.getRICStateInfo()
   }
 
   /**
@@ -180,7 +179,7 @@ export class CommandRunner implements IHPetCommandRunner {
     param?: object | null,
     afterDelayMs?: number
   ): Promise<any> => {
-    const result = await this.ricConnector.sendRICRESTMsg(cmd, param ?? {})
+    const result = await martyConnector._ricConnector.sendRICRESTMsg(cmd, param ?? {})
     if (typeof afterDelayMs === 'number' && afterDelayMs > 0) {
       await sleepAsync(afterDelayMs)
     }
@@ -196,7 +195,7 @@ export class CommandRunner implements IHPetCommandRunner {
    * @param fileName - The name of the file to be sent
    */
   sendFile = async (fileName: string): Promise<void> => {
-    await helper.sendFile(this.ricConnector, fileName)
+    await helper.sendFile(martyConnector._ricConnector, fileName)
   }
 
   /**
@@ -208,7 +207,7 @@ export class CommandRunner implements IHPetCommandRunner {
    * @param fileName - The name of the file to be played
    */
   streamSoundFile = async (fileName: string): Promise<void> => {
-    await helper.streamSoundFile(this.ricConnector, fileName)
+    await helper.streamSoundFile(martyConnector._ricConnector, fileName)
   }
 
   /**
@@ -220,20 +219,21 @@ export class CommandRunner implements IHPetCommandRunner {
       { led: '#880000', lcd: '#FF0000' },
       { led: '#000040', lcd: '#0080FF' },
     ]
-    await this.ricConnector.checkCorrectRICStart(availableColours)
+    await martyConnector._ricConnector.checkCorrectRICStart(availableColours)
   }
 
   /**
    * command: acceptCheckCorrectRIC
    */
   acceptCheckCorrectRIC = async (): Promise<void> => {
-    await this.ricConnector.checkCorrectRICStop(true)
+    await martyConnector._ricConnector.checkCorrectRICStop(true)
   }
 
   /**
    * command: rejectCheckCorrectRIC
    */
   rejectCheckCorrectRIC = async (): Promise<void> => {
-    await this.ricConnector.checkCorrectRICStop(false)
+    await martyConnector._ricConnector.checkCorrectRICStop(false)
   }
+
 }

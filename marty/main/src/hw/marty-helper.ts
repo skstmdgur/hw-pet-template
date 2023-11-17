@@ -3,6 +3,7 @@ import log from '@/log'
 import { errmsg } from '@/utls/misc'
 import type { RICConnector } from '@robotical/ricjs'
 import { RICChannelWebBLE } from '@robotical/ricjs'
+import martyConnector from './marty/MartyConnector'
 
 const basePath = config.basePath
 
@@ -23,7 +24,7 @@ export async function connectBLE(ricConnector: RICConnector): Promise<boolean> {
   }
 
   try {
-    const connected = await ricConnector.connect('WebBLE', device)
+    const connected = await martyConnector.connect('WebBLE', device)
     if (connected) {
       log.debug(`connectBLE(): connected to device ${device.name}`)
     } else {

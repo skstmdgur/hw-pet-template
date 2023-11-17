@@ -41,6 +41,9 @@ importers:
       '@robotical/ricjs':
         specifier: ^1.16.4
         version: 1.16.4(ws@8.14.2)
+      '@robotical/ricjs-robotical-addons':
+        specifier: ^1.2.8
+        version: 1.2.8(ws@8.14.2)
       bufferutil:
         specifier: ^4.0.8
         version: 4.0.8
@@ -62,6 +65,12 @@ importers:
       react-dom:
         specifier: ^18.2.0
         version: 18.2.0(react@18.2.0)
+      semver:
+        specifier: ^7.5.4
+        version: 7.5.4
+      soundtouchjs:
+        specifier: ^0.1.30
+        version: 0.1.30
       utf-8-validate:
         specifier: ^6.0.3
         version: 6.0.3
@@ -872,6 +881,15 @@ packages:
 
   /@popperjs/core@2.11.8:
     resolution: {integrity: sha512-P1st0aksCrn9sGZhp8GMYwBnQsbvAWsZAX44oXNNvLHGqAOcoVxmjZiohstwQ7SqKnbR47akdNi+uleWD8+g6A==}
+    dev: false
+
+  /@robotical/ricjs-robotical-addons@1.2.8(ws@8.14.2):
+    resolution: {integrity: sha512-cRgWWnYHHQKRwx96DBb1CXK0pRQMSkF7taT3ZB647IOrQjyqdstyOr1Wtjako/AlI77u0cEp/K5YUnrW3vs/dg==}
+    dependencies:
+      '@robotical/ricjs': 1.16.4(ws@8.14.2)
+    transitivePeerDependencies:
+      - debug
+      - ws
     dev: false
 
   /@robotical/ricjs@1.16.4(ws@8.14.2):
@@ -3599,6 +3617,10 @@ packages:
       is-plain-obj: 4.1.0
       sort-object-keys: 1.1.3
     dev: true
+
+  /soundtouchjs@0.1.30:
+    resolution: {integrity: sha512-qc1kMCPQ+SH8tmoPwVSpVInGAE4XFyQ5uZLm1rLyGjwD+MT2ZdBWHWureyq2akDBYBE81GI0I0FdLCNBf86zDQ==}
+    dev: false
 
   /source-map-js@1.0.2:
     resolution: {integrity: sha512-R0XvVJ9WusLiqTCEiGCmICCMplcCkIwwR11mOSD9CR5u+IXYdiseeEuXCVAjS54zqwkLcPNnmU4OeJ6tUrWhDw==}
