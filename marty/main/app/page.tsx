@@ -2,9 +2,8 @@
 
 import { HW_ID, HW_NAME } from '@/constant'
 import { CommandRunner } from '@/hw/CommandRunner'
-import log from '@/log'
 import type { ConnectionState } from '@ktaicoder/hw-pet'
-import { HPet, HPetEvents } from '@ktaicoder/hw-pet'
+import { HPet, HPetEventKeys } from '@ktaicoder/hw-pet'
 import { Box, ButtonBase, Typography } from '@mui/material'
 import { useEffect, useState } from 'react'
 
@@ -38,16 +37,15 @@ export default function Page() {
       commandRunnerClass: CommandRunner,
     })
 
-    pet.once(HPetEvents.COMMAND_RUNNER_STARTED, (runner: CommandRunner) => {
-      log.debug(HPetEvents.COMMAND_RUNNER_STARTED, runner)
-      setCommandRunner(runner)
-      pet.on(HPetEvents.CONNECTION_STATE_CHANGED, setConnectionState)
+    pet.on(HPetEventKeys.CommandRunner.stateChanged, (data) => {
+      const { state, commandRunner } = data
+      if (state === 'started') {
+        setCommandRunner(commandRunner as CommandRunner)
+      } else {
+        setCommandRunner(undefined)
+      }
     })
-
-    pet.on(HPetEvents.COMMAND_RUNNER_STOPPED, () => {
-      setCommandRunner(undefined)
-    })
-
+    pet.on(HPetEventKeys.connectionStateChanged, setConnectionState)
     pet.start()
 
     return () => {

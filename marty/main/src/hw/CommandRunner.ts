@@ -2,8 +2,9 @@ import config from '@/config'
 import log from '@/log'
 import { errmsg, sleepAsync } from '@/utls/misc'
 import {
-  HPetEvents,
+  HPetEventKeys,
   type ConnectionState,
+  type HPetEventDefinition,
   type IHPetCommandRunner,
   type IHPetContext,
   type IParentSender,
@@ -29,7 +30,7 @@ export class CommandRunner extends MartyBlocks implements IHPetCommandRunner {
   private connectionState: ConnectionState = 'disconnected'
   private hwId: string
   private toParent: IParentSender
-  private events: EventEmitter
+  private events: EventEmitter<HPetEventDefinition>
 
   constructor(options: IHPetContext) {
     super()
@@ -91,7 +92,7 @@ export class CommandRunner extends MartyBlocks implements IHPetCommandRunner {
   private updateConnectionState_ = (state: ConnectionState) => {
     if (state !== this.connectionState) {
       this.connectionState = state
-      this.events.emit(HPetEvents.CONNECTION_STATE_CHANGED, this.connectionState)
+      this.events.emit(HPetEventKeys.connectionStateChanged, this.connectionState)
 
       // notify to parent iframe
       this.toParent.notifyConnectionState(this.connectionState)

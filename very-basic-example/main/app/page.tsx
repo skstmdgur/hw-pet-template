@@ -1,12 +1,11 @@
 'use client'
 
-import log from '@/log'
 import type { ConnectionState } from '@ktaicoder/hw-pet'
-import { HPet, HPetEvents } from '@ktaicoder/hw-pet'
+import { HPet, HPetEventKeys } from '@ktaicoder/hw-pet'
 import { Box, ButtonBase, Typography } from '@mui/material'
 import { useEffect, useState } from 'react'
-import { HW_ID, HW_NAME } from '../src/constant'
-import { CommandRunner } from '../src/hw/CommandRunner'
+import { HW_ID, HW_NAME } from '@/constant'
+import { CommandRunner } from '@/hw/CommandRunner'
 
 const LOGO_IMG_URL = 'logo.png'
 
@@ -39,16 +38,15 @@ export default function Page() {
       commandRunnerClass: CommandRunner,
     })
 
-    pet.once(HPetEvents.COMMAND_RUNNER_STARTED, (runner: CommandRunner) => {
-      log.debug(HPetEvents.COMMAND_RUNNER_STARTED, runner)
-      setCommandRunner(runner)
-      pet.on(HPetEvents.CONNECTION_STATE_CHANGED, setConnectionState)
+    pet.on(HPetEventKeys.CommandRunner.stateChanged, (data) => {
+      const { state, commandRunner } = data
+      if (state === 'started') {
+        setCommandRunner(commandRunner as CommandRunner)
+      } else {
+        setCommandRunner(undefined)
+      }
     })
-
-    pet.on(HPetEvents.COMMAND_RUNNER_STOPPED, () => {
-      setCommandRunner(undefined)
-      setConnectionState('disconnected')
-    })
+    pet.on(HPetEventKeys.connectionStateChanged, setConnectionState)
 
     pet.start()
 
@@ -90,10 +88,9 @@ export default function Page() {
           m: '0 auto',
           width: '100%',
           maxWidth: '100px',
-          height: 100,
           '& img': {
             width: '100%',
-            height: '100%',
+            height: 100,
             objectFit: 'contain',
           },
         }}

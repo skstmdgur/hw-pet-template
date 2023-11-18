@@ -34,7 +34,14 @@ module.exports = {
       },
     },
   },
-  ignorePatterns: ['node_modules/', 'dist/'],
+  ignorePatterns: [
+    'node_modules/',
+    '**/node_modules/',
+    '/**/node_modules/*',
+    'out/',
+    'dist/',
+    'build/',
+  ],
   // add rules configurations here
   rules: {
     '@typescript-eslint/no-unnecessary-type-arguments': 'off',
@@ -42,7 +49,7 @@ module.exports = {
     'import/no-extraneous-dependencies': 'off',
     'no-new': 'off',
     'no-alert': 'off',
-    camelcase: 'off',    
+    camelcase: 'off',
     '@typescript-eslint/no-empty-function': 'off',
     'no-nested-ternary': 'off',
     '@typescript-eslint/consistent-type-definitions': 'warn',

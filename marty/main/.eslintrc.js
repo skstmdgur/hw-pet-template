@@ -1,6 +1,10 @@
 module.exports = {
-  parser: "@typescript-eslint/parser",
   extends: ['custom/next'],
+  parserOptions: {
+    project: './tsconfig.json',
+    sourceType: 'module',
+    tsconfigRootDir: __dirname,
+  },
   rules: {
     'react-hooks/rules-of-hooks': 'error',
     'react-hooks/exhaustive-deps': 'warn',

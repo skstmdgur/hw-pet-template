@@ -7,9 +7,6 @@ const nextConfig = {
   reactStrictMode: false,
   output: BASE_PATH === '/' ? 'standalone' : 'export',
   basePath: BASE_PATH === '/' ? '' : BASE_PATH,
-  experimental: {
-    webpackBuildWorker: true,
-  },
 }
 
 module.exports = nextConfig

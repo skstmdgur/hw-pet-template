@@ -1,4 +1,4 @@
-import { sleepAsync } from '@/utls/misc'
+import { sleepAsync } from '@/util/misc'
 
 /**
  * Connects to the hardware.

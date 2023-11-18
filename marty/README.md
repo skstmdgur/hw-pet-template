@@ -12,7 +12,7 @@ Marty
 - react@18
 - worspace with turborepo
 - pnpm
-- typescript@^4.9.5
+- typescript@^5.2.2
 - @mui/material@5
 
 ## Build and Run
