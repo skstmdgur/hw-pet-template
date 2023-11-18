@@ -4,8 +4,7 @@ import SoundHelper from './helpers/SoundHelper';
 import martyConnector from './MartyConnector';
 
 const DEBUG = false;
-//@ts-ignore
-window.martyConnector = martyConnector;
+// window.martyConnector = martyConnector; //exposing for debugging
 /**
  * 하드웨어 서비스 (Hardware Service): MartyRobotical
  */
@@ -337,7 +336,7 @@ export class MartyBlocks {
    * @param sound Sound name
    * @details Plays a sound until the sound is finished
    */
-  play_sound = async (soundName: string): Promise<void> => {
+  play_sound = async (soundName: string) => {
     const durationOffset = 1000; // adding 1 second to the duration to make sure the sound is played completely
     const soundDuration = SoundHelper.getSoundDuration(soundName);
     if (!soundDuration) {
@@ -357,7 +356,7 @@ export class MartyBlocks {
    * @param sound Sound name
    * @details Plays a sound and returns immediately
    */
-  start_sound = async (soundName: string): Promise<void> => {
+  start_sound = async (soundName: string) => {
     const durationOffset = 1000; // adding 1 second to the duration to make sure the sound is played completely
     const soundDuration = SoundHelper.getSoundDuration(soundName);
     if (!soundDuration) {
@@ -385,7 +384,7 @@ export class MartyBlocks {
    * @param voice Voice name
    * @param accent Accent name
    */
-  marty_speak = async (text: string, voice: string, accent: string): Promise<void> => {
+  marty_speak = async (text: string, voice: string, accent: string) => {
     const voiceData = SoundHelper.getVoiceData(voice);
     if (!voiceData) {
       throw new Error(`Voice not found: ${voice}`);

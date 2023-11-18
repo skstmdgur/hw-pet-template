@@ -1,8 +1,8 @@
 import isVersionGreater from "./helpers/compare-version";
-import { RICSystemInfo } from "@robotical/ricjs";
+import type { RICSystemInfo } from "@robotical/ricjs";
 
 
-class soundStreamingProfile {
+class SoundStreamingProfile {
   bitRate: number;      // in kbps
   sampleRate: number;   // in Hz
   abr: boolean;         // Average Bit Rate encoding
@@ -25,11 +25,11 @@ class MartySoundStreamingStats {
   private RIC_VERSION_NEW_SOKTO_MODE = "1.2.52";
 
   // profiles must be listed in decreasing order by bitrate
-  private soundStreamingProfiles = [new soundStreamingProfile(64,44100,true),
-                                    new soundStreamingProfile(48,32000,true),
-                                    new soundStreamingProfile(32,22050,true),
-                                    new soundStreamingProfile(24,16000,true),
-                                    new soundStreamingProfile(16,11025,true)];
+  private soundStreamingProfiles = [new SoundStreamingProfile(64,44100,true),
+                                    new SoundStreamingProfile(48,32000,true),
+                                    new SoundStreamingProfile(32,22050,true),
+                                    new SoundStreamingProfile(24,16000,true),
+                                    new SoundStreamingProfile(16,11025,true)];
 
   private currentSoundStreamingProfileIndex = 0;
 
@@ -75,12 +75,7 @@ class MartySoundStreamingStats {
     if (!systemInfo || !systemInfo.SystemVersion || !bleConnPerf) return;
     if (isVersionGreater(this.RIC_VERSION_NEW_SOKTO_MODE, systemInfo.SystemVersion)){
       this.setBitRate(16);
-      return;
     }
-    
-    // bleConnPerf result is in bytes per second. Convert to kbps and pass to setBitRate
-    // TODO: bleConnPerf result is not currently reliable
-    //this.setBitRate(Math.floor(bleConnPerf*8/1024));
   }
 
   shouldUseLegacySoktoMode(systemInfo: RICSystemInfo){

@@ -2,16 +2,19 @@ import {
   RICOKFail,
   RICConnector,
   RICConnEvent,
+  RICServoParamUpdate,
+} from '@robotical/ricjs'
+import type {
+
   RICUpdateEvent,
   RICWifiConnStatus,
   RICCommsStats,
   RICWifiScanResults,
-  RICServoParamUpdate,
   RICSystemInfo,
 } from '@robotical/ricjs'
-import { MartyObserver } from './MartyObserver'
-import { RICNotificationsManager } from './RICNotificationsManager'
-import { PystatusMsgType } from '@robotical/ricjs/src/RICTypes'
+import type { MartyObserver } from './MartyObserver'
+
+import type { PystatusMsgType } from '@robotical/ricjs/src/RICTypes'
 import { RICRoboticalAddOns } from '@robotical/ricjs-robotical-addons'
 import MartySoundStreamingStats from './MartySoundStreamingStats'
 import {
@@ -32,7 +35,7 @@ export class MartyConnector {
   private _observers: { [key: string]: Array<MartyObserver> } = {}
 
   // RICNotificationsManager
-  private _ricNotificationsManager: RICNotificationsManager = new RICNotificationsManager(this)
+  // private _ricNotificationsManager: RICNotificationsManager = new RICNotificationsManager(this)
 
   // Colours to use for LED patterns
   private ledLcdColours = [
@@ -47,19 +50,19 @@ export class MartyConnector {
   private updaterRemovers: (() => void)[] = []
 
   // Marty name
-  public RICFriendlyName: string = ''
+  public RICFriendlyName = ''
 
   // is connecting: from when the user presses the connect button to verifying the colours
-  public isConnecting: boolean = false
+  public isConnecting = false
 
   // sound streaming stats
   public soundStreamingStats = new MartySoundStreamingStats()
 
   // Marty version
-  public martyVersion: string = '0.0.0'
+  public martyVersion = '0.0.0'
 
   // Marty Serial Number
-  public martySerialNo: string = ''
+  public martySerialNo = ''
 
   // wifi scan duration
   private _wifiScanDuration = 10000 //ms
@@ -101,9 +104,9 @@ export class MartyConnector {
         eventType: string,
         eventEnum: RICConnEvent | RICUpdateEvent,
         eventName: string,
-        eventData: string | object | null | undefined,
+        eventData: string,
       ) => {
-        console.log(`eventType: ${eventType} eventEnum: ${eventEnum} eventName: ${eventName} eventData: ${eventData}`)
+        // console.log(`eventType: ${eventType} eventEnum: ${eventEnum} eventName: ${eventName} eventData: ${eventData}`)
         this.publish(eventType, eventEnum, eventName, eventData)
       },
     )
@@ -137,7 +140,7 @@ export class MartyConnector {
     }
 
     // Connect to RIC
-    let success = await this._ricConnector.connect(method, locator)
+    const success = await this._ricConnector.connect(method, locator)
     if (!success) {
       console.log('Failed to connect to RIC')
       return false
@@ -183,7 +186,7 @@ export class MartyConnector {
       this.isVerified = true
 
       // add a callback to display warning messages from RIC to the user
-      this._ricNotificationsManager.setNotificationsHandler(this._ricConnector.getRICMsgHandler())
+      // this._ricNotificationsManager.setNotificationsHandler(this._ricConnector.getRICMsgHandler())
 
       // servo parameters update
       const spu = RICServoParamUpdate.getSingletonInstance()
@@ -251,7 +254,7 @@ export class MartyConnector {
   }
 
   clearUpdatersAfterDisconnect() {
-    this.updaterRemovers.forEach((updaterRemover) => updaterRemover())
+    this.updaterRemovers.forEach((updaterRemover) => {updaterRemover()})
     this.updaterRemovers = []
   }
 
@@ -399,11 +402,11 @@ export class MartyConnector {
               if (typeof wifiscanMsgResults !== 'boolean') {
                 resolve(wifiscanMsgResults)
               } else {
-                reject('Something went wrong')
+                reject(new Error('wifiScanResults failed'))
               }
             })
-            .catch((err: unknown) => reject(err))
-            .finally(() => clearTimeout(resultsTimeout))
+            .catch((err: unknown) => {reject(err)})
+            .finally(() => {clearTimeout(resultsTimeout)})
         }, this._wifiScanDuration)),
     )
     if ((results as RICWifiScanResults).hasOwnProperty('wifi')) {
@@ -467,11 +470,11 @@ export class MartyConnector {
     const ricStateInfo = this._ricConnector.getRICStateInfo()
     const addons = ricStateInfo.addOnInfo.addons
     let dsVal: number | null = null
-    for (let addon of addons) {
+    for (const addon of addons) {
       if ('DistanceSensorReading' in addon.vals) {
         return addon.vals['DistanceSensorReading'] as number
       }
-      if (addon.whoAmI == RIC_WHOAMI_TYPE_CODE_ADDON_DISTANCE) {
+      if (addon.whoAmI === RIC_WHOAMI_TYPE_CODE_ADDON_DISTANCE) {
         for (const val in addon.vals) {
           if (val.includes('Reading')) dsVal = addon.vals[val] as number
         }
@@ -539,7 +542,7 @@ export class MartyConnector {
   getNoiseSensorReading(): number {
     const ricStateInfo = this._ricConnector.getRICStateInfo()
     const addons = ricStateInfo.addOnInfo.addons
-    for (let addon of addons) {
+    for (const addon of addons) {
       if (addon.whoAmI === RIC_WHOAMI_TYPE_CODE_ADDON_NOISE) {
         return SensorHelper.getNoise(addon);
       }
@@ -550,7 +553,7 @@ export class MartyConnector {
   getLightSensorReading(channel: string): number {
     const ricStateInfo = this._ricConnector.getRICStateInfo()
     const addons = ricStateInfo.addOnInfo.addons
-    for (let addon of addons) {
+    for (const addon of addons) {
       if (addon.whoAmI === RIC_WHOAMI_TYPE_CODE_ADDON_LIGHT) {
         return SensorHelper.getLight(addon, channel);
       }

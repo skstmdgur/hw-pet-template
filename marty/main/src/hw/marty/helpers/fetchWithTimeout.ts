@@ -12,7 +12,7 @@ const fetchWithTimeout = (resource: string, init: any, timeout: number): Promise
     const signal = controller ? controller.signal : null;
     // The fetch call races a timer.
     return Promise.race([
-        fetch(resource, Object.assign({ signal }, init)).then(response => {
+        fetch(resource, { ...signal, ...init }).then(response => {
             clearTimeout(timeoutID);
             return response;
         }),

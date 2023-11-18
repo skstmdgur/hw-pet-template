@@ -23,6 +23,7 @@
     "noUnusedParameters": false,
     "strictNullChecks": false,
     "strict": false,
+    "allowJs": true,
     "experimentalDecorators": true,
     "allowSyntheticDefaultImports": true,
     "forceConsistentCasingInFileNames": true,

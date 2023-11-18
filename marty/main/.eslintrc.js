@@ -1,4 +1,5 @@
 module.exports = {
+  parser: "@typescript-eslint/parser",
   extends: ['custom/next'],
   rules: {
     'react-hooks/rules-of-hooks': 'error',
