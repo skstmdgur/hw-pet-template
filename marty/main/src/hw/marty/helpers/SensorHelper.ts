@@ -22,21 +22,21 @@ export default class SensorHelper {
 
   static getNoise(addon) {
     for (const addonValKey in addon.vals) {
-      const addonVal = addon.vals[addonValKey];
-      if (addonValKey.includes("HighestSinceLastReading")) {
-        return addonVal;
+      const addonVal = addon.vals[addonValKey]
+      if (addonValKey.includes('HighestSinceLastReading')) {
+        return addonVal
       }
     }
-    return null;
+    return null
   }
 
   static getLight(addon, channel) {
     for (const addonValKey in addon.vals) {
-      const addonVal = addon.vals[addonValKey];
+      const addonVal = addon.vals[addonValKey]
       if (addonValKey.includes(channel)) {
-        return addonVal;
+        return addonVal
       }
     }
-    return null;
+    return null
   }
 }

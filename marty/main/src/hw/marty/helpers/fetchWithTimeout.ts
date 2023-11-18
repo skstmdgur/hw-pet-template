@@ -6,23 +6,23 @@
  * @returns {Promise<Response>} The response from the server.
  */
 const fetchWithTimeout = (resource: string, init: any, timeout: number): Promise<Response> => {
-    let timeoutID: any;
-    // Not supported in Safari <11
-    const controller = window.AbortController ? new window.AbortController() : null;
-    const signal = controller ? controller.signal : null;
-    // The fetch call races a timer.
-    return Promise.race([
-        fetch(resource, { ...signal, ...init }).then(response => {
-            clearTimeout(timeoutID);
-            return response;
-        }),
-        new Promise((resolve, reject) => {
-            timeoutID = setTimeout(() => {
-                if (controller) controller.abort();
-                reject(new Error(`Fetch timed out after ${timeout} ms`));
-            }, timeout);
-        })
-    ]) as Promise<Response>;
-};
+  let timeoutID: any
+  // Not supported in Safari <11
+  const controller = window.AbortController ? new window.AbortController() : null
+  const signal = controller ? controller.signal : null
+  // The fetch call races a timer.
+  return Promise.race([
+    fetch(resource, { ...signal, ...init }).then((response) => {
+      clearTimeout(timeoutID)
+      return response
+    }),
+    new Promise((resolve, reject) => {
+      timeoutID = setTimeout(() => {
+        if (controller) controller.abort()
+        reject(new Error(`Fetch timed out after ${timeout} ms`))
+      }, timeout)
+    }),
+  ]) as Promise<Response>
+}
 
-export default fetchWithTimeout;
+export default fetchWithTimeout

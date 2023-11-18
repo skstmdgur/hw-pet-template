@@ -40,40 +40,40 @@ export default class ColourHelper {
     if (isOnAir) return 'air'
     else {
       const colours = [
-        { hue: [0, 10], chroma: [50, 200], clear: [40, 150], name: "red" },
+        { hue: [0, 10], chroma: [50, 200], clear: [40, 150], name: 'red' },
         {
           hue: [20, 50],
           chroma: [40, 300],
           clear: [100, 255],
-          name: "yellow",
+          name: 'yellow',
         },
         {
           hue: [85, 160],
           chroma: [5, 100],
           clear: [25, 150],
-          name: "green",
+          name: 'green',
         },
         {
           hue: [180, 220],
           chroma: [40, 230],
           clear: [55, 255],
-          name: "blue",
+          name: 'blue',
         },
         {
           hue: [200, 320],
           chroma: [0, 40],
           clear: [25, 150],
-          name: "purple",
+          name: 'purple',
         },
         {
           hue: [345, 361],
           chroma: [50, 200],
           clear: [40, 150],
-          name: "red",
+          name: 'red',
         },
-      ];
+      ]
 
-      const [hue, chroma] = this.getHueChroma(red, green, blue);
+      const [hue, chroma] = this.getHueChroma(red, green, blue)
       for (const colour of colours) {
         if (
           colour.hue[0] <= hue &&
@@ -83,22 +83,21 @@ export default class ColourHelper {
           colour.clear[0] <= clear &&
           clear <= colour.clear[1]
         ) {
-          return colour.name;
+          return colour.name
         }
       }
 
-      return "unclear";
+      return 'unclear'
     }
   }
 
   static getColourChannel(addon, channel: string) {
     for (const addonValKey in addon.vals) {
-      const addonVal = addon.vals[addonValKey];
+      const addonVal = addon.vals[addonValKey]
       if (addonValKey.includes(channel)) {
-        return addonVal;
+        return addonVal
       }
     }
-    return null;
+    return null
   }
-
 }

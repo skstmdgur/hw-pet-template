@@ -61,10 +61,7 @@ function fetchUint8Array(filePath: string): Promise<Uint8Array | null> {
     })
 }
 
-export async function sendFile(
-  ricConnector: RICConnector,
-  fileName: string
-): Promise<void> {
+export async function sendFile(ricConnector: RICConnector, fileName: string): Promise<void> {
   const fileUrl = joinBasePath('/assets/files', encodeURIComponent(fileName))
   const fileData = await fetchUint8Array(fileUrl)
   if (!fileData) {
@@ -77,10 +74,7 @@ export async function sendFile(
   })
 }
 
-export async function streamSoundFile(
-  ricConnector: RICConnector,
-  fileName: string
-): Promise<void> {
+export async function streamSoundFile(ricConnector: RICConnector, fileName: string): Promise<void> {
   const fileUrl = joinBasePath('/assets/sounds', encodeURIComponent(fileName))
   const audioData = await fetchUint8Array(fileUrl)
 

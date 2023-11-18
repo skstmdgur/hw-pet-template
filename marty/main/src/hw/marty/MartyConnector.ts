@@ -1,11 +1,5 @@
-import {
-  RICOKFail,
-  RICConnector,
-  RICConnEvent,
-  RICServoParamUpdate,
-} from '@robotical/ricjs'
+import { RICOKFail, RICConnector, RICConnEvent, RICServoParamUpdate } from '@robotical/ricjs'
 import type {
-
   RICUpdateEvent,
   RICWifiConnStatus,
   RICCommsStats,
@@ -192,7 +186,9 @@ export class MartyConnector {
       const spu = RICServoParamUpdate.getSingletonInstance()
       spu && spu.setRobotConnected(true)
 
-      this._ricConnector.setLegacySoktoMode(this.soundStreamingStats.shouldUseLegacySoktoMode(systemInfo))
+      this._ricConnector.setLegacySoktoMode(
+        this.soundStreamingStats.shouldUseLegacySoktoMode(systemInfo),
+      )
       // checking for servo faults (this will trigger reportMsgCallback)
       console.log('checking for servo faults')
       this._ricConnector.ricServoFaultDetector.atomicReadOperation()
@@ -254,7 +250,9 @@ export class MartyConnector {
   }
 
   clearUpdatersAfterDisconnect() {
-    this.updaterRemovers.forEach((updaterRemover) => {updaterRemover()})
+    this.updaterRemovers.forEach((updaterRemover) => {
+      updaterRemover()
+    })
     this.updaterRemovers = []
   }
 
@@ -274,7 +272,11 @@ export class MartyConnector {
     return new RICOKFail()
   }
 
-  async streamAudio(audioData: Uint8Array, duration: number, clearExisting?: boolean): Promise<boolean> {
+  async streamAudio(
+    audioData: Uint8Array,
+    duration: number,
+    clearExisting?: boolean,
+  ): Promise<boolean> {
     console.log(`streamAudio length ${audioData.length}`)
     if (this._ricConnector) {
       this._ricConnector.streamAudio(audioData, !!clearExisting, duration)
@@ -405,8 +407,12 @@ export class MartyConnector {
                 reject(new Error('wifiScanResults failed'))
               }
             })
-            .catch((err: unknown) => {reject(err)})
-            .finally(() => {clearTimeout(resultsTimeout)})
+            .catch((err: unknown) => {
+              reject(err)
+            })
+            .finally(() => {
+              clearTimeout(resultsTimeout)
+            })
         }, this._wifiScanDuration)),
     )
     if ((results as RICWifiScanResults).hasOwnProperty('wifi')) {
@@ -484,7 +490,6 @@ export class MartyConnector {
     return 0
   }
 
-
   isFootOnGround(): boolean {
     const ricStateInfo = this._ricConnector.getRICStateInfo()
     const addons = ricStateInfo.addOnInfo.addons
@@ -522,7 +527,7 @@ export class MartyConnector {
     const addons = ricStateInfo.addOnInfo.addons
     for (const addon of addons) {
       if (addon.whoAmI === RIC_WHOAMI_TYPE_CODE_ADDON_COLOUR) {
-        return ColourHelper.getColourHelper(addon);
+        return ColourHelper.getColourHelper(addon)
       }
     }
     return 'black'
@@ -533,7 +538,7 @@ export class MartyConnector {
     const addons = ricStateInfo.addOnInfo.addons
     for (const addon of addons) {
       if (addon.whoAmI === RIC_WHOAMI_TYPE_CODE_ADDON_COLOUR) {
-        return ColourHelper.getColourChannel(addon, channel);
+        return ColourHelper.getColourChannel(addon, channel)
       }
     }
     return 0
@@ -544,7 +549,7 @@ export class MartyConnector {
     const addons = ricStateInfo.addOnInfo.addons
     for (const addon of addons) {
       if (addon.whoAmI === RIC_WHOAMI_TYPE_CODE_ADDON_NOISE) {
-        return SensorHelper.getNoise(addon);
+        return SensorHelper.getNoise(addon)
       }
     }
     return 0
@@ -555,13 +560,11 @@ export class MartyConnector {
     const addons = ricStateInfo.addOnInfo.addons
     for (const addon of addons) {
       if (addon.whoAmI === RIC_WHOAMI_TYPE_CODE_ADDON_LIGHT) {
-        return SensorHelper.getLight(addon, channel);
+        return SensorHelper.getLight(addon, channel)
       }
     }
     return 0
   }
-    
-  
 }
 
 const martyConnector = new MartyConnector()

@@ -1,3 +1,6 @@
+import config from '@/config'
+import log from '@/log'
+import { errmsg, sleepAsync } from '@/utls/misc'
 import {
   HPetEvents,
   type ConnectionState,
@@ -8,8 +11,6 @@ import {
 import type { RICStateInfo } from '@robotical/ricjs'
 import type EventEmitter from 'eventemitter3'
 import * as helper from './marty-helper'
-import { errmsg, sleepAsync } from '@/utls/misc'
-import config from '@/config'
 import { MartyBlocks } from './marty/MartyBlocks'
 import martyConnector from './marty/MartyConnector'
 
@@ -31,7 +32,7 @@ export class CommandRunner extends MartyBlocks implements IHPetCommandRunner {
   private events: EventEmitter
 
   constructor(options: IHPetContext) {
-    super();
+    super()
     this.hwId = options.hwId
     this.toParent = options.toParent
     this.events = options.events
@@ -44,30 +45,30 @@ export class CommandRunner extends MartyBlocks implements IHPetCommandRunner {
    * Initialization tasks, such as registering event listeners, can be performed here.
    */
   init = async (): Promise<void> => {
-    martyConnector._ricConnector.setEventListener(
-      (eventType, eventEnum, eventName, data) => {
-        console.log('XXX [RIC Event]', {
+    martyConnector._ricConnector.setEventListener((eventType, eventEnum, eventName, data) => {
+      if (DEBUG) {
+        log.debug('XXX [RIC Event]', {
           eventType,
           eventEnum,
           eventName,
           data,
         })
-
-        // connection state changed
-        if (eventType === 'conn') {
-          if (eventName === 'CONNECTING_RIC') {
-            this.updateConnectionState_('connecting')
-          } else if (eventName === 'CONNECTED_RIC') {
-            this.updateConnectionState_('connected')
-          } else if (eventName === 'DISCONNECTED_RIC') {
-            this.updateConnectionState_('disconnected')
-          } else if (eventName === 'CONNECTION_FAILED') {
-            this.updateConnectionState_('disconnected')
-          }
-          // "CONN_STREAMING_ISSUE" maybe need
-        }
       }
-    )
+
+      // connection state changed
+      if (eventType === 'conn') {
+        if (eventName === 'CONNECTING_RIC') {
+          this.updateConnectionState_('connecting')
+        } else if (eventName === 'CONNECTED_RIC') {
+          this.updateConnectionState_('connected')
+        } else if (eventName === 'DISCONNECTED_RIC') {
+          this.updateConnectionState_('disconnected')
+        } else if (eventName === 'CONNECTION_FAILED') {
+          this.updateConnectionState_('disconnected')
+        }
+        // "CONN_STREAMING_ISSUE" maybe need
+      }
+    })
   }
 
   /**
@@ -90,10 +91,7 @@ export class CommandRunner extends MartyBlocks implements IHPetCommandRunner {
   private updateConnectionState_ = (state: ConnectionState) => {
     if (state !== this.connectionState) {
       this.connectionState = state
-      this.events.emit(
-        HPetEvents.CONNECTION_STATE_CHANGED,
-        this.connectionState
-      )
+      this.events.emit(HPetEvents.CONNECTION_STATE_CHANGED, this.connectionState)
 
       // notify to parent iframe
       this.toParent.notifyConnectionState(this.connectionState)
@@ -148,7 +146,7 @@ export class CommandRunner extends MartyBlocks implements IHPetCommandRunner {
     try {
       await martyConnector._ricConnector.disconnect()
     } catch (err) {
-      console.log('disconnect fail', errmsg(err))
+      log.debug('disconnect fail', errmsg(err))
     }
     this.updateConnectionState_('disconnected')
   }
@@ -174,11 +172,7 @@ export class CommandRunner extends MartyBlocks implements IHPetCommandRunner {
    * @param afterDelayMs - Time to wait after executing the command, no waiting if the value is 0
    * @returns The return value of ricConnector.sendRICRESTMsg()
    */
-  sendREST = async (
-    cmd: string,
-    param?: object | null,
-    afterDelayMs?: number
-  ): Promise<any> => {
+  sendREST = async (cmd: string, param?: object | null, afterDelayMs?: number): Promise<any> => {
     const result = await martyConnector._ricConnector.sendRICRESTMsg(cmd, param ?? {})
     if (typeof afterDelayMs === 'number' && afterDelayMs > 0) {
       await sleepAsync(afterDelayMs)
@@ -235,5 +229,4 @@ export class CommandRunner extends MartyBlocks implements IHPetCommandRunner {
   rejectCheckCorrectRIC = async (): Promise<void> => {
     await martyConnector._ricConnector.checkCorrectRICStop(false)
   }
-
 }

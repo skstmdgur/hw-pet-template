@@ -12,8 +12,7 @@ const LOGO_IMG_URL = 'logo.png'
 const BLUETOOTH_IMG_URL = 'bluetooth.svg'
 
 export default function Page() {
-  const [connectionState, setConnectionState] =
-    useState<ConnectionState>('disconnected')
+  const [connectionState, setConnectionState] = useState<ConnectionState>('disconnected')
 
   const [commandRunner, setCommandRunner] = useState<CommandRunner>()
 
