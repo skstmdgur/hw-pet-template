@@ -99,4 +99,21 @@ In `VSCode`, you can easily address this using the `eslint fix all` command.
 
 It is convenient to set up a shortcut key for this in VSCode.
 
+### Use Code Formatter
+
+We use `prettier` as our code formatter.
+
+You can format the entire source code with the following command:
+
+```sh
+pnpm format
+```
+
+The configuration files are as follows. Each team can format according to their desired settings.
+
+```
+.prettierrc.js
+.prettierrcignore
+```
+
 End.
