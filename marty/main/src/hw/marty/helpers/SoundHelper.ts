@@ -3,11 +3,11 @@ import fetchWithTimeout from "./fetchWithTimeout";
 import { PitchShifter } from "soundtouchjs";
 import lamejs from "../external_libs/lame-all";
 
-export type SoundData = {
+export interface SoundData {
   name: string
   duration: number // ms
 };
-export type VoiceData = {
+export interface VoiceData {
   name: string
   gender: string
   playbackRate: number
@@ -257,7 +257,7 @@ export default class SoundHelper {
     return path;
   }
 
-  static async speak(words: string, gender: string, locale: string): Promise<any> {
+  static async speak(words: string, gender: string, locale: string): Promise<boolean> {
     return new Promise((resolve, reject) => {
       const path = this.getText2SpeechUrl(words, gender, locale);
       const playbackRate = 1;
@@ -361,12 +361,12 @@ export default class SoundHelper {
                 mp3SoundBuffers
               );
               if (martyConnector.isConnected()) {
-                // @ts-ignore
+                // @ts-expect-error
                 martyConnector.streamAudio(Array.from(mp3SoundData), maxDuration * 1000);
               } else {
                 // play locally
                 const base64Audio = this.arrayBufferToBase64(mp3SoundData);
-                const dataURL = "data:audio/mp3;base64," + base64Audio;
+                const dataURL = `data:audio/mp3;base64,${base64Audio}`;
                 const audio = new Audio(dataURL);
                 audio.play();
               }
@@ -378,6 +378,7 @@ export default class SoundHelper {
             })
             .catch(async (err) => {
               console.warn(err);
+              reject(err);
             });
         })
     });
@@ -400,31 +401,31 @@ export default class SoundHelper {
 
     const bitRate = 64;
     const avgFlag = true;
-    // @ts-ignore
+    // @ts-expect-error
     const mp3encoder = new lamejs.Mp3Encoder(1, sampleRate, bitRate, avgFlag);
     const mp3Data = [];
-    for (var i = 0; i < rawSoundData.length; i += sampleBlockSize) {
+    for (let i = 0; i < rawSoundData.length; i += sampleBlockSize) {
       const sampleChunk = rawSoundData.subarray(i, i + sampleBlockSize);
-      var mp3buf = mp3encoder.encodeBuffer(sampleChunk);
+      const mp3buf = mp3encoder.encodeBuffer(sampleChunk);
       if (mp3buf.length > 0) {
         mp3Data.push(mp3buf);
       }
     }
-    var mp3buf = mp3encoder.flush(); //finish writing mp3
-    if (mp3buf.length > 0) {
-      mp3Data.push(mp3buf);
+    const mp3bufFlashed = mp3encoder.flush(); //finish writing mp3
+    if (mp3bufFlashed.length > 0) {
+      mp3Data.push(mp3bufFlashed);
     }
     return mp3Data;
   }
 
   static convertMp3BufferToData(mp3SoundBuffers) {
     let mp3Len = 0;
-    for (let mp3Buf of mp3SoundBuffers) {
+    for (const mp3Buf of mp3SoundBuffers) {
       mp3Len += mp3Buf.length;
     }
     const mp3SoundData = new Int8Array(mp3Len);
     let curPos = 0;
-    for (let mp3Buf of mp3SoundBuffers) {
+    for (const mp3Buf of mp3SoundBuffers) {
       mp3SoundData.set(mp3Buf, curPos);
       curPos += mp3Buf.length;
     }

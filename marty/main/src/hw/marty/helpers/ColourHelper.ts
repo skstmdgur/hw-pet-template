@@ -1,6 +1,6 @@
 export default class ColourHelper {
   static hexToRgb(hex: string): { r: number; g: number; b: number } | null {
-    var result = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(hex)
+    const result = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(hex)
     return result
       ? {
           r: parseInt(result[1], 16),
@@ -74,7 +74,7 @@ export default class ColourHelper {
       ];
 
       const [hue, chroma] = this.getHueChroma(red, green, blue);
-      for (let colour of colours) {
+      for (const colour of colours) {
         if (
           colour.hue[0] <= hue &&
           hue <= colour.hue[1] &&
