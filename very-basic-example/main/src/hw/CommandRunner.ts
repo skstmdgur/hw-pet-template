@@ -59,10 +59,7 @@ export class CommandRunner implements IHPetCommandRunner {
   private updateConnectionState_ = (state: ConnectionState) => {
     if (state !== this.connectionState) {
       this.connectionState = state
-      this.events.emit(
-        HPetEvents.CONNECTION_STATE_CHANGED,
-        this.connectionState
-      )
+      this.events.emit(HPetEvents.CONNECTION_STATE_CHANGED, this.connectionState)
 
       // notify to parent frame (CODINY)
       this.toParent.notifyConnectionState(this.connectionState)

@@ -6,11 +6,7 @@ export const metadata: Metadata = {
   description: 'codiny hw iframe',
 }
 
-export default function RootLayout({
-  children,
-}: {
-  children: React.ReactNode
-}): JSX.Element {
+export default function RootLayout({ children }: { children: React.ReactNode }): JSX.Element {
   return (
     <html lang="en">
       <body>
