@@ -34,7 +34,14 @@ module.exports = {
       },
     },
   },
-  ignorePatterns: ['node_modules/', 'dist/'],
+  ignorePatterns: [
+    'node_modules/',
+    '**/node_modules/',
+    '/**/node_modules/*',
+    'out/',
+    'dist/',
+    'build/',
+  ],
   // add rules configurations here
   rules: {
     '@typescript-eslint/no-unnecessary-type-arguments': 'off',
