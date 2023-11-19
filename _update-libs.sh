@@ -6,12 +6,12 @@ SCRIPT_DIR=$(dirname "$(readlink -f "$0")")
 cd "${SCRIPT_DIR}"
 
 LIBS=""
-LIBS="${LIBS} @ktaicoder/hw-pet@latest"
+LIBS="${LIBS} @ktaicoder/hw-pet"
 LIBS="${LIBS} typescript@^5.2.2"
-LIBS="${LIBS} @vercel/style-guide@latest"
-LIBS="${LIBS} eslint@latest"
+LIBS="${LIBS} @vercel/style-guide"
+LIBS="${LIBS} eslint"
 LIBS="${LIBS} next@^13"
-LIBS="${LIBS} @next/eslint-plugin-next@latest"
+LIBS="${LIBS} @next/eslint-plugin-next"
 LIBS="${LIBS} eslint-config-turbo"
 
 do_update(){

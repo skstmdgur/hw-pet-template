@@ -1,3 +1,5 @@
 *:Zone.Identifier
 
+./_export-upload.sh
+
 node_modules
