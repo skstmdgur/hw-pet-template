@@ -55,7 +55,7 @@ export class CommandRunner extends MartyBlocks implements IHPetCommandRunner {
           data,
         })
       }
-
+      martyConnector.publish(eventType, eventEnum, eventName, data);
       // connection state changed
       if (eventType === 'conn') {
         if (eventName === 'CONNECTING_RIC') {
@@ -66,6 +66,8 @@ export class CommandRunner extends MartyBlocks implements IHPetCommandRunner {
           this.updateConnectionState_('disconnected')
         } else if (eventName === 'CONNECTION_FAILED') {
           this.updateConnectionState_('disconnected')
+        } else if (eventName === 'VERIFIED_CORRECT_RIC') {
+          this.updateConnectionState_('verified')
         }
         // "CONN_STREAMING_ISSUE" maybe need
       }

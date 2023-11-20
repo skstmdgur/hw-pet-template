@@ -91,20 +91,6 @@ export class MartyConnector {
     const addOnManager = this._ricConnector.getAddOnManager()
     RICRoboticalAddOns.registerAddOns(addOnManager)
 
-    // ----------
-    // Subscribe to RICConnector events
-    this._ricConnector.setEventListener(
-      (
-        eventType: string,
-        eventEnum: RICConnEvent | RICUpdateEvent,
-        eventName: string,
-        eventData: string,
-      ) => {
-        // console.log(`eventType: ${eventType} eventEnum: ${eventEnum} eventName: ${eventName} eventData: ${eventData}`)
-        this.publish(eventType, eventEnum, eventName, eventData)
-      },
-    )
-
     // Subscribe to disconnect event
     this.onDisconnectEventSubscription()
 
