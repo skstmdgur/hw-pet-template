@@ -2,33 +2,36 @@
 
 import { HW_ID, HW_NAME } from '@/constant'
 import { CommandRunner } from '@/hw/CommandRunner'
-import type { ConnectionState } from '@ktaicoder/hw-pet'
-import { HPet, HPetEventKeys } from '@ktaicoder/hw-pet'
 import martyConnector from '@/hw/marty/MartyConnector'
-import { RICConnEvent } from '@robotical/ricjs'
+import type { MartyConnectionState } from '@/hw/types'
+import { errmsg } from '@/utls/misc'
+import { HPet, HPetEventKeys } from '@ktaicoder/hw-pet'
 import { Box, ButtonBase, Typography } from '@mui/material'
-import { useEffect, useState } from 'react'
+import { RICConnEvent } from '@robotical/ricjs'
+import { useCallback, useEffect, useState } from 'react'
 import LEDs from './components/hw/marty'
+import log from '@/log'
 
 const LOGO_IMG_URL = 'logo.png'
 const BLUETOOTH_IMG_URL = 'bluetooth.svg'
 
 export default function Page() {
-  const [connectionState, setConnectionState] = useState<ConnectionState>('disconnected')
-  const [randomColours, setRandomColours] = useState<string[]>([]);
+  const [connectionState, setConnectionState] = useState<MartyConnectionState>('disconnected')
+  const [randomColours, setRandomColours] = useState<string[]>([])
   const [commandRunner, setCommandRunner] = useState<CommandRunner>()
 
-  // Click handler for the Connect button
-  const handleClickConnectBtn = async () => {
-    const runner = commandRunner
+  const doConnect = useCallback(async (runner?: CommandRunner) => {
     if (!runner) return
     if (runner.NEEDS_VERIFICATION) {
-      await runner.connect();
-      await martyConnector.verifyMarty();
-    } else {
-      runner.connect()
+      await runner.connect()
+      await martyConnector.verifyMarty()
     }
     runner.connect()
+  }, [])
+
+  // Click handler for the Connect button
+  const handleClickConnectBtn = () => {
+    doConnect()
   }
 
   // Click handler for the Disconnect button
@@ -37,7 +40,9 @@ export default function Page() {
     if (!runner) {
       return
     }
-    runner.disconnect()
+    runner.disconnect().catch((err) => {
+      log.debug('ignore disconnect fail', errmsg(err))
+    })
   }
 
   useEffect(() => {
@@ -64,72 +69,80 @@ export default function Page() {
     }
   }, [])
 
-  const martyConnectorSubscriptionHelper = {
-    notify(
-      eventType: string,
-      eventEnum: RICConnEvent,
-      eventName: string,
-      eventData: string | object | null | undefined
-    ) {
-      switch (eventType) {
-        case "conn":
-          switch (eventEnum) {
-            case RICConnEvent.CONN_VERIFYING_CORRECT_RIC:
-              setRandomColours(eventData as string[]);
-              break;
-
-            default:
-              break;
-          }
-          break;
-      }
-    },
-  };
-
   // Create subscription to the marty connector state
   useEffect(() => {
+    const martyConnectorSubscriptionHelper = {
+      notify(
+        eventType: string,
+        eventEnum: RICConnEvent,
+        eventName: string,
+        eventData: string | object | null | undefined,
+      ) {
+        switch (eventType) {
+          case 'conn':
+            switch (eventEnum) {
+              case RICConnEvent.CONN_VERIFYING_CORRECT_RIC:
+                setRandomColours(eventData as string[])
+                break
+
+              default:
+                break
+            }
+            break
+        }
+      },
+    }
+
     // Subscribe
-    martyConnector.subscribe(martyConnectorSubscriptionHelper, ["conn"]);
+    martyConnector.subscribe(martyConnectorSubscriptionHelper, ['conn'])
     // Return unsubscribe function
     return () => {
-      martyConnector.unsubscribe(martyConnectorSubscriptionHelper);
-    };
-  }, []);
+      martyConnector.unsubscribe(martyConnectorSubscriptionHelper)
+    }
+  }, [])
 
-  const handleClickVerifyBtn = async () => {
-    await martyConnector.stopVerifyingMarty(true);
+  const handleClickVerifyBtn = () => {
+    martyConnector.stopVerifyingMarty(true).catch((err) => {
+      console.log('ignore error', errmsg(err))
+    })
   }
 
   let connectedStateJSX = null
   if (commandRunner?.NEEDS_VERIFICATION) {
-    connectedStateJSX = <>
-      <p className="x_verify_text">Look on Marty's back, is it displaying these lights?</p>
-      <LEDs coloursArr={randomColours} />
-      {!!(randomColours.length > 0) && <div className="x_bottom_buttons_container">
-        <ButtonBase
-          className="x_bottom_buttons x_verify_no"
-          component="div"
-          onClick={handleClickDisconnectBtn}
-        >
-          <span>No</span>
-        </ButtonBase>
-        <ButtonBase
-          className="x_bottom_buttons x_verify_yes"
-          component="div"
-          onClick={handleClickVerifyBtn}
-        >
-          <span>Yes</span>
-        </ButtonBase>
-      </div>}
-    </>
+    connectedStateJSX = (
+      <>
+        <p className="x_verify_text">Look on Marty&apos;s back, is it displaying these lights?</p>
+        <LEDs coloursArr={randomColours} />
+        {!!(randomColours.length > 0) && (
+          <div className="x_bottom_buttons_container">
+            <ButtonBase
+              className="x_bottom_buttons x_verify_no"
+              component="div"
+              onClick={handleClickDisconnectBtn}
+            >
+              <span>No</span>
+            </ButtonBase>
+            <ButtonBase
+              className="x_bottom_buttons x_verify_yes"
+              component="div"
+              onClick={handleClickVerifyBtn}
+            >
+              <span>Yes</span>
+            </ButtonBase>
+          </div>
+        )}
+      </>
+    )
   } else {
-    connectedStateJSX = <ButtonBase
-      className="x_bottom_buttons x_connected"
-      component="div"
-      onClick={handleClickDisconnectBtn}
-    >
-      <span>Disconnect</span>
-    </ButtonBase>
+    connectedStateJSX = (
+      <ButtonBase
+        className="x_bottom_buttons x_connected"
+        component="div"
+        onClick={handleClickDisconnectBtn}
+      >
+        <span>Disconnect</span>
+      </ButtonBase>
+    )
   }
 
   return (
@@ -150,7 +163,7 @@ export default function Page() {
             bgcolor: 'success.main',
           },
           '& .x_verify_no': {
-            bgcolor: '#e91e63'
+            bgcolor: '#e91e63',
           },
         },
         '& .x_verify_text': {
@@ -223,12 +236,12 @@ export default function Page() {
 
       {connectionState === 'verified' && (
         <ButtonBase
-           className="x_bottom_buttons x_connected"
-           component="div"
-           onClick={handleClickDisconnectBtn}
-         >
-            <span>Disconnect</span>
-          </ButtonBase>
+          className="x_bottom_buttons x_connected"
+          component="div"
+          onClick={handleClickDisconnectBtn}
+        >
+          <span>Disconnect</span>
+        </ButtonBase>
       )}
 
       {connectionState === 'disconnected' && (

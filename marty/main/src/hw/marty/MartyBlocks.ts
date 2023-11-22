@@ -9,7 +9,7 @@ const DEBUG = false
  * Hardware Service: MartyRobotical
  */
 export class MartyBlocks {
-  public readonly NEEDS_VERIFICATION = true;
+  public readonly NEEDS_VERIFICATION = true
   /**
    */
   dance = async (): Promise<void> => {

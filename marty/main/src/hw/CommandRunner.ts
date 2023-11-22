@@ -14,6 +14,7 @@ import type EventEmitter from 'eventemitter3'
 import * as helper from './marty-helper'
 import { MartyBlocks } from './marty/MartyBlocks'
 import martyConnector from './marty/MartyConnector'
+import type { MartyConnectionState } from './types'
 
 const DEBUG = config.isDebug
 
@@ -27,7 +28,7 @@ const DEBUG = config.isDebug
  * Additional commands are the remaining methods other than the ones mentioned above (e.g., sendRICRESTMsg).
  */
 export class CommandRunner extends MartyBlocks implements IHPetCommandRunner {
-  private connectionState: ConnectionState = 'disconnected'
+  private connectionState: MartyConnectionState = 'disconnected'
   private hwId: string
   private toParent: IParentSender
   private events: EventEmitter<HPetEventDefinition>
@@ -55,7 +56,7 @@ export class CommandRunner extends MartyBlocks implements IHPetCommandRunner {
           data,
         })
       }
-      martyConnector.publish(eventType, eventEnum, eventName, data);
+      martyConnector.publish(eventType, eventEnum, eventName, data)
       // connection state changed
       if (eventType === 'conn') {
         if (eventName === 'CONNECTING_RIC') {
@@ -91,13 +92,13 @@ export class CommandRunner extends MartyBlocks implements IHPetCommandRunner {
    * and notify the parent frame (CODINY).
    * @param state - The connection state
    */
-  private updateConnectionState_ = (state: ConnectionState) => {
+  private updateConnectionState_ = (state: MartyConnectionState) => {
     if (state !== this.connectionState) {
       this.connectionState = state
-      this.events.emit(HPetEventKeys.connectionStateChanged, this.connectionState)
+      this.events.emit(HPetEventKeys.connectionStateChanged, this.connectionState as any)
 
       // notify to parent iframe
-      this.toParent.notifyConnectionState(this.connectionState)
+      this.toParent.notifyConnectionState(this.connectionState as any)
     }
   }
 
@@ -110,7 +111,7 @@ export class CommandRunner extends MartyBlocks implements IHPetCommandRunner {
    * @returns ConnectionState - connection state
    */
   getConnectionState = async (): Promise<ConnectionState> => {
-    return this.connectionState
+    return this.connectionState as any
   }
 
   /**
