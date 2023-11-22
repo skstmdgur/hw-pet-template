@@ -31,7 +31,7 @@ export default function Page() {
 
   // Click handler for the Connect button
   const handleClickConnectBtn = () => {
-    doConnect()
+    doConnect(commandRunner)
   }
 
   // Click handler for the Disconnect button
