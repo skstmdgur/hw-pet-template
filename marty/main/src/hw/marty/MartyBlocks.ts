@@ -9,8 +9,8 @@ const DEBUG = false
  * Hardware Service: MartyRobotical
  */
 export class MartyBlocks {
+  public readonly NEEDS_VERIFICATION = true;
   /**
-   * @param ctx - Context
    */
   dance = async (): Promise<void> => {
     const moveTime = 3000
@@ -20,7 +20,6 @@ export class MartyBlocks {
   }
 
   /**
-   * @param ctx - Context
    */
   get_ready = async (): Promise<void> => {
     const moveTime = 3000
@@ -30,7 +29,6 @@ export class MartyBlocks {
   }
 
   /**
-   * @param ctx - Context
    */
   wiggle = async (): Promise<void> => {
     const moveTime = 4000
@@ -40,7 +38,6 @@ export class MartyBlocks {
   }
 
   /**
-   * @param ctx - Context
    * @param time - Time in seconds
    * @param side - 0 = left or 1 = right
    */
@@ -53,7 +50,6 @@ export class MartyBlocks {
   }
 
   /**
-   * @param ctx - Context
    * @param eyeCommand - eyesExcited or eyesWide or eyesAngry or eyesNormal or wiggleEyes
    */
   eyes = async (eyeCommand: string): Promise<void> => {
@@ -67,7 +63,6 @@ export class MartyBlocks {
   }
 
   /**
-   * @param ctx - Context
    * @param side - 0 = left or 1 = right
    */
   kick = async (side: string): Promise<void> => {
@@ -78,7 +73,6 @@ export class MartyBlocks {
   }
 
   /**
-   * @param ctx - Context
    * @param time - Time in seconds
    */
   hold = async (time: string): Promise<void> => {
@@ -89,7 +83,6 @@ export class MartyBlocks {
   }
 
   /**
-   * @param ctx - Context
    * @param side - 0 = left or 1 = right or 2 = backward or 3 = forward
    * @param time - Time in seconds
    */
@@ -102,7 +95,6 @@ export class MartyBlocks {
   }
 
   /**
-   * @param ctx - Context
    * @param side - 0 = left or 1 = right
    */
   lift_foot = async (side: string): Promise<void> => {
@@ -112,7 +104,6 @@ export class MartyBlocks {
   }
 
   /**
-   * @param ctx - Context
    * @param side - 0 = left or 1 = right
    */
   lower_foot = async (side: string): Promise<void> => {
@@ -122,7 +113,6 @@ export class MartyBlocks {
   }
 
   /**
-   * @param ctx - Context
    * @param time - Time in seconds
    * @param joint - 0 = left hip or 1 = left twist or 2 = left knee or 3 = right hip or 4 = right twist or 5 = right knee or 6 = left arm or 7 = right arm or 8 = eyes
    * @param angle - Angle in degrees
@@ -136,7 +126,6 @@ export class MartyBlocks {
   }
 
   /**
-   * @param ctx - Context
    * @param times - Number of times to slide
    * @param side - 0 = left or 1 = right
    */
@@ -152,7 +141,6 @@ export class MartyBlocks {
   }
 
   /**
-   * @param ctx - Context
    * @param time - Time in seconds
    */
   stand_straight = async (time: string): Promise<void> => {
@@ -163,7 +151,6 @@ export class MartyBlocks {
   }
 
   /**
-   * @param ctx - Context
    * @param steps - Number of steps to turn
    * @param side - 0 = left or 1 = right
    */
@@ -183,7 +170,6 @@ export class MartyBlocks {
   }
 
   /**
-   * @param ctx - Context
    * @param steps - Number of steps to walk
    * @param side - 25 = forward or -25 = backward
    */
@@ -200,7 +186,6 @@ export class MartyBlocks {
   }
 
   /**
-   * @param ctx - Context
    * @param steps - Number of steps to walk
    * @param stepLength - Number of step in mm
    * @param time - Time in seconds
@@ -228,7 +213,6 @@ export class MartyBlocks {
   }
 
   /**
-   * @param ctx - Context
    * @param side - 0 = left or 1 = right
    */
   wave = async (side: string): Promise<void> => {
@@ -239,7 +223,6 @@ export class MartyBlocks {
   }
 
   /**
-   * @param ctx - Context
    * @param hexColour - Hex colour
    */
   function_led_set = async (hexColour: string): Promise<void> => {
@@ -254,7 +237,6 @@ export class MartyBlocks {
   }
 
   /**
-   * @param ctx - Context
    * @param hexColour - Hex colour
    * @param timeInMs - Time in milliseconds
    */
@@ -263,13 +245,12 @@ export class MartyBlocks {
     if (rgb === null) {
       rgb = { r: 0, g: 0, b: 0 }
     }
-    const command = `indicator/set?pixIdx=1;blinkType=on;r=${rgb.r};g=${rgb.g};b=${rgb.b};rateMs=${timeInMs}`
+    const command = `indicator/set?pixIdx=1;blinkType=breathe;r=${rgb.r};g=${rgb.g};b=${rgb.b};rateMs=${timeInMs}`
     martyConnector.sendRestMessage(command)
     await new Promise((resolve) => setTimeout(resolve, parseInt(timeInMs)))
   }
 
   /**
-   * @param ctx - Context
    */
   function_led_off = async (): Promise<void> => {
     const command = `indicator/set?pixIdx=1;blinkType=off;r=0;g=0;b=0;rateMs=1000`
@@ -278,7 +259,6 @@ export class MartyBlocks {
   }
 
   /**
-   * @param ctx - Context
    * @param LEDAddon - LEDfoot / LEDarm / LEDeye
    * @param pattern - show-off / pinwheel / off
    */
@@ -293,7 +273,6 @@ export class MartyBlocks {
   }
 
   /**
-   * @param ctx - Context
    * @param LEDAddon - LEDfoot / LEDarm / LEDeye
    * @param colour - hex
    */
@@ -306,7 +285,6 @@ export class MartyBlocks {
   }
 
   /**
-   * @param ctx - Context
    * @param LEDAddon - LEDfoot / LEDarm / LEDeye
    * @param region - 0 / 1 / 2
    * @param colour - hex
@@ -320,7 +298,6 @@ export class MartyBlocks {
   }
 
   /**
-   * @param ctx - Context
    * @param LEDAddon - LEDfoot / LEDarm / LEDeye
    * @param ledId -
    * @param colour - hex
@@ -335,7 +312,6 @@ export class MartyBlocks {
   }
 
   /**
-   * @param ctx - Context
    * @param sound - Sound name
    * @details Plays a sound until the sound is finished
    */
@@ -346,12 +322,11 @@ export class MartyBlocks {
       return await new Promise((resolve) => setTimeout(resolve, 0))
     }
     const mp3SoundData = await SoundHelper.fetchSound(soundName)
-    martyConnector.streamAudio(mp3SoundData, soundDuration * durationOffset, true)
-    await new Promise((resolve) => setTimeout(resolve, soundDuration * durationOffset))
+    martyConnector.streamAudio(mp3SoundData, soundDuration + durationOffset, true)
+    await new Promise((resolve) => setTimeout(resolve, soundDuration + durationOffset))
   }
 
   /**
-   * @param ctx - Context
    * @param sound - Sound name
    * @details Plays a sound and returns immediately
    */
@@ -362,19 +337,17 @@ export class MartyBlocks {
       return await new Promise((resolve) => setTimeout(resolve, 0))
     }
     const mp3SoundData = await SoundHelper.fetchSound(soundName)
-    martyConnector.streamAudio(mp3SoundData, soundDuration * durationOffset, true)
+    martyConnector.streamAudio(mp3SoundData, soundDuration + durationOffset, true)
     await new Promise((resolve) => setTimeout(resolve, 200)) // return (almost) immediately
   }
 
   /**
-   * @param ctx - Context
    */
   stop_all_sounds = async (): Promise<void> => {
     martyConnector.streamAudio(new Uint8Array([0]), 0, true)
   }
 
   /**
-   * @param ctx - Context
    * @param text - Text to speak
    * @param voice - Voice name
    * @param accent - Accent name
@@ -390,7 +363,7 @@ export class MartyBlocks {
     }
 
     let locale = SoundHelper.LANGUAGE_DATA[accent].speechSynthLocale
-    if (voice === 'KITTEN') {
+    if (voice === 'kitten') {
       text = text.replace(/\S+/g, 'meow')
       locale = SoundHelper.LANGUAGE_DATA['en'].speechSynthLocale
     }
@@ -399,7 +372,6 @@ export class MartyBlocks {
   }
 
   /**
-   * @param ctx - Context
    * @param axis - X or Y or Z
    * @returns Acceleration in G
    */
@@ -414,7 +386,6 @@ export class MartyBlocks {
   }
 
   /**
-   * @param ctx - Context
    * @returns Remaining battery in %
    */
   remaining_battery = async (): Promise<number> => {
@@ -423,7 +394,6 @@ export class MartyBlocks {
   }
 
   /**
-   * @param ctx - Context
    * @param joint - 0 = left hip or 1 = left twist or 2 = left knee or 3 = right hip or 4 = right twist or 5 = right knee or 6 = left arm or 7 = right arm or 8 = eyes
    * @returns Current in mA
    */
@@ -433,7 +403,6 @@ export class MartyBlocks {
   }
 
   /**
-   * @param ctx - Context
    * @param joint - 0 = left hip or 1 = left twist or 2 = left knee or 3 = right hip or 4 = right twist or 5 = right knee or 6 = left arm or 7 = right arm or 8 = eyes
    * @returns Angle in degrees
    */
@@ -443,7 +412,6 @@ export class MartyBlocks {
   }
 
   /**
-   * @param ctx - Context
    * @returns distance sensor reading
    */
   distance = async (): Promise<number> => {
@@ -452,7 +420,6 @@ export class MartyBlocks {
   }
 
   /**
-   * @param ctx - Context
    * @return is foot on the ground? (boolean)
    */
   foot_on_ground = async (): Promise<boolean> => {
@@ -461,7 +428,6 @@ export class MartyBlocks {
   }
 
   /**
-   * @param ctx - Context
    * @return is foot obstacle detected? (boolean)
    */
   foot_obstacle = async (): Promise<boolean> => {
@@ -470,7 +436,6 @@ export class MartyBlocks {
   }
 
   /**
-   * @param ctx - Context
    * @return colour as string
    */
   colour_sensor = async (): Promise<string> => {
@@ -479,7 +444,6 @@ export class MartyBlocks {
   }
 
   /**
-   * @param ctx - Context
    * @param channel - clear/red/green/blue
    * @return colour channel value
    */
@@ -489,7 +453,6 @@ export class MartyBlocks {
   }
 
   /**
-   * @param ctx - Context
    * @return noise sensor reading
    */
   noise_sensor = async (): Promise<number> => {
@@ -498,7 +461,6 @@ export class MartyBlocks {
   }
 
   /**
-   * @param ctx - Context
    * @param channel - 1/2
    * @return light sensor reading for the given channel
    */

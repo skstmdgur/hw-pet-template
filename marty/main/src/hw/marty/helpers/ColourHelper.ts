@@ -94,7 +94,7 @@ export default class ColourHelper {
   static getColourChannel(addon, channel: string) {
     for (const addonValKey in addon.vals) {
       const addonVal = addon.vals[addonValKey]
-      if (addonValKey.includes(channel)) {
+      if (addonValKey.toLocaleLowerCase().includes(channel.toLocaleLowerCase())) {
         return addonVal
       }
     }

@@ -1,0 +1,47 @@
+.leds-colours-container {
+  margin: 0 auto;
+  display: flex;
+  max-width: 90px;
+  flex-direction: row;
+  align-items: center;
+  justify-content: space-between;
+  background-color: #f5f5f5;
+  border-radius: 5px;
+  padding: 1rem;
+  column-gap: .5rem;
+}
+
+.leds-colour-1,
+.leds-colour-2,
+.leds-colour-3 {
+  width: 24px;
+  height: 16px;
+  border-radius: 4px;
+  border-width: 1px;
+  border-color: #ccc;
+}
+
+.loading {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  justify-content: center;
+  margin-top: 2rem;
+}
+.loading__dot {
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  background-color: #ccc;
+  margin: 0 .5rem;
+  animation: loading 1s infinite ease-in-out;
+}
+
+@keyframes loading {
+  0%, 80%, 100% {
+    transform: scale(0);
+  }
+  40% {
+    transform: scale(1.0);
+  }
+}
