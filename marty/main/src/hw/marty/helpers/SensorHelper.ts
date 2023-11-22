@@ -33,7 +33,7 @@ export default class SensorHelper {
   static getLight(addon, channel) {
     for (const addonValKey in addon.vals) {
       const addonVal = addon.vals[addonValKey]
-      if (addonValKey.includes(channel)) {
+      if (addonValKey.toLocaleLowerCase().includes(channel.toLocaleLowerCase())) {
         return addonVal
       }
     }
