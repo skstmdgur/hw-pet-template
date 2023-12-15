@@ -12,3 +12,4 @@ do_purge(){
 
 do_purge very-basic-example
 do_purge marty
+do_purge exMarsCube
