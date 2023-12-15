@@ -25,8 +25,9 @@ export default function Page() {
     if (runner.NEEDS_VERIFICATION) {
       await runner.connect()
       await martyConnector.verifyMarty()
+    } else {
+      runner.connect()
     }
-    runner.connect()
   }, [])
 
   // Click handler for the Connect button
@@ -232,9 +233,9 @@ export default function Page() {
         <img src={BLUETOOTH_IMG_URL} alt="" width={24} height={24} />
       </Box>
 
-      {connectionState === 'connected' && connectedStateJSX}
+      {connectionState === 'verifying' && connectedStateJSX}
 
-      {connectionState === 'verified' && (
+      {connectionState === 'connected' && (
         <ButtonBase
           className="x_bottom_buttons x_connected"
           component="div"

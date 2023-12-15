@@ -62,13 +62,13 @@ export class CommandRunner extends MartyBlocks implements IHPetCommandRunner {
         if (eventName === 'CONNECTING_RIC') {
           this.updateConnectionState_('connecting')
         } else if (eventName === 'CONNECTED_RIC') {
-          this.updateConnectionState_('connected')
+          this.updateConnectionState_('verifying')
         } else if (eventName === 'DISCONNECTED_RIC') {
           this.updateConnectionState_('disconnected')
         } else if (eventName === 'CONNECTION_FAILED') {
           this.updateConnectionState_('disconnected')
         } else if (eventName === 'VERIFIED_CORRECT_RIC') {
-          this.updateConnectionState_('verified')
+          this.updateConnectionState_('connected')
         }
         // "CONN_STREAMING_ISSUE" maybe need
       }
