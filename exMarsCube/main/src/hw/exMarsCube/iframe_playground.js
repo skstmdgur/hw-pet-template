@@ -1,0 +1,27 @@
+// just holding some code to test the blocks in the iframe playground
+hw.getCellColor(face, cell);
+hw.getFaceColor(face);
+hw.getFaceRotationValue(face);
+hw.getModeRecord(mode, record);
+hw.getDiceNumberRecord(record);
+hw.getModeStatus();
+hw.setMenuInit();
+hw.setModeSetting(main, sub);
+hw.setPlayMode(scale);
+hw.setUserMode(user);
+hw.setNonBrake(flag);
+hw.setResetAllFace();
+hw.setResetRotation();
+hw.setCenterColorChange(face, color);
+hw.setCellColorChange(face, colorCell1, colorCell2, colorCell3, colorCell4, colorCell5, colorCell6, colorCell7, colorCell8);
+hw.setPositionDirectionTorqueChange(face, position, rotationDirection, torque);
+hw.setFaceRotationOnlyColor(face, rotationDirection, angle);
+hw.setFaceRotation(face, rotationDirection, angle);
+hw.setFacesRotation(face1, rotationDirection1, angle1, face2, rotationDirection2, angle2);
+hw.setSolveCube(faceColor, faceLocation, seconds);
+hw.setPlayNote(pitchName, seconds);
+hw.setReturnModeRecord(mode);
+hw.setDiceStart(dice);
+hw.setReturnDiceNumberRecord();
+hw.setAutoSolveCube();
+hw.setReturnCallCellColor();
