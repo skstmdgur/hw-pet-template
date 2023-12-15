@@ -3,3 +3,5 @@
 ./_export-upload.sh
 
 node_modules
+_tmp
+
