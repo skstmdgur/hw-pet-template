@@ -9,8 +9,13 @@ module.exports = {
     sourceType: 'module',
     tsconfigRootDir: __dirname,
   },
+  ignorePatterns: ['src/hw/exMarsCube/iframe_playground.js'],
   rules: {
     'react/no-unstable-nested-components': 'off',
+    '@typescript-eslint/no-unsafe-enum-comparison': 'off',
+    '@typescript-eslint/array-type': 'off',
+    'no-bitwise': 'off',
+    'no-else-return': 'off',
     'no-lonely-if': 'off',
     'no-empty': 'off',
     'no-constant-binary-expression': 'off',
