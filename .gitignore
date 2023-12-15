@@ -1,6 +1,6 @@
 *:Zone.Identifier
 
-./_export-upload.sh
+_export-upload.sh
 
 node_modules
 _tmp
