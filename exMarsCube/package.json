@@ -1,5 +1,5 @@
 {
-  "name": "codiny-hw-marty",
+  "name": "codiny-hw-exmarscube",
   "private": true,
   "scripts": {
     "build": "turbo run build",
