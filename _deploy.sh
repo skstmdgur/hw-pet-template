@@ -23,7 +23,7 @@ do_export() {
 }
 
 do_export marty
-# do_export exMarsCube
+do_export exMarsCube
 
 DEPLOY_SERVER=https://aicodiny.com
 
@@ -46,6 +46,8 @@ if [ -z "$DATI_API_TOKEN" ]; then
 fi
 
 do_deploy marty
+do_deploy exMarsCube
 
 echo "rm -rf ${TEMP}"
 rm -rf ${TEMP}
+
