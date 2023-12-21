@@ -1,22 +1,18 @@
-import { Packet } from './ExMarsCubeDefine'
-
 export class FIFO {
-  private items: Array<Packet> = [[]]
+  private items = [[]]
   public length = 0
 
-  constructor() {}
-
-  enqueue = async(item: Packet): Promise<void> => {
+  enqueue = async(item: Array<number>): Promise<void> => {
     this.items.push(item)
     this.length = this.items.length
   }
 
-  peek = (): Packet => {
+  peek = (): Array<number> => {
     return this.items[0]
   }
 
-  dequeue = async(): Promise<Packet> => {
-    const buffer: Packet | undefined = this.items.shift()
+  dequeue = async(): Promise<Array<number>> => {
+    const buffer = this.items.shift()
     this.length = this.items.length
     return buffer ? buffer : []
   }

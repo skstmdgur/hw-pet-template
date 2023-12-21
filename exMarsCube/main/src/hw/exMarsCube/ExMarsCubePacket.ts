@@ -3,17 +3,16 @@ import {
   FaceColor,
   Index,
   Mode,
-  Packet,
   PacketDelimiter,
   PacketType,
 } from './ExMarsCubeDefine'
 
 export class ExMarsCubePacket {
-  faceCell: Array<Packet> = new Array(6)
-  faceRotDir: Packet = new Array(6)
-  record: Array<Packet> = new Array(8)
-  currentMode: Packet = new Array(2)  
-  readonly sendPacketType: number = PacketType.sendByte
+  faceCell = new Array(6)
+  faceRotDir = new Array(6)
+  record = new Array(8)
+  currentMode = new Array(2)  
+  readonly sendPacketType = PacketType.sendByte
 
   txPacket = (
     index: number,
@@ -21,8 +20,8 @@ export class ExMarsCubePacket {
     param2: number,
     param3: number,
     param4: number,
-  ): Packet => {
-    const buffer: Packet = new Array<number>(this.sendPacketType)
+  ): Array<number> => {
+    const buffer = new Array<number>(this.sendPacketType)
 
     buffer[0] = PacketDelimiter.header
     buffer[1] = index
@@ -35,16 +34,16 @@ export class ExMarsCubePacket {
     return buffer
   }
 
-  txPacketMenuSetting = (main: number, sub: number): Packet => {
+  txPacketMenuSetting = (main: number, sub: number): Array<number> => {
     return this.txPacket(Index.menu, 11, main, sub, 255)
   }
 
-  txPacketModeSetting = (index: number, mode: number): Packet => {
+  txPacketModeSetting = (index: number, mode: number): Array<number> => {
     return this.txPacket(Index.menu, 30, index, mode, 255)
   }
 
-  txPacketSetCenterColor = (face: number, color: number): Packet => {
-    const index: number = (face << 5) | Index.centerColor
+  txPacketSetCenterColor = (face: number, color: number): Array<number> => {
+    const index = (face << 5) | Index.centerColor
     return this.txPacket(index, color, 0, 0, 0)
   }
 
@@ -58,12 +57,12 @@ export class ExMarsCubePacket {
     color6: number,
     color7: number,
     color8: number,
-  ): Packet => {
-    const index: number = (face << 5) | Index.cellColor
-    const para1: number = (color1 << 4) | color2
-    const para2: number = (color3 << 4) | color4
-    const para3: number = (color5 << 4) | color6
-    const para4: number = (color7 << 4) | color8
+  ): Array<number> => {
+    const index = (face << 5) | Index.cellColor
+    const para1 = (color1 << 4) | color2
+    const para2 = (color3 << 4) | color4
+    const para3 = (color5 << 4) | color6
+    const para4 = (color7 << 4) | color8
 
     return this.txPacket(index, para1, para2, para3, para4)
   }
@@ -73,8 +72,8 @@ export class ExMarsCubePacket {
     position: number,
     direction: number,
     torque: number,
-  ): Packet => {
-    const index: number = (face << 5) | Index.posDirTor
+  ): Array<number> => {
+    const index = (face << 5) | Index.posDirTor
     let pos = 0
 
     if (position < 2) {
@@ -88,11 +87,11 @@ export class ExMarsCubePacket {
     return this.txPacket(index, pos, direction, torque, 0)
   }
 
-  txPacketMoveFace = (face: number, rotation: number): Packet => {
+  txPacketMoveFace = (face: number, rotation: number): Array<number> => {
     let para = 0
-    let buffer: Packet = new Array<number>(this.sendPacketType)
+    let buffer = new Array<number>(this.sendPacketType)
 
-    if (0 <= rotation && rotation <= 15) {
+    if (rotation >= 0 && rotation <= 15) {
       if (face === FaceColor.white || face === FaceColor.green || face === FaceColor.red) {
         para = (rotation << 4) & 240
       } else if (
@@ -115,15 +114,15 @@ export class ExMarsCubePacket {
     return buffer
   }
 
-  txPacketResetAllFace = (): Packet => {
+  txPacketResetAllFace = (): Array<number> => {
     return this.txPacket(Index.face, Action.faceResetAll, 0, 0, 0)
   }
 
-  txPacketFaceMoveWithMotor = (face: number, rotation: number): Packet => {
+  txPacketFaceMoveWithMotor = (face: number, rotation: number): Array<number> => {
     let para = 0
-    let buffer: Packet = new Array<number>(this.sendPacketType)
+    let buffer = new Array<number>(this.sendPacketType)
 
-    if (0 <= rotation && rotation <= 15) {
+    if (rotation >= 0  && rotation <= 15) {
       if (face === FaceColor.white || face === FaceColor.green || face === FaceColor.red) {
         para = (rotation << 4) & 240
       } else if (
@@ -151,7 +150,7 @@ export class ExMarsCubePacket {
     rotation1: number,
     face2: number,
     rotation2: number,
-  ): Packet => {
+  ): Array<number> => {
     let para2 = 0
     let para3 = 0
     let para4 = 0
@@ -200,31 +199,31 @@ export class ExMarsCubePacket {
     return this.txPacket(Index.face, Action.faceMoveWithMotor, para2, para3, para4)
   }
 
-  txPacketDiceStart = (dice: number): Packet => {
-    const index: number = Index.menu
+  txPacketDiceStart = (dice: number): Array<number> => {
+    const index = Index.menu
     return this.txPacket(index, 21, dice, 255, 255)
   }
 
-  txPacketRecord = (recordIndex: number): Packet => {
-    const index: number = (7 << 5) | Index.recordRequest
+  txPacketRecord = (recordIndex: number): Array<number> => {
+    const index = (7 << 5) | Index.recordRequest
     return this.txPacket(index, recordIndex, 255, 255, 255)
   }
 
-  txPacketSensingRequest = (): Packet => {
-    const index: number = (FaceColor.all << 5) | Index.sensingRequest
+  txPacketSensingRequest = (): Array<number> => {
+    const index = (FaceColor.all << 5) | Index.sensingRequest
     return this.txPacket(index, 255, 255, 255, 255)
   }
 
-  rxParser = async(packet: Packet): Promise<void> => {
-    const index: number = packet[1] & 31
+  rxParser = async(packet: Array<number>): Promise<void> => {
+    const index = packet[1] & 31
 
     if (index === Index.menu) {
       this.currentMode[Mode.main] = packet[3]
       this.currentMode[Mode.sub] = packet[4]
     } else if (index === Index.sensingResponse) {
-      const face: number = (packet[1] >> 5) & 15
+      const face = (packet[1] >> 5) & 15
 
-      if (0 <= face && face <= 5) {
+      if (face <= 0 && face <= 5) {
         if (face === FaceColor.white) {
           this.faceCell[face][0] = (packet[3] >> 4) & 15
           this.faceCell[face][1] = packet[3] & 15
@@ -346,7 +345,7 @@ export class ExMarsCubePacket {
       }
     } else if (index === Index.recordResponse) {
       // 0: 최신, 1: 차순 ... , 5: 최고
-      const recordIndex: number = (packet[1] >> 5) & 15
+      const recordIndex = (packet[1] >> 5) & 15
       this.record[recordIndex][packet[2]] = (packet[3] << 16) | (packet[4] << 8) | packet[5]
     }
   }
@@ -356,7 +355,7 @@ export class ExMarsCubePacket {
   }
 
   convertEnumType = (fromObj: any, toObj: any, value: any): any => {
-    const key: string | undefined = Object.keys(fromObj).find((key) => fromObj[key] === value)
+    const key = Object.keys(fromObj).find((key) => fromObj[key] === value)
     return key ? toObj[key] : 'undefind'
   }
 }
