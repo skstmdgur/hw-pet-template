@@ -1,4 +1,3 @@
-import log from '@/log'
 import { HPetEventKeys } from '@ktaicoder/hw-pet'
 import type {
   HPetEventDefinition,
@@ -14,7 +13,6 @@ import {
   DirectionFromFace,
   FaceColor,
   Mode,
-  Packet,
   PacketDelimiter,
   Pitch,
   Record,
@@ -35,9 +33,9 @@ export class CommandRunner extends ExMarsCubePacket implements IHPetCommandRunne
   private hwId: string
   private toParent: IParentSender
   private events: EventEmitter<HPetEventDefinition>
-  private bleNusServiceUUID: string = '6e400001-b5a3-f393-e0a9-e50e24dcca9e'
-  private bleNusCharRXUUID: string = '6e400002-b5a3-f393-e0a9-e50e24dcca9e'
-  private bleNusCharTXUUID: string = '6e400003-b5a3-f393-e0a9-e50e24dcca9e'  
+  private bleNusServiceUUID = '6e400001-b5a3-f393-e0a9-e50e24dcca9e'
+  private bleNusCharRXUUID = '6e400002-b5a3-f393-e0a9-e50e24dcca9e'
+  private bleNusCharTXUUID = '6e400003-b5a3-f393-e0a9-e50e24dcca9e'  
   private rxCharacteristic: BluetoothRemoteGATTCharacteristic | undefined = undefined
   private txCharacteristic: BluetoothRemoteGATTCharacteristic | undefined = undefined
   private rxLoopFlag: boolean
@@ -144,8 +142,6 @@ export class CommandRunner extends ExMarsCubePacket implements IHPetCommandRunne
     if (!device) {
       return false
     } else {
-      device.addEventListener('gattserverdisconnected', this.disconnect)
-
       const server = await device.gatt?.connect()
       const service = await server.getPrimaryService(this.bleNusServiceUUID)
 
@@ -182,9 +178,9 @@ export class CommandRunner extends ExMarsCubePacket implements IHPetCommandRunne
   receivedBytes = (event: any): void => {
     const value: DataView = event.target.value
     const length: number = value.byteLength
-    const received: Packet = new Array<number>(length)
+    const received = new Array<number>(length)
 
-    for (let i: number = 0; i < length; i++) {
+    for (let i = 0; i < length; i++) {
       received[i] = value.getUint8(i)
     }
     this.fifo.enqueue(received)
@@ -192,12 +188,10 @@ export class CommandRunner extends ExMarsCubePacket implements IHPetCommandRunne
 
   scan = async(): Promise<BluetoothDevice | null> => {
     try {
-      let device: BluetoothDevice
-      let options: RequestDeviceOptions = {
+      const device = await navigator.bluetooth.requestDevice({
         filters: [{ namePrefix: 'eX-Mars' }],
         optionalServices: [ this.bleNusServiceUUID ]
-      }
-      device = await navigator.bluetooth.requestDevice(options)
+      })
       return device
     } catch (e) {
       return null
@@ -208,16 +202,16 @@ export class CommandRunner extends ExMarsCubePacket implements IHPetCommandRunne
     while (this.rxLoopFlag) {
       // 서로 다른 패킷이 한 배열로 반환될 경우 패킷별로 분할 됨.
       if (this.fifo.length >= 7) {
-        const packet: Packet = await this.fifo.dequeue()
+        const packet = await this.fifo.dequeue()
         let headerFlag = false
         let headerArr = 0
         for (let i = 0; i < packet.length; i++) {
-          if (headerFlag === false && packet[i] === PacketDelimiter.header) {
+          if (!headerFlag && packet[i] === PacketDelimiter.header) {
             headerFlag = true
             headerArr = i
           }
-          if (headerFlag === true && packet[i] === PacketDelimiter.terminator) {
-            const result: Packet = []
+          if (headerFlag && packet[i] === PacketDelimiter.terminator) {
+            const result = []
             for (let j = headerArr; j < i + 1; j++) {
               result.push(packet[j])
             }
@@ -231,7 +225,7 @@ export class CommandRunner extends ExMarsCubePacket implements IHPetCommandRunne
   }
 
   getCellColor = async(face: string, cell: string): Promise<string> => {
-    const value: number = this.faceCell[parseInt(face)][parseInt(cell)]
+    const value = this.faceCell[parseInt(face)][parseInt(cell)]
     const buffer = this.txPacketSensingRequest()
     await this.sendBytes(buffer)
     return this.convertEnumType(parseInt(cell) < 8 ? CellColor : FaceColor, Color, value).toString()
@@ -240,7 +234,7 @@ export class CommandRunner extends ExMarsCubePacket implements IHPetCommandRunne
   getFaceColor = async (face: string): Promise<string[]> => {
     const colors: Array<string> = new Array<string>(9)
     for (let cell = 0; cell < 9; cell++) {
-      const value: number = this.faceCell[parseInt(face)][cell]
+      const value = this.faceCell[parseInt(face)][cell]
       colors[cell] = this.convertEnumType(cell < 8 ? CellColor : FaceColor, Color, value).toString()
     }
     const buffer = this.txPacketSensingRequest()
@@ -249,7 +243,7 @@ export class CommandRunner extends ExMarsCubePacket implements IHPetCommandRunne
   }
 
   getFaceRotationValue = async (face: string): Promise<string> => {
-    const dir: number = this.faceRotDir[parseInt(face)]
+    const dir = this.faceRotDir[parseInt(face)]
     this.faceRotDir[parseInt(face)] = 0
     switch (dir) {
       case 3:
@@ -275,31 +269,31 @@ export class CommandRunner extends ExMarsCubePacket implements IHPetCommandRunne
   }
 
   setMenuInit = async(): Promise<void> => {
-    const buffer: Packet = this.txPacketMenuSetting(10, 10)
+    const buffer = this.txPacketMenuSetting(10, 10)
     await this.sendBytes(buffer)
     await sleepAsync(20)
   }
 
   setModeSetting = async(main: string, sub: string): Promise<void> => {
-    const buffer: Packet = this.txPacketMenuSetting(parseInt(main), parseInt(sub))
+    const buffer = this.txPacketMenuSetting(parseInt(main), parseInt(sub))
     await this.sendBytes(buffer)
     await sleepAsync(20)
   }
 
   setPlayMode = async(scale: string): Promise<void> => {
-    const buffer: Packet = this.txPacketModeSetting(3, parseInt(scale))
+    const buffer = this.txPacketModeSetting(3, parseInt(scale))
     await this.sendBytes(buffer)
     await sleepAsync(20)
   }
 
   setUserMode = async(user: string): Promise<void> => {
-    const buffer: Packet = this.txPacketModeSetting(1, parseInt(user))
+    const buffer = this.txPacketModeSetting(1, parseInt(user))
     await this.sendBytes(buffer)
     await sleepAsync(20)
   }
 
   setNonBrake = async(flag: string): Promise<void> => {
-    let buffer: Packet = new Array<number>(this.sendPacketType)
+    let buffer = new Array<number>(this.sendPacketType)
     switch (parseInt(flag)) {
       case Switch.Off:
         buffer = this.txPacketMenuSetting(13, 4)
@@ -313,7 +307,7 @@ export class CommandRunner extends ExMarsCubePacket implements IHPetCommandRunne
   }
 
   setResetAllFace = async(): Promise<void> => {
-    const buffer: Packet = this.txPacketResetAllFace()
+    const buffer = this.txPacketResetAllFace()
     await this.sendBytes(buffer)
     await sleepAsync(20)
   }
@@ -326,7 +320,7 @@ export class CommandRunner extends ExMarsCubePacket implements IHPetCommandRunne
   }
 
   setCenterColorChange = async(face: string, color: string): Promise<void> => {
-    const buffer: Packet = this.txPacketSetCenterColor(parseInt(face), parseInt(color))
+    const buffer = this.txPacketSetCenterColor(parseInt(face), parseInt(color))
     await this.sendBytes(buffer)
     await sleepAsync(20)
   }
@@ -342,7 +336,7 @@ export class CommandRunner extends ExMarsCubePacket implements IHPetCommandRunne
     colorCell7: string,
     colorCell8: string,
   ): Promise<void> => {
-    const buffer: Packet = this.txPacketSetCellColor(
+    const buffer = this.txPacketSetCellColor(
       parseInt(face),
       parseInt(colorCell1),
       parseInt(colorCell2),
@@ -363,7 +357,7 @@ export class CommandRunner extends ExMarsCubePacket implements IHPetCommandRunne
     rotationDirection: string,
     torque: string,
   ): Promise<void> => {
-    const buffer: Packet = this.txPacketSetPosDirTor(
+    const buffer = this.txPacketSetPosDirTor(
       parseInt(face),
       parseInt(position),
       parseInt(rotationDirection),
@@ -374,7 +368,7 @@ export class CommandRunner extends ExMarsCubePacket implements IHPetCommandRunne
   }
 
   setFaceRotationOnlyColor = async(face: string, rotationDirection: string, angle: string): Promise<void> => {
-    const buffer: Packet = this.txPacketMoveFace(
+    const buffer = this.txPacketMoveFace(
       parseInt(face),
       this.calculrateAngle(parseInt(rotationDirection), parseInt(angle)),
     )
@@ -383,7 +377,7 @@ export class CommandRunner extends ExMarsCubePacket implements IHPetCommandRunne
   }
 
   setFaceRotation = async(face: string, rotationDirection: string, angle: string): Promise<void> => {
-    const buffer: Packet = this.txPacketFaceMoveWithMotor(
+    const buffer = this.txPacketFaceMoveWithMotor(
       parseInt(face),
       this.calculrateAngle(parseInt(rotationDirection), parseInt(angle)),
     )
@@ -398,7 +392,7 @@ export class CommandRunner extends ExMarsCubePacket implements IHPetCommandRunne
     rotationDirection2: string,
     angle2: string,
   ): Promise<void> => {
-    const buffer: Packet = this.txPacketFacesMoveWithMotor(
+    const buffer = this.txPacketFacesMoveWithMotor(
       parseInt(face1),
       this.calculrateAngle(parseInt(rotationDirection1), parseInt(angle1)),
       parseInt(face2),
@@ -413,14 +407,14 @@ export class CommandRunner extends ExMarsCubePacket implements IHPetCommandRunne
     faceLocation: string,
     seconds: string,
   ): Promise<void> => {
-    const fc: number = parseInt(faceColor)
-    const fl: number = parseInt(faceLocation)
-    let face: number = FaceColor.yellow
-    let angle: number = Rotation.ninety
-    if (fl % 2 == 1) {
+    const fc = parseInt(faceColor)
+    const fl = parseInt(faceLocation)
+    let face = FaceColor.yellow
+    let angle = Rotation.ninety
+    if (fl % 2 === 1) {
       angle += 8
     }
-    if (fc == FaceColor.green) {
+    if (fc === FaceColor.green) {
       switch (fl) {
         case DirectionFromFace.forwardCW:
         case DirectionFromFace.forwardCCW:
@@ -447,7 +441,7 @@ export class CommandRunner extends ExMarsCubePacket implements IHPetCommandRunne
           face = FaceColor.blue
           break
       }
-    } else if (fc == FaceColor.purple) {
+    } else if (fc === FaceColor.purple) {
       switch (fl) {
         case DirectionFromFace.forwardCW:
         case DirectionFromFace.forwardCCW:
@@ -474,7 +468,7 @@ export class CommandRunner extends ExMarsCubePacket implements IHPetCommandRunne
           face = FaceColor.red
           break
       }
-    } else if (fc == FaceColor.blue) {
+    } else if (fc === FaceColor.blue) {
       switch (fl) {
         case DirectionFromFace.forwardCW:
         case DirectionFromFace.forwardCCW:
@@ -501,7 +495,7 @@ export class CommandRunner extends ExMarsCubePacket implements IHPetCommandRunne
           face = FaceColor.green
           break
       }
-    } else if (fc == FaceColor.red) {
+    } else if (fc === FaceColor.red) {
       switch (fl) {
         case DirectionFromFace.forwardCW:
         case DirectionFromFace.forwardCCW:
@@ -529,17 +523,17 @@ export class CommandRunner extends ExMarsCubePacket implements IHPetCommandRunne
           break
       }
     }
-    const buffer: Packet = this.txPacketFaceMoveWithMotor(face, angle)
+    const buffer = this.txPacketFaceMoveWithMotor(face, angle)
     await this.sendBytes(buffer)
     await sleepAsync(parseFloat(seconds) * 1000)
   }
 
   setPlayNote = async(pitchName: string, seconds: string): Promise<void> => {
-    let face: number = FaceColor.white
+    let face = FaceColor.white
     let angle = 3
 
     if (parseInt(pitchName) !== 12) {
-      if (parseInt(pitchName) % 2 == 1) {
+      if (parseInt(pitchName) % 2 === 1) {
         angle += 8
       }
       switch (parseInt(pitchName)) {
@@ -569,32 +563,32 @@ export class CommandRunner extends ExMarsCubePacket implements IHPetCommandRunne
           break
       }
 
-      const buffer: Packet = this.txPacketFaceMoveWithMotor(face, angle)
+      const buffer = this.txPacketFaceMoveWithMotor(face, angle)
       await this.sendBytes(buffer)
       await sleepAsync(parseFloat(seconds) * 1000)
     }
   }
 
   setReturnModeRecord = async(mode: string): Promise<void> => {
-    const buffer: Packet = this.txPacketRecord(parseInt(mode))
+    const buffer = this.txPacketRecord(parseInt(mode))
     await this.sendBytes(buffer)
     await sleepAsync(20)
   }
 
   setDiceStart = async(dice: string): Promise<void> => {
-    const buffer: Packet = this.txPacketDiceStart(parseInt(dice))
+    const buffer = this.txPacketDiceStart(parseInt(dice))
     await this.sendBytes(buffer)
     await sleepAsync(20)
   }
 
   setReturnDiceNumberRecord = async(): Promise<void> => {
-    const buffer: Packet = this.txPacketRecord(Record.zeroTwoMode)
+    const buffer = this.txPacketRecord(Record.zeroTwoMode)
     await this.sendBytes(buffer)
     await sleepAsync(20)
   }
 
   setAutoSolveCube = async(): Promise<void> => {
-    const buffer: Packet = this.txPacketRecord(7)
+    const buffer = this.txPacketRecord(7)
     await this.sendBytes(buffer)
     await sleepAsync(20)
   }
