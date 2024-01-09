@@ -155,6 +155,7 @@ export class MartyBlocks {
    * @param side - 0 = left or 1 = right
    */
   turn = async (steps: string, side: string): Promise<void> => {
+    side = ensureString(side);
     const moveTime = 1500
     let stepsInt = parseInt(steps)
     if (stepsInt === 0 || stepsInt < 0 || stepsInt > 20) {
@@ -468,4 +469,23 @@ export class MartyBlocks {
     const lightSensor = martyConnector.getLightSensorReading(channel)
     return lightSensor || 0
   }
+}
+
+/**
+ * Makes sure the argument is string 
+ * Also makes sure of wrong argument formats
+ * @param arg - Argument to be checked
+ * @returns The argument as string
+ */
+const ensureString = (arg: any): string => {
+  if (typeof arg === 'string') {
+    return arg
+  }
+  if (typeof arg === 'number') {
+    return arg.toString()
+  }
+  if (typeof arg === 'boolean') {
+    return arg.toString()
+  }
+  return ''
 }
