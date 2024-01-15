@@ -313,7 +313,7 @@ export default class SoundHelper {
 
           const offlineContext = new OfflineAudioContext(1, sampleLength, 44100)
           const gainNode = offlineContext.createGain()
-          gainNode.gain.value = 1
+          gainNode.gain.value = 2
           const source = offlineContext.createBufferSource()
           source.buffer = extendedBuffer
 
