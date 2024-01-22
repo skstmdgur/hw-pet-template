@@ -1,10 +1,8 @@
-## VeryBasicExample
+# exMarsCube
 
-# VeryBasic
+![exMarsCube](./main/public/logo.png)
 
-![VeryBasic](./main/public/logo.png)
-
-VeryBasic
+exMarsCube
 
 ## Technical stacks
 
@@ -72,14 +70,14 @@ Please modify the main/src/constants.ts file.
 /**
  * hardware id
  */
-export const HW_ID = 'veryBasic'
+export const HW_ID = 'exMarsCube'
 
 /**
  * hardware name
  */
 export const HW_NAME = {
-  en: 'Very Basic',
-  ko: '기본',
+  en: 'eX-Mars Cube',
+  ko: 'eX-Mars Cube',
 }
 ```
 
@@ -238,9 +236,5 @@ export class CommandRunner implements IHPetCommandRunner {
   }
 }
 ```
-
-## TODO
-
-### 개발하는 동안 테스트
 
 End.
