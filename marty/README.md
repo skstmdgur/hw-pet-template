@@ -300,8 +300,4 @@ export class CommandRunner implements IHPetCommandRunner {
 }
 ```
 
-## TODO
-
-### 개발하는 동안 테스트
-
 End.
