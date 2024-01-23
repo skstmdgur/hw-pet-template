@@ -12,7 +12,13 @@ The currently registered hardware includes the following:
 
 - [very-basic-example](./very-basic-example/README.md) - An example containing the minimum basic implementation.
 
+- [saeonAltinoLite-ble](./saeonAltinoLite-ble/README.md) - `알티노 라이트` 하드웨어 제어(한글 설명).
 - [marty](./marty/README.md) - Code for controlling the `Marty` hardware.
+- [exMarsCube](./exMarsCube/README.md) - Code for controlling the `exMarsCube` hardware.
+
+> 가장 마지막으로 업데이트 된 하드웨어는 `알티노 라이트`입니다. 신규 프로젝트를 작성하는 경우 `알티노 라이트`를 복사하는 것을 권장합니다.
+
+> The most recently updated hardware is the `Altino Light.` When creating a new project, it is recommended to replicate the `Altino Light.`
 
 ## Code Deployment
 
