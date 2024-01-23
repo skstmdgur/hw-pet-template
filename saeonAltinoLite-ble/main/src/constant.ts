@@ -1,7 +1,7 @@
 /**
  * hardware id
  */
-export const HW_ID = 'altinoLite-ble';
+export const HW_ID = 'saeonAltinoLite-ble';
 
 /**
  * hardware name

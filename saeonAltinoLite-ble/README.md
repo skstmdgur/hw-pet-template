@@ -71,7 +71,7 @@ await hw.echo('hello'); // response 'hello'
 /**
  * hardware id
  */
-export const HW_ID = 'altinoLite-ble';
+export const HW_ID = 'saeonAltinoLite-ble';
 
 /**
  * hardware name
@@ -99,10 +99,10 @@ export const HW_NAME = {
 /**
  * 하드웨어에 명령을 보내는 클래스
  * 필요한 명령어들을 추가하세요.
- * 메소드의 이름이 명령어입니다. 예를 들어 블록코딩에서 move라는 명령어를 실행하려면 move() 메서드를 작성하시면 됩니다.
+ * 메서드의 이름이 명령어입니다. 예를 들어 블록코딩에서 move라는 명령어를 실행하려면 move() 메서드를 작성하시면 됩니다.
  *
  * 라이프 사이클 메서드: init(), destroy()
- * 필수 구현 메소드: getConnectionState(), getHwId(), connect(), disconnect()
+ * 필수 구현 메서드: getConnectionState(), getHwId(), connect(), disconnect()
  * 위에 언급한 메서드 이외의 메서드들은 추가적인 명령어들입니다.
  */
 export class CommandRunner implements IHPetCommandRunner {
@@ -155,9 +155,9 @@ export class CommandRunner implements IHPetCommandRunner {
   /**
    * 명령어: connect
    *
-   * 하드웨어에 연결하는 함수
+   * 하드웨어에 연결
    * 반드시 구현해야 하는 메서드입니다.
-   * @returns 리턴값은 의미 없습니다.
+   * @returns 반환값은 의미 없습니다.
    */
   connect = async (): Promise<boolean> => {
     await fakeConnect()
@@ -172,7 +172,6 @@ export class CommandRunner implements IHPetCommandRunner {
    *
    * 하드웨어와의 연결을 종료하는 메서드
    * 반드시 구현해야 하는 메서드입니다.
-   * @returns 리턴값은 의미 없습니다.
    */
   disconnect = async () => {
     await fakeDisconnect().catch((err) => {
