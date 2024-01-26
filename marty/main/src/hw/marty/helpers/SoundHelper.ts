@@ -223,6 +223,26 @@ export default class SoundHelper {
 
   static SOUNDS_DIR = 'assets/sounds'
 
+  private static soundVolume  = 1
+
+  static set changeSoundVolumeBy(volume: number) {
+    // volume is coming in in the range -200 to 200
+    const rescaledVolume = (volume * 5) / 200;
+    let newVolume = SoundHelper.soundVolume + rescaledVolume;
+    // min volume is 0 and max volume is 5
+    if (newVolume < 0) {
+      newVolume = 0;
+    } else if (newVolume > 5) {
+      newVolume = 5;
+    }
+    SoundHelper.soundVolume = newVolume;
+  }
+
+  static set setSoundVolume(volume: number) {
+    const rescaledVolume = (volume * 5) / 200;
+    SoundHelper.soundVolume = rescaledVolume;
+  }
+
   static getSoundDuration(soundName: string): number | undefined {
     const soundData = SoundHelper.getSoundData(soundName)
     if (!soundData) {
@@ -313,7 +333,7 @@ export default class SoundHelper {
 
           const offlineContext = new OfflineAudioContext(1, sampleLength, 44100)
           const gainNode = offlineContext.createGain()
-          gainNode.gain.value = 2
+          gainNode.gain.value = SoundHelper.soundVolume
           const source = offlineContext.createBufferSource()
           source.buffer = extendedBuffer
 
