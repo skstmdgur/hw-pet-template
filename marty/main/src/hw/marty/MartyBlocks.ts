@@ -373,6 +373,30 @@ export class MartyBlocks {
   }
 
   /**
+   * Sets the volume of Marty speak 
+   * @param volume - Volume in %
+   */
+  set_volume = async (volume: string) => {
+    const parsedVolume = parseFloat(volume)
+    if (parsedVolume < 0 || parsedVolume > 200) {
+      return
+    }
+    SoundHelper.setSoundVolume = parsedVolume
+  }
+
+  /**
+   * Changes the volume of Marty speak by the given amount
+   * @param volume - Volume in %
+   */
+  change_volume_by = async (volume: string) => {
+    const parsedVolume = parseFloat(volume)
+    if (parsedVolume < -200 || parsedVolume > 200) {
+      return
+    }
+    SoundHelper.changeSoundVolumeBy = parsedVolume
+  }
+
+  /**
    * @param axis - X or Y or Z
    * @returns Acceleration in G
    */
