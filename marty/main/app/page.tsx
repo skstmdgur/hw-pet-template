@@ -4,18 +4,21 @@ import { HW_ID, HW_NAME } from '@/constant'
 import { CommandRunner } from '@/hw/CommandRunner'
 import martyConnector from '@/hw/marty/MartyConnector'
 import type { MartyConnectionState } from '@/hw/types'
+import log from '@/log'
 import { errmsg } from '@/utls/misc'
-import { HPet, HPetEventKeys } from '@ktaicoder/hw-pet'
+import { HPet, HPetNotifyEventKeys } from '@ktaicoder/hw-pet'
 import { Box, ButtonBase, Typography } from '@mui/material'
 import { RICConnEvent } from '@robotical/ricjs'
-import { useCallback, useEffect, useState } from 'react'
+import { useSearchParams } from 'next/navigation'
+import { useCallback, useEffect, useMemo, useState } from 'react'
 import LEDs from './components/hw/marty'
-import log from '@/log'
 
 const LOGO_IMG_URL = 'logo.png'
 const BLUETOOTH_IMG_URL = 'bluetooth.svg'
 
 export default function Page() {
+  const searchParams = useSearchParams()
+  const iframeToken = useMemo(() => getIframeToken(searchParams.get('iframeToken')), [searchParams])
   const [connectionState, setConnectionState] = useState<MartyConnectionState>('disconnected')
   const [randomColours, setRandomColours] = useState<string[]>([])
   const [commandRunner, setCommandRunner] = useState<CommandRunner>()
@@ -48,11 +51,12 @@ export default function Page() {
 
   useEffect(() => {
     const pet = new HPet({
+      iframeToken,
       hwId: HW_ID,
       commandRunnerClass: CommandRunner,
     })
 
-    pet.on(HPetEventKeys.CommandRunner.stateChanged, (data) => {
+    pet.notifyEvents.on(HPetNotifyEventKeys.CommandRunner.stateChanged, (data) => {
       const { state, commandRunner } = data
       if (state === 'started') {
         setCommandRunner(commandRunner as CommandRunner)
@@ -60,7 +64,7 @@ export default function Page() {
         setCommandRunner(undefined)
       }
     })
-    pet.on(HPetEventKeys.connectionStateChanged, setConnectionState)
+    pet.notifyEvents.on(HPetNotifyEventKeys.connectionStateChanged, setConnectionState)
     pet.start()
 
     return () => {
@@ -68,7 +72,7 @@ export default function Page() {
       pet.stop()
       setCommandRunner(undefined)
     }
-  }, [])
+  }, [iframeToken])
 
   // Create subscription to the marty connector state
   useEffect(() => {
@@ -85,7 +89,6 @@ export default function Page() {
               case RICConnEvent.CONN_VERIFYING_CORRECT_RIC:
                 setRandomColours(eventData as string[])
                 break
-
               default:
                 break
             }
@@ -262,4 +265,13 @@ export default function Page() {
       )}
     </Box>
   )
+}
+
+function getIframeToken(iframeToken: string | null): string {
+  if (iframeToken) {
+    return iframeToken
+  }
+
+  console.log('invalid iframeToken:', iframeToken)
+  return 'unknown'
 }
