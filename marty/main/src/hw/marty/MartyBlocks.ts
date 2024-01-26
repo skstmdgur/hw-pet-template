@@ -306,7 +306,10 @@ export class MartyBlocks {
   leds_specific_led = async (LEDAddon: string, ledId: string, colour: string): Promise<void> => {
     const resolveTime = 200
     const colourWithoutHash = colour.replace('#', '')
-    const ledIdMapped = AddonHelper.ledIdMapping(ledId)
+    let ledIdMapped: number | string = ledId
+    if (LEDAddon === 'LEDeye') {
+      ledIdMapped = AddonHelper.ledIdMapping(ledId)
+    }
     const command = `led/${LEDAddon}/setled/${ledIdMapped}/${colourWithoutHash}`
     martyConnector.sendRestMessage(command)
     await new Promise((resolve) => setTimeout(resolve, resolveTime))
@@ -381,7 +384,8 @@ export class MartyBlocks {
     if (parsedVolume < 0 || parsedVolume > 200) {
       return
     }
-    SoundHelper.setSoundVolume = parsedVolume
+    SoundHelper.setSoundVolume = parsedVolume;
+    await new Promise((resolve) => setTimeout(resolve, 200)) // return (almost) immediately
   }
 
   /**
@@ -394,6 +398,7 @@ export class MartyBlocks {
       return
     }
     SoundHelper.changeSoundVolumeBy = parsedVolume
+    await new Promise((resolve) => setTimeout(resolve, 200)) // return (almost) immediately
   }
 
   /**
