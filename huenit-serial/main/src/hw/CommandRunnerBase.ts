@@ -25,11 +25,34 @@ const chr = (str: string): number => str.charCodeAt(0)
  * Additional commands are the remaining methods other than the ones mentioned above (e.g., echo).
  */
 export class CommandRunnerBase implements IHPetCommandRunner {
+  /**
+   * 연결 상태
+   */
   private connectionState: ConnectionState = 'disconnected'
+
+  /**
+   * 하드웨어 ID
+   */
   private hwId: string
+
+  /**
+   * 부모 프레임에 데이터 전송하는 도우미 객체
+   */
   private toParent: IParentSender
+
+  /**
+   * 연결 상태 등을 부모 프레임에 notify하기 위한 이벤트 객체
+   */
   private notifyEvents: EventEmitter<HPetNotifiyEventDefinition>
+
+  /**
+   * 시리얼 디바이스
+   */
   private device_?: WebSerialDevice
+
+  /**
+   * 강제 중지 여부
+   */
   private forceStop_ = false
 
   /**
@@ -43,6 +66,9 @@ export class CommandRunnerBase implements IHPetCommandRunner {
     this.hwId = hwId
     this.toParent = toParent
     this.notifyEvents = notifyEvents
+    // commandEvents: 부모 프레임에서 전달되는 명령의 이벤트들
+    // notifyEvents: 부모 프레임에 전달하는 연결 상태등의 notification 이벤트들
+    // uiEvents: iframe의 ui와 상호작용할 수 있는 이벤트, 필요한 경우에만 사용
   }
 
   /**
@@ -168,7 +194,7 @@ export class CommandRunnerBase implements IHPetCommandRunner {
   /**
    * 디바이스 콜백 - 연결됨
    */
-  private onConnected_ = async (device: WebSerialDevice) => {
+  protected onConnected_ = async (device: WebSerialDevice) => {
     this.forceStop_ = false
     this.updateConnectionState_('connected')
   }
@@ -176,7 +202,7 @@ export class CommandRunnerBase implements IHPetCommandRunner {
   /**
    * 디바이스 콜백 - 연결이 끊어짐
    */
-  private onDisconnected_ = async () => {
+  protected onDisconnected_ = async () => {
     this.forceStop_ = true
     this.updateConnectionState_('disconnected')
   }
@@ -184,7 +210,7 @@ export class CommandRunnerBase implements IHPetCommandRunner {
   /**
    * 디바이스 콜백 - 디바이스로부터 데이터가 수신됨
    */
-  private onDataFromDevice_ = (dataBuffer: Uint8Array) => {
+  protected onDataFromDevice_ = (dataBuffer: Uint8Array) => {
     console.log('onDataFromDevice_():', dataBuffer)
   }
 

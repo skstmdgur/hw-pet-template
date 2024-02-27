@@ -1,24 +1,4 @@
-import { errmsg, sleepAsync } from '@/util/misc'
-
-/**
- * Connects to the hardware.
- * Adds a dummy sleep to simulate actual hardware interaction.
- * @returns Promise<boolean>
- */
-export async function fakeConnect(): Promise<boolean> {
-  await sleepAsync(1000)
-  return true
-}
-
-/**
- * Disconnects from the hardware.
- * Adds a dummy sleep to simulate actual hardware interaction.
- * @returns Promise<boolean>
- */
-export async function fakeDisconnect(): Promise<boolean> {
-  await sleepAsync(300)
-  return true
-}
+import { errmsg } from '@/util/misc'
 
 export async function openSerialDevice(): Promise<SerialPort | undefined> {
   try {
