@@ -9,6 +9,8 @@ TEMP=_tmp
 rm -rf ${TEMP}
 mkdir -p ${TEMP}
 
+TARGET_PROJ=huenit-serial
+
 do_export() {
     hwId=$1
     $hwId/_purge.sh
@@ -22,8 +24,7 @@ do_export() {
     echo
 }
 
-do_export marty
-do_export exMarsCube
+do_export $TARGET_PROJ
 
 DEPLOY_SERVER=https://aicodiny.com
 
@@ -45,9 +46,7 @@ if [ -z "$DATI_API_TOKEN" ]; then
     exit 1
 fi
 
-do_deploy marty
-do_deploy exMarsCube
+do_deploy $TARGET_PROJ
 
 echo "rm -rf ${TEMP}"
 rm -rf ${TEMP}
-
