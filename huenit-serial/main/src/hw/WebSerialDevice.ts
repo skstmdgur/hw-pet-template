@@ -39,15 +39,18 @@ export class WebSerialDevice {
   }
 
   /**
-   * implement IDevice
+   * 디바이스의 상태 관찰
    */
   observeDeviceState = (): Observable<HwDeviceState> => this.deviceState$.asObservable()
 
+  /**
+   * 디바이스의 연결 여부 관찰
+   */
   observeOpenedOrNot = (): Observable<boolean> =>
     this.deviceState$.pipe(map((it) => it === 'opened'))
 
   /**
-   * implement IDevice
+   * 연결이 될 때까지 기다리기
    */
   waitUntilOpened = (timeoutMilli = 0): Promise<boolean> => {
     if (timeoutMilli > 0) {
@@ -71,7 +74,7 @@ export class WebSerialDevice {
   }
 
   /**
-   * implement IDevice
+   * 디바이스의 데이터 관찰
    */
   observeRawData = (): Observable<BufferTimestamped> => {
     return this.deviceState$.pipe(
@@ -85,7 +88,6 @@ export class WebSerialDevice {
 
   /**
    * 연결 여부
-   * implement IDevice
    */
   isOpened = (): boolean => {
     return this.deviceState$.value === 'opened'
@@ -102,7 +104,6 @@ export class WebSerialDevice {
 
   /**
    * 디바이스 열기
-   * implement IDevice
    */
   open = async (port: SerialPort, options: SerialOptions): Promise<void> => {
     if (this.DEBUG) console.log('WebSerialDevice.open()', options)
@@ -144,6 +145,9 @@ export class WebSerialDevice {
     this.readLoopPromise_ = this.startReadLoop_()
   }
 
+  /**
+   * 시리얼포트 읽기 루프 실행
+   */
   private startReadLoop_ = async () => {
     while (this.deviceState$.value === 'opened') {
       if (this.DEBUG) {
@@ -210,11 +214,9 @@ export class WebSerialDevice {
   }
 
   /**
-   * write to serial port
+   * 시리얼포트에 데이터 전송
    * @param value data to send
    * @returns Promise<void>
-   *
-   * implement IDevice
    */
   write = async (value: Uint8Array): Promise<void> => {
     const port = this.port_
@@ -244,7 +246,7 @@ export class WebSerialDevice {
   }
 
   /**
-   * implement IDevice
+   * 디바이스 닫기
    */
   close = async () => {
     if (this.DEBUG) console.log('WebSerialDevice.close() currentState=' + this.deviceState$.value)
