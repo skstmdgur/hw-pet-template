@@ -20,17 +20,21 @@ export default function Page() {
     const connectSerial = async () => {
         try {
             setConnectionState('connecting');
-            // const newPort = await navigator.serial.requestPort();
-            const port = await navigator.serial.requestPort();
 
-            console.log('port_name : ', port);
-            // await newPort.open({ baudRate: 115200 });
-            await port.open({ baudRate: 115200 });
-            // setPort(newPort);
-            if (commandRunner){
-                commandRunner.setPort(port);
-                setConnectionState('connected');
+            if ('serial' in navigator) {
+                const newPort = await (navigator as any).serial.requestPort();
+                // navigator.serial이 존재하는 경우에만 이 코드 블록이 실행됨
+                await newPort.open({ baudRate: 115200 });
+                setPort(newPort);
+                // setPort(newPort);
+                if (commandRunner){
+                    commandRunner.setPort(port);
+                    setConnectionState('connected');
+                }
+            } else {
+                console.error('Serial API is not supported in this browser.');
             }
+
             // 이제 원하는 작업 수행
             // port 을 사용하여 데이터를 전송하거나 수신할 수 있음
         } catch (error) {

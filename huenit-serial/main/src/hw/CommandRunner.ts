@@ -1,5 +1,4 @@
 import { CommandRunnerBase } from './CommandRunnerBase'
-import axios from 'axios';
 
 /**
  * Inherits from the CommandRunnerBase class.
@@ -55,20 +54,20 @@ export class CommandRunner extends CommandRunnerBase {
   }
 
   async suctionOff(): Promise<void> {
-      let pkt1 = this.strToAsciiArray('M1400A0\nM1401A1\n');
+      const pkt1 = this.strToAsciiArray('M1400A0\nM1401A1\n');
 
       await this.sendCommand(new Uint8Array(pkt1));
 
       // Wait for 300 milliseconds
-      await new Promise(resolve => setTimeout(resolve, 300));
+      await new Promise(resolve => {setTimeout(resolve, 300)});
 
-      let pkt2 = this.strToAsciiArray('M1401A0\n');
+      const pkt2 = this.strToAsciiArray('M1401A0\n');
 
       await this.sendCommand(new Uint8Array(pkt2));
   }
 
   async timeSleep(t: number): Promise<void> {
-      await new Promise(resolve => setTimeout(resolve, t * 1000));
+      await new Promise(resolve => {setTimeout(resolve, t * 1000)});
   }
 
     
@@ -105,38 +104,6 @@ export class CommandRunner extends CommandRunnerBase {
     }
   };
 
-  teststart =async (): Promise<string> => {
-    try {
-      // 예시로 사용할 임시 URL
-      const apiUrl = 'https://jsonplaceholder.typicode.com/posts';
-
-      // POST 요청을 보낼 데이터
-      const postData = {
-        title: 'foo',
-        body: 'bar',
-        userId: 1,
-        // ... 추가 필요한 데이터
-      };
-
-      // POST 요청 보내기
-      const response = await axios.post(apiUrl, postData);
-
-      // API 응답에서 원하는 정보 추출
-      const resultData = response.data.id;
-
-      // 결과값을 로깅하거나 다른 작업을 수행할 수 있습니다.
-      console.log('중심좌표 :', resultData);
-
-      // 성공 메시지를 반환
-      return resultData;
-
-    } catch (error) {
-      // 오류 처리
-      console.error('API 호출 오류:', error);
-      throw new Error('API 호출 중 오류가 발생했습니다.');
-    }
-
-  }
 
   /**
    * command: foo
