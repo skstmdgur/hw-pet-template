@@ -1,3 +1,5 @@
+/* eslint-disable react/jsx-no-leaked-render */
+/* eslint-disable react/jsx-sort-props */
 'use client'
 import type { EmotionCache, Options as OptionsOfCreateCache } from '@emotion/cache'
 import createCache from '@emotion/cache'

@@ -1,14 +1,19 @@
 import log from '@/log'
-import { HPetEventKeys } from '@ktaicoder/hw-pet'
+import { errmsg } from '@/util/misc'
 import type {
-  HPetEventDefinition,
   ConnectionState,
+  HPetNotifiyEventDefinition,
   IHPetCommandRunner,
   IHPetContext,
   IParentSender,
 } from '@ktaicoder/hw-pet'
+import { HPetNotifyEventKeys } from '@ktaicoder/hw-pet'
 import type EventEmitter from 'eventemitter3'
-import { fakeConnect, fakeDisconnect } from './command-util'
+import { Subscription, map } from 'rxjs'
+import { WebSerialDevice } from './WebSerialDevice'
+import { openSerialDevice } from './command-util'
+
+const chr = (str: string): number => str.charCodeAt(0)
 
 /**
  * Class for sending commands to the hardware.
@@ -23,12 +28,21 @@ export class CommandRunnerBase implements IHPetCommandRunner {
   private connectionState: ConnectionState = 'disconnected'
   private hwId: string
   private toParent: IParentSender
-  private events: EventEmitter<HPetEventDefinition>
+  private notifyEvents: EventEmitter<HPetNotifiyEventDefinition>
+  private device_?: WebSerialDevice
+  private forceStop_ = false
+
+  /**
+   * 연결이 해제될 때 호출될 함수
+   */
+  private disposeFn_?: VoidFunction
 
   constructor(options: IHPetContext) {
-    this.hwId = options.hwId
-    this.toParent = options.toParent
-    this.events = options.events
+    const { hwId, toParent, commandEvents, notifyEvents, uiEvents } = options
+
+    this.hwId = hwId
+    this.toParent = toParent
+    this.notifyEvents = notifyEvents
   }
 
   /**
@@ -60,7 +74,7 @@ export class CommandRunnerBase implements IHPetCommandRunner {
   private updateConnectionState_ = (state: ConnectionState) => {
     if (state !== this.connectionState) {
       this.connectionState = state
-      this.events.emit(HPetEventKeys.connectionStateChanged, this.connectionState)
+      this.notifyEvents.emit(HPetNotifyEventKeys.connectionStateChanged, this.connectionState)
 
       // notify to parent frame (CODINY)
       this.toParent.notifyConnectionState(this.connectionState)
@@ -91,6 +105,33 @@ export class CommandRunnerBase implements IHPetCommandRunner {
     return this.hwId
   }
 
+  protected registerListeners_ = (device: WebSerialDevice) => {
+    const subscription = new Subscription()
+
+    // 디바이스의 상태가 변경될때 콜백 호출
+    subscription.add(
+      device.observeDeviceState().subscribe((state) => {
+        if (state === 'opened') {
+          this.onConnected_(device)
+        } else if (state === 'closed') {
+          this.onDisconnected_()
+        }
+      }),
+    )
+
+    // 디바이스로부터 데이터가 수신되면 콜백 호출
+    subscription.add(
+      device
+        .observeRawData()
+        .pipe(map((it) => it.dataBuffer))
+        .subscribe(this.onDataFromDevice_),
+    )
+
+    this.disposeFn_ = () => {
+      subscription.unsubscribe()
+    }
+  }
+
   /**
    * command: connect
    *
@@ -100,11 +141,78 @@ export class CommandRunnerBase implements IHPetCommandRunner {
    * @returns The return value is meaningless.
    */
   connect = async (): Promise<boolean> => {
-    await fakeConnect()
+    let port: SerialPort | undefined
 
-    // When changing the connection state, be sure to call updateConnectionState_()
-    this.updateConnectionState_('connected')
+    try {
+      port = await openSerialDevice()
+      if (!port) return false
+    } catch (ignore) {
+      console.log(errmsg(ignore))
+    }
+
+    if (!port) {
+      return false
+    }
+
+    this.updateConnectionState_('connecting')
+    const device = new WebSerialDevice()
+    this.device_ = device
+    this.registerListeners_(device)
+    device.open(port, { baudRate: 115200 })
+
+    // 연결이 되면 onConnected_() 가 호출되고,
+    // 연결이 실패하면 onDisconnected_() 가 호출됩니다
     return true
+  }
+
+  /**
+   * 디바이스 콜백 - 연결됨
+   */
+  private onConnected_ = async (device: WebSerialDevice) => {
+    this.forceStop_ = false
+    this.updateConnectionState_('connected')
+  }
+
+  /**
+   * 디바이스 콜백 - 연결이 끊어짐
+   */
+  private onDisconnected_ = async () => {
+    this.forceStop_ = true
+    this.updateConnectionState_('disconnected')
+  }
+
+  /**
+   * 디바이스 콜백 - 디바이스로부터 데이터가 수신됨
+   */
+  private onDataFromDevice_ = (dataBuffer: Uint8Array) => {
+    console.log('onDataFromDevice_():', dataBuffer)
+  }
+
+  /**
+   * 디바이스에 데이터를 전송합니다
+   * Send values to the device
+   */
+  protected writeRaw_ = async (values: number[] | Uint8Array | string): Promise<void> => {
+    const device = this.device_
+    // 디바이스에 연결되지 않은 상태
+    if (!device) {
+      console.log('writeRaw_(): ignore, device not connected')
+      return
+    }
+
+    // 디바이스 중지 중
+    if (this.forceStop_) {
+      console.log('writeRaw_(): ignore, stopping...')
+      return
+    }
+
+    if (typeof values === 'string') {
+      await device.write(new Uint8Array(values.split('').map(chr)))
+    } else if (Array.isArray(values)) {
+      await device.write(new Uint8Array(values))
+    } else {
+      await device.write(values)
+    }
   }
 
   /**
@@ -115,9 +223,16 @@ export class CommandRunnerBase implements IHPetCommandRunner {
    * @returns The return value is meaningless.
    */
   disconnect = async () => {
-    await fakeDisconnect().catch((err) => {
-      // ignore error
-    })
+    this.forceStop_ = true
+    if (this.disposeFn_) {
+      this.disposeFn_()
+      this.disposeFn_ = undefined
+    }
+
+    if (this.device_) {
+      await this.device_.close()
+      this.device_ = undefined
+    }
 
     // When changing the connection state, be sure to call updateConnectionState_()
     this.updateConnectionState_('disconnected')

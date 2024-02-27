@@ -1,4 +1,4 @@
-import { sleepAsync } from '@/util/misc'
+import { errmsg, sleepAsync } from '@/util/misc'
 
 /**
  * Connects to the hardware.
@@ -18,4 +18,19 @@ export async function fakeConnect(): Promise<boolean> {
 export async function fakeDisconnect(): Promise<boolean> {
   await sleepAsync(300)
   return true
+}
+
+export async function openSerialDevice(): Promise<SerialPort | undefined> {
+  try {
+    if ('serial' in navigator) {
+      return await navigator.serial.requestPort()
+    }
+    console.error('Serial API is not supported in this browser.')
+    return undefined
+  } catch (err) {
+    if (errmsg(err) === 'No port selected by the user') {
+      return undefined
+    }
+    throw err
+  }
 }
