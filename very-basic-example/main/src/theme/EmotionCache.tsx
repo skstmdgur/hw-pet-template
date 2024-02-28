@@ -1,4 +1,5 @@
 'use client'
+
 import type { EmotionCache, Options as OptionsOfCreateCache } from '@emotion/cache'
 import createCache from '@emotion/cache'
 import { CacheProvider as DefaultCacheProvider } from '@emotion/react'
@@ -71,15 +72,15 @@ export default function NextAppDirEmotionCacheProvider(props: NextAppDirEmotionC
       <>
         {globals.map(({ name, style }) => (
           <style
-            key={name}
-            data-emotion={`${registry.cache.key}-global ${name}`}
             dangerouslySetInnerHTML={{ __html: style }}
+            data-emotion={`${registry.cache.key}-global ${name}`}
+            key={name}
           />
         ))}
 
-        {styles && (
-          <style data-emotion={dataEmotionAttribute} dangerouslySetInnerHTML={{ __html: styles }} />
-        )}
+        {styles ? (
+          <style dangerouslySetInnerHTML={{ __html: styles }} data-emotion={dataEmotionAttribute} />
+        ) : null}
       </>
     )
   })
