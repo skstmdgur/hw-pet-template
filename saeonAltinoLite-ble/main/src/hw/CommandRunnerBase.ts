@@ -228,10 +228,6 @@ export class CommandRunnerBase implements IHPetCommandRunner {
       }),
     );
 
-    this.disposeFn = () => {
-      subscription.unsubscribe();
-    };
-
     const ioService = services.basicIoService;
     if (ioService) {
       console.warn('ioService.on(receive) event listener registered');
@@ -240,6 +236,13 @@ export class CommandRunnerBase implements IHPetCommandRunner {
     } else {
       console.warn('ioService is null');
     }
+
+    this.disposeFn = () => {
+      subscription.unsubscribe();
+      if (ioService) {
+        ioService.stopReceive();
+      }
+    };
 
     // txloop
     this.txLoop_();
