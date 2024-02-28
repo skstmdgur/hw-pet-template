@@ -59,6 +59,7 @@ export class ServiceHelper {
     const characteristic = await this.getCharacteristic(uuid);
 
     if (!characteristic) {
+      console.warn('characteristic is null, uuid=', uuid);
       return;
     }
 

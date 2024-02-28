@@ -41,12 +41,21 @@ export class BasicIoService extends EventEmitter {
   }
 
   private async init(): Promise<void> {
+    // console.warn('BasicIoService.init()');
     await this.helper.handleListener(
       'receive',
       BasicIoCharacteristic.rx,
       this.receiveHandler.bind(this),
     );
   }
+
+  startReceive = (): void => {
+    this.emit('newListener', 'receive');
+  };
+
+  stopReceive = (): void => {
+    this.emit('removeListener', 'receive');
+  };
 
   /**
    * Send serial data

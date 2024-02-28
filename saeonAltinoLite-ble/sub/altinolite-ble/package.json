@@ -23,6 +23,10 @@
     "tsup": "^8.0.1",
     "typescript": "^5.3.3"
   },
+  "peerDependencies": {
+    "eventemitter3": "^5",
+    "rxjs": "^7"
+  },
   "exports": {
     ".": {
       "require": {
