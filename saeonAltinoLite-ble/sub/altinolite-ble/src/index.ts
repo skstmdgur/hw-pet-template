@@ -10,7 +10,7 @@ interface Service {
 }
 
 class ServiceBuilder {
-  constructor(private services: BluetoothRemoteGATTService[]) { }
+  constructor(private services: BluetoothRemoteGATTService[]) {}
 
   public async createService<T>(
     serviceClass: (new (service: BluetoothRemoteGATTService) => T) & Service,

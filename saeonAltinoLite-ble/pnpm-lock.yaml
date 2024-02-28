@@ -156,8 +156,8 @@ importers:
   sub/ui:
     devDependencies:
       '@ktaicoder/hw-pet':
-        specifier: ^1.2.8
-        version: 1.2.8
+        specifier: ^1.2.9
+        version: 1.2.9
       '@mui/icons-material':
         specifier: ^5.15.3
         version: 5.15.6(@mui/material@5.15.6)(@types/react@18.2.48)(react@18.2.0)
@@ -880,6 +880,13 @@ packages:
     resolution: {integrity: sha512-RKNULD817uCLu6TXFlwkkrukixmLXKOj9lmYyPvU0VuD+inz23Q5YShIXpAh8jmnr/ZfWgwW7zCw78Yal6o6QA==}
     dependencies:
       eventemitter3: 5.0.1
+    dev: false
+
+  /@ktaicoder/hw-pet@1.2.9:
+    resolution: {integrity: sha512-eRFRvMtp7fIAIDGSvUq8hAor1ojRPYlgHrvHlY+g6JOR4LpY3IElspuB8FZQ5JZbov8oHzaLltCbCwTmhC3wPQ==}
+    dependencies:
+      eventemitter3: 5.0.1
+    dev: true
 
   /@microsoft/tsdoc-config@0.16.2:
     resolution: {integrity: sha512-OGiIzzoBLgWWR0UdRJX98oYO+XKGf7tiK4Zk6tQ/E4IJqGCe7dvkTvgDZV5cFJUzLGDOjeAXrnZoA6QkVySuxw==}

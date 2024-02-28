@@ -70,9 +70,9 @@ export class ServiceHelper {
         return;
       }
 
-      return ServiceHelper.queue.add(async () =>
-        { characteristic.addEventListener('characteristicvaluechanged', handler); },
-      );
+      return ServiceHelper.queue.add(async () => {
+        characteristic.addEventListener('characteristicvaluechanged', handler);
+      });
     });
 
     // eslint-disable-next-line @typescript-eslint/no-misused-promises

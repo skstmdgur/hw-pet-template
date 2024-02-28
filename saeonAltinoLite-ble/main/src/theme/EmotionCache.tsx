@@ -78,7 +78,9 @@ export default function NextAppDirEmotionCacheProvider(props: NextAppDirEmotionC
           />
         ))}
 
-        {styles ? <style dangerouslySetInnerHTML={{ __html: styles }} data-emotion={dataEmotionAttribute} /> : null}
+        {styles ? (
+          <style dangerouslySetInnerHTML={{ __html: styles }} data-emotion={dataEmotionAttribute} />
+        ) : null}
       </>
     );
   });

@@ -9,7 +9,7 @@
     "type-check": "tsc --pretty --noEmit"
   },
   "devDependencies": {
-    "@ktaicoder/hw-pet": "^1.2.8",
+    "@ktaicoder/hw-pet": "^1.2.9",
     "@mui/icons-material": "^5.15.3",
     "@mui/material": "^5.15.3",
     "@repo/eslint-config": "workspace:*",
@@ -26,7 +26,7 @@
     "typescript": "^5.3.3"
   },
   "peerDependencies": {
-    "@ktaicoder/hw-pet": "^1.2.7",
+    "@ktaicoder/hw-pet": "^1.2.9",
     "@mui/icons-material": "^5",
     "@mui/material": "^5",
     "clsx": "^2",
