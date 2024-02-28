@@ -9,11 +9,11 @@ VeryBasic
 ## Technical stacks
 
 - nodejs@20
-- nextjs@13
+- nextjs@14
 - react@18
 - worspace with turborepo
 - pnpm
-- typescript@^5.2.2
+- typescript@^5.3.3
 - @mui/material@5
 
 ## Build and Run
@@ -40,11 +40,13 @@ await hw.echo('hello') // response 'hello'
 - `main/`
   - Contains the content of the iframe to be embedded in the Codiny service.
   - Includes the source code of the web page written in NextJS.
-- `sub/eslint-config-custom/`
+- `sub/eslint-config/`
   - Contains eslint configurations.
-- `sub/tsconfig/`
+- `sub/typescript-config/`
   - Contains TypeScript configurations.
-
+- `sub/ui/`
+  - Contains ui components.
+  
 ## Source Code Modification
 
 - There is no need to modify the `sub/` folder.
@@ -239,8 +241,24 @@ export class CommandRunner implements IHPetCommandRunner {
 }
 ```
 
-## TODO
+## Testing in IFRAME Playground
 
-### 개발하는 동안 테스트
+- You can test in the IFRAME playground of the Codiny Block Workshop.
+- Prepare functioning hardware.
+- Visit the following address and enter the IFRAME URL as http://localhost:3000 to test:
+  - https://aicodiny.com/simul/hw-playground
+- You can test in the IFRAME Playground even if you haven't registered blocks in Codiny's Block Workshop.
+
+### Demo Videos
+
+Please refer to the IFRAME Playground demo videos.
+
+- The video shows hardware named `Marty` being operated in conjunction with Codiny.
+- You can observe the process of the Codiny operational server connecting with the developer's local host.
+
+- Marty Playground Demo
+  - https://www.youtube.com/watch?v=89DEb8h49EA
+- Marty Execution Demo
+  - https://www.youtube.com/watch?v=ZYi-DQNnnLQ
 
 End.
