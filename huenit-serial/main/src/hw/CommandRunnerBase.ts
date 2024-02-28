@@ -8,7 +8,7 @@ import type {
   IParentSender,
 } from '@ktaicoder/hw-pet'
 import { HPetNotifyEventKeys } from '@ktaicoder/hw-pet'
-import type EventEmitter from 'eventemitter3'
+import type { EventEmitter } from 'eventemitter3'
 import { Subscription, map } from 'rxjs'
 import { WebSerialDevice } from './WebSerialDevice'
 import { openSerialDevice } from './command-util'
