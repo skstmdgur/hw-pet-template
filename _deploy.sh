@@ -10,6 +10,7 @@ rm -rf ${TEMP}
 mkdir -p ${TEMP}
 
 TARGET_PROJ=huenit-serial
+DEPLOY_SERVER=https://aicodiny.com
 
 do_export() {
     hwId=$1
@@ -25,8 +26,6 @@ do_export() {
 }
 
 do_export $TARGET_PROJ
-
-DEPLOY_SERVER=https://aicodiny.com
 
 do_deploy() {
     hwId=$1
