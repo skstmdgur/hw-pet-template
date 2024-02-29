@@ -19,17 +19,16 @@ import {
   filter,
   from,
   interval,
-  map,
   sampleTime,
   switchMap,
   take,
   takeUntil,
   tap,
 } from 'rxjs'
-import { WebSerialDevice } from './WebSerialDevice'
-import { openSerialDevice } from './command-util'
 import { SaeonSmartFarmParser } from './SaeonSmartFarmParser'
 import { SmartFarmOutput } from './SmartFarmOutput'
+import { WebSerialDevice } from './WebSerialDevice'
+import { openSerialDevice } from './command-util'
 
 const TRACE = false
 const TX_INTERVAL = 50
@@ -342,6 +341,7 @@ export class CommandRunnerBase implements IHPetCommandRunner {
       console.log('rxLoop_(): device is not opened')
       return
     }
+
     const subscription = new Subscription()
     subscription.add(
       device
@@ -358,6 +358,10 @@ export class CommandRunnerBase implements IHPetCommandRunner {
         )
         .subscribe(),
     )
+
+    this.rxLoopDisposeFn_ = () => {
+      subscription.unsubscribe()
+    }
   }
 
   private txLoop_ = () => {
