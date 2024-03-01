@@ -28,8 +28,8 @@ pnpm dev
 ## 명령어 예시
 
 ```js
-await hw.foo(); // response 'bar'
-await hw.echo('hello'); // response 'hello'
+await hw.foo() // response 'bar'
+await hw.echo('hello') // response 'hello'
 ```
 
 ## 폴더 구조
@@ -80,7 +80,7 @@ export const HW_ID = 'saeonSmartFarm-serial'
 export const HW_NAME = {
   en: 'Saeon IOT SmartFarm',
   ko: '새온 IOT 스마트팜',
-};
+}
 ```
 
 - 하드웨어 ID는 원하는 ID로 설정할 수 있으나, 규칙에 어긋난 경우 승인이 거부됩니다.

@@ -21,12 +21,11 @@ export class SmartFarmOutput {
    */
   updateForStopAll() {
     this.CONTROL = 0
-    this.LED1 = 0
-    this.LED2 = 0
-    this.LED3 = 0
-    this.LED4 = 0
-    this.LED5 = 0
-    this.LED6 = 0
+    this.updateForStopLed()
+    this.updateForStopDisplay()
+  }
+
+  updateForStopDisplay() {
     this.DIS1 = 0
     this.DIS2 = 0
     this.DIS3 = 0
@@ -36,5 +35,14 @@ export class SmartFarmOutput {
     this.DIS7 = 0
     this.DIS8 = 0
     this.DIS9 = 0
+  }
+
+  updateForStopLed() {
+    this.LED1 = 0
+    this.LED2 = 0
+    this.LED3 = 0
+    this.LED4 = 0
+    this.LED5 = 0
+    this.LED6 = 0
   }
 }

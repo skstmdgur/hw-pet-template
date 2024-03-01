@@ -15,7 +15,6 @@ interface Options {
 /**
  * SaeonSmartFarmParser입니다
  * 지정된 패킷 크기의 시작/종료 마크를 찾아서 패킷을 전송합니다.
- * Transform 클래스를 상속합니다
  */
 export class SaeonSmartFarmParser {
   // 중개 버퍼
@@ -78,6 +77,11 @@ export class SaeonSmartFarmParser {
     }
   }
 
+  /**
+   * 옵저버블 트랜스포머 생성
+   * 디바이스로부터 수신된 데이터 청크를 패킷으로 변환하여
+   * 옵저버블 다운스트림으로 전달하는 트랜스포머입니다.
+   */
   static parse = (): TransformFn => {
     return (upstream: Observable<Uint8Array>) => {
       return new Observable((subscriber) => {

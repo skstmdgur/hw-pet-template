@@ -1,3 +1,4 @@
+import { isNullish } from '@repo/ui'
 import { CommandRunnerBase } from './CommandRunnerBase'
 
 /**
@@ -10,35 +11,22 @@ export class CommandRunner extends CommandRunnerBase {
   async stop(option: string): Promise<void> {
     const output = this.output
     console.log(`stop(${option})`)
-    if (option == 'All') {
+    if (option === 'All') {
       output.updateForStopAll()
-    } else if (option == 'Window') {
+    } else if (option === 'Led') {
+      output.updateForStopLed()
+    } else if (option === 'Display') {
+      output.updateForStopDisplay()
+    } else if (option === 'Window') {
       output.CONTROL &= 0xfe
-    } else if (option == 'Fan') {
+    } else if (option === 'Fan') {
       output.CONTROL &= 0xfd
-    } else if (option == 'Pump') {
+    } else if (option === 'Pump') {
       output.CONTROL &= 0xfb
-    } else if (option == 'Heater') {
+    } else if (option === 'Heater') {
       output.CONTROL &= 0xf7
-    } else if (option == 'Cam') {
+    } else if (option === 'Cam') {
       output.CONTROL &= 0x0f
-    } else if (option == 'Led') {
-      output.LED1 = 0
-      output.LED2 = 0
-      output.LED3 = 0
-      output.LED4 = 0
-      output.LED5 = 0
-      output.LED6 = 0
-    } else if (option == 'Display') {
-      output.DIS1 = 0
-      output.DIS2 = 0
-      output.DIS3 = 0
-      output.DIS4 = 0
-      output.DIS5 = 0
-      output.DIS6 = 0
-      output.DIS7 = 0
-      output.DIS8 = 0
-      output.DIS9 = 0
     }
   }
 
@@ -53,30 +41,26 @@ export class CommandRunner extends CommandRunnerBase {
   }
 
   async switch(idx: string): Promise<boolean> {
-    let value = false
     console.log(`switch number (${idx})`)
     const sensors = this.sensors
-    if (idx == '1') {
-      if (sensors.SW1 == 0) value = false
-      if (sensors.SW1 == 1) value = true
+    switch (+idx) {
+      case 1:
+        return sensors.SW1 === 1
+      case 2:
+        return sensors.SW2 === 1
+      case 3:
+        return sensors.SW3 === 1
+      default:
+        return false
     }
-    if (idx == '2') {
-      if (sensors.SW2 == 0) value = false
-      if (sensors.SW2 == 1) value = true
-    }
-    if (idx == '3') {
-      if (sensors.SW3 == 0) value = false
-      if (sensors.SW3 == 1) value = true
-    }
-    return value
   }
 
   async window(option: string): Promise<void> {
     console.log(`window(${option})`)
     const output = this.output
-    if (option == 'Open') {
+    if (option === 'Open') {
       output.CONTROL |= 0x01
-    } else if (option == 'Close') {
+    } else if (option === 'Close') {
       output.CONTROL &= 0xfe
     }
   }
@@ -84,9 +68,9 @@ export class CommandRunner extends CommandRunnerBase {
   async fan(option: string): Promise<void> {
     console.log(`fan(${option})`)
     const output = this.output
-    if (option == 'On') {
+    if (option === 'On') {
       output.CONTROL |= 0x02
-    } else if (option == 'Off') {
+    } else if (option === 'Off') {
       output.CONTROL &= 0xfd
     }
   }
@@ -94,9 +78,9 @@ export class CommandRunner extends CommandRunnerBase {
   async pump(option: string): Promise<void> {
     console.log(`pump(${option})`)
     const output = this.output
-    if (option == 'On') {
+    if (option === 'On') {
       output.CONTROL |= 0x04
-    } else if (option == 'Off') {
+    } else if (option === 'Off') {
       output.CONTROL &= 0xfb
     }
   }
@@ -104,9 +88,9 @@ export class CommandRunner extends CommandRunnerBase {
   async heater(option: string): Promise<void> {
     console.log(`heater(${option})`)
     const output = this.output
-    if (option == 'On') {
+    if (option === 'On') {
       output.CONTROL |= 0x08
-    } else if (option == 'Off') {
+    } else if (option === 'Off') {
       output.CONTROL &= 0xf7
     }
   }
@@ -128,19 +112,17 @@ export class CommandRunner extends CommandRunnerBase {
     const _green = Number(green)
     const _blue = Number(blue)
 
-    if (_idx == null) return
+    if (isNullish(idx) || isNullish(red) || isNullish(green) || isNullish(blue)) return
+
     if (_idx < 1) return
     if (_idx > 4) return
 
-    if (red == null) return
     if (_red < 0) return
     if (_red > 15) return
 
-    if (green == null) return
     if (_green < 0) return
     if (_green > 15) return
 
-    if (blue == null) return
     if (_blue < 0) return
     if (_blue > 15) return
 
@@ -155,7 +137,7 @@ export class CommandRunner extends CommandRunnerBase {
     dst = dst << (((_idx - 1) % 2) * 12)
     msk = msk << (((_idx - 1) % 2) * 12)
 
-    if (_idx == 1 || _idx == 2) {
+    if (_idx === 1 || _idx === 2) {
       org = output.LED3
       org = (org << 8) | output.LED2
       org = (org << 8) | output.LED1
@@ -168,7 +150,7 @@ export class CommandRunner extends CommandRunnerBase {
       output.LED3 = (org >> 16) & 0xff
     }
 
-    if (_idx == 3 || _idx == 4) {
+    if (_idx === 3 || _idx === 4) {
       org = output.LED6
       org = (org << 8) | output.LED5
       org = (org << 8) | output.LED4
@@ -184,19 +166,17 @@ export class CommandRunner extends CommandRunnerBase {
 
   async ledNumber(idx: number, red: number, green: number, blue: number): Promise<void> {
     const output = this.output
-    if (idx == null) return
+    if (isNullish(idx) || isNullish(red) || isNullish(green) || isNullish(blue)) return
+
     if (idx < 1) return
     if (idx > 4) return
 
-    if (red == null) return
     if (red < 0) return
     if (red > 15) return
 
-    if (green == null) return
     if (green < 0) return
     if (green > 15) return
 
-    if (blue == null) return
     if (blue < 0) return
     if (blue > 15) return
 
@@ -211,7 +191,7 @@ export class CommandRunner extends CommandRunnerBase {
     dst = dst << (((idx - 1) % 2) * 12)
     msk = msk << (((idx - 1) % 2) * 12)
 
-    if (idx == 1 || idx == 2) {
+    if (idx === 1 || idx === 2) {
       org = output.LED3
       org = (org << 8) | output.LED2
       org = (org << 8) | output.LED1
@@ -224,7 +204,7 @@ export class CommandRunner extends CommandRunnerBase {
       output.LED3 = (org >> 16) & 0xff
     }
 
-    if (idx == 3 || idx == 4) {
+    if (idx === 3 || idx === 4) {
       org = output.LED6
       org = (org << 8) | output.LED5
       org = (org << 8) | output.LED4
@@ -242,9 +222,7 @@ export class CommandRunner extends CommandRunnerBase {
     const output = this.output
     st = st.replace(/“ | ”/g, '')
 
-    if (st == null) return
-    if (st.length == 0) return
-
+    if (isNullish(st) || st.length === 0) return
     if (st.length > 9) st = st.substring(0, 9)
 
     const buf = [0]

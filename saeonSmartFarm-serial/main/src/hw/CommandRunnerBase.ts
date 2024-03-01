@@ -94,8 +94,14 @@ export class CommandRunnerBase implements IHPetCommandRunner {
    */
   private disposeFn_?: VoidFunction
 
+  /**
+   * txLoop 리소스 해제 함수
+   */
   private txLoopDisposeFn_?: VoidFunction
 
+  /**
+   * rxLoop 리소스 해제 함수
+   */
   private rxLoopDisposeFn_?: VoidFunction
 
   protected output = new SmartFarmOutput()
