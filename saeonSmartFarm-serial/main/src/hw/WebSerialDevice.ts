@@ -14,10 +14,6 @@ import {
 } from 'rxjs'
 
 type HwDeviceState = 'opening' | 'opened' | 'closing' | 'closed'
-type BufferTimestamped = {
-  timestamp: number
-  dataBuffer: Uint8Array
-}
 
 export class WebSerialDevice {
   DEBUG = false
