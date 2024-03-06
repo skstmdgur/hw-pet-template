@@ -9,7 +9,7 @@ import { createTheme } from '@mui/material/styles'
 //   display: 'swap',
 // })
 
-const theme = createTheme({
+export const theme = createTheme({
   palette: {
     mode: 'light',
   },
@@ -28,5 +28,3 @@ const theme = createTheme({
     },
   },
 })
-
-export default theme
