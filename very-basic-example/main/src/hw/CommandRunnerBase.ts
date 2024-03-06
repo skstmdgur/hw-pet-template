@@ -1,13 +1,13 @@
 import log from '@/log'
-import { HPetEventKeys } from '@ktaicoder/hw-pet'
-import type {
-  HPetEventDefinition,
-  ConnectionState,
-  IHPetCommandRunner,
-  IHPetContext,
-  IParentSender,
+import type { HPetNotifiyEventDefinition } from '@ktaicoder/hw-pet'
+import {
+  HPetNotifyEventKeys,
+  type ConnectionState,
+  type IHPetCommandRunner,
+  type IHPetContext,
+  type IParentSender,
 } from '@ktaicoder/hw-pet'
-import type EventEmitter from 'eventemitter3'
+import type { EventEmitter } from 'eventemitter3'
 import { fakeConnect, fakeDisconnect } from './command-util'
 
 /**
@@ -20,15 +20,35 @@ import { fakeConnect, fakeDisconnect } from './command-util'
  * Additional commands are the remaining methods other than the ones mentioned above (e.g., echo).
  */
 export class CommandRunnerBase implements IHPetCommandRunner {
+  /**
+   * 연결 상태
+   */
   private connectionState: ConnectionState = 'disconnected'
+
+  /**
+   * 하드웨어 ID
+   */
   private hwId: string
+
+  /**
+   * 부모 프레임에 데이터 전송하는 도우미 객체
+   */
   private toParent: IParentSender
-  private events: EventEmitter<HPetEventDefinition>
+
+  /**
+   * 연결 상태 등을 부모 프레임에 notify하기 위한 이벤트 객체
+   */
+  private notifyEvents: EventEmitter<HPetNotifiyEventDefinition>
 
   constructor(options: IHPetContext) {
-    this.hwId = options.hwId
-    this.toParent = options.toParent
-    this.events = options.events
+    const { hwId, toParent, commandEvents, notifyEvents, uiEvents } = options
+
+    this.hwId = hwId
+    this.toParent = toParent
+    this.notifyEvents = notifyEvents
+    // commandEvents: 부모 프레임에서 전달되는 명령의 이벤트들
+    // notifyEvents: 부모 프레임에 전달하는 연결 상태등의 notification 이벤트들
+    // uiEvents: iframe의 ui와 상호작용할 수 있는 이벤트, 필요한 경우에만 사용
   }
 
   /**
@@ -60,7 +80,7 @@ export class CommandRunnerBase implements IHPetCommandRunner {
   private updateConnectionState_ = (state: ConnectionState) => {
     if (state !== this.connectionState) {
       this.connectionState = state
-      this.events.emit(HPetEventKeys.connectionStateChanged, this.connectionState)
+      this.notifyEvents.emit(HPetNotifyEventKeys.connectionStateChanged, this.connectionState)
 
       // notify to parent frame (CODINY)
       this.toParent.notifyConnectionState(this.connectionState)

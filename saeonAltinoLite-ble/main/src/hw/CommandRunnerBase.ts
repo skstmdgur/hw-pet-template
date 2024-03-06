@@ -11,8 +11,19 @@ import {
 import * as altinolite from '@repo/altinolite-ble';
 import { sleepAsync } from '@repo/ui';
 import type { EventEmitter } from 'eventemitter3';
-import type { Observable, Subscription } from 'rxjs';
-import { BehaviorSubject, concatMap, filter, from, interval, take, takeUntil } from 'rxjs';
+import type { Observable } from 'rxjs';
+import {
+  BehaviorSubject,
+  Subject,
+  Subscription,
+  concatMap,
+  filter,
+  from,
+  interval,
+  take,
+  takeUntil,
+} from 'rxjs';
+import { SaeonAltinoLiteParser } from './SaeonAltinoLiteParser';
 import { AltinoLightOutput } from './altino-lite-utils';
 
 const TRACE = false;
@@ -41,8 +52,6 @@ function createDefaultTxBytes(): number[] {
 export class CommandRunnerBase implements IHPetCommandRunner {
   private stopped$ = new BehaviorSubject(false);
 
-  private txSubscription_: Subscription | undefined;
-
   private forceStopping_ = false;
 
   protected connectionState: ConnectionState = 'disconnected';
@@ -58,6 +67,12 @@ export class CommandRunnerBase implements IHPetCommandRunner {
   protected services: altinolite.Services | undefined;
 
   protected output = new AltinoLightOutput();
+
+  private deviceRawData$ = new Subject<Uint8Array>();
+
+  private txLoopDisposeFn_?: VoidFunction;
+
+  private rxLoopDisposeFn_?: VoidFunction;
 
   protected sensors = {
     CDS: 0,
@@ -205,29 +220,32 @@ export class CommandRunnerBase implements IHPetCommandRunner {
     this.updateConnectionState_('connected');
     bluetoothDevice.addEventListener('gattserverdisconnected', this.onDisconnected_);
 
-    const ioService = services.basicIoService;
-    if (ioService) {
-      ioService.on('receive', this.onReceive_);
-    }
+    this.rxLoop_(services);
     this.txLoop_();
   };
 
   private onDisconnected_ = async () => {
     console.log('onDisconnected_');
+    this.rxLoopDisposeFn_?.();
+    this.rxLoopDisposeFn_ = undefined;
+    this.txLoopDisposeFn_?.();
+    this.txLoopDisposeFn_ = undefined;
+
     this.bluetoothDevice = undefined;
+    const ioService = this.services?.basicIoService;
+    if (ioService) {
+      ioService.stopReceive();
+    }
     this.services = undefined;
     this.stopped$.next(true);
-    this.txSubscription_?.unsubscribe();
-    this.txSubscription_ = undefined;
     this.updateConnectionState_('disconnected');
   };
 
-  private onReceive_ = (event: CustomEvent) => {
-    const pkt = event.detail;
-
+  private onReceive_ = (pkt: Uint8Array) => {
+    // console.log('onReceive_', pkt);
     // validate packet length
     if (pkt.length < 22) {
-      // console.info(`onReceive_() invalid pkt.length: ${pkt.length} byte`)
+      console.info(`onReceive_() invalid pkt.length: ${pkt.length} byte`);
       return;
     }
     // validate packet start mark and end mark
@@ -355,18 +373,51 @@ export class CommandRunnerBase implements IHPetCommandRunner {
     return this.stopped$.pipe(filter(Boolean), take(1));
   };
 
+  private rxLoop_ = (services: altinolite.Services) => {
+    console.log('rxLoop_() start');
+    // rxloop
+    const subscription = new Subscription();
+    subscription.add(
+      this.deviceRawData$.pipe(SaeonAltinoLiteParser.parse()).subscribe((data) => {
+        this.onReceive_(data);
+      }),
+    );
+
+    const ioService = services.basicIoService;
+    if (ioService) {
+      ioService.startReceive();
+      ioService.on('receive', (pkt: Uint8Array) => {
+        this.deviceRawData$.next(pkt);
+      });
+    } else {
+      console.warn('ioService is null');
+    }
+
+    this.rxLoopDisposeFn_ = () => {
+      subscription.unsubscribe();
+      if (ioService) {
+        ioService.stopReceive();
+      }
+    };
+  };
+
   /**
    * Periodically send output objects to devices
    */
   private txLoop_ = () => {
-    const logTag = 'txLoop_()';
-    console.log(logTag, 'start');
-    this.txSubscription_ = interval(TX_INTERVAL)
-      .pipe(
-        concatMap(() => from(this.writeOutput_())),
-        takeUntil(this.closeTrigger_()),
-      )
-      .subscribe();
+    console.log('txLoop_() start');
+    const subscription = new Subscription();
+    subscription.add(
+      interval(TX_INTERVAL)
+        .pipe(
+          concatMap(() => from(this.writeOutput_())),
+          takeUntil(this.closeTrigger_()),
+        )
+        .subscribe(),
+    );
+    this.txLoopDisposeFn_ = () => {
+      subscription.unsubscribe();
+    };
   };
 
   /**

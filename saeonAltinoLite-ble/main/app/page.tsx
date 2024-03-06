@@ -9,7 +9,7 @@ import { ConnectButton, HardwareImageBox, HardwareNameBox, MediaIconBox, usePet 
 const DEBUG = config.isDebug;
 
 const LOGO_IMG_URL = 'logo.png';
-const BLUETOOTH_IMG_URL = 'bluetooth.svg';
+const MEDIA_ICON = 'bluetooth.svg';
 
 export default function Page() {
   const { commandRunner, connectionState, pet } = usePet(HW_ID, CommandRunner);
@@ -35,30 +35,11 @@ export default function Page() {
       sx={{
         pt: 2,
         bgcolor: '#fff',
-        '& .x_bottom_buttons': {
-          display: 'flex',
-          justifyContent: 'center',
-          alignItems: 'center',
-          p: 0,
-          height: 40,
-          bgcolor: 'primary.main',
-          color: '#fff',
-          width: '100%',
-          '&.x_connected': {
-            bgcolor: 'success.main',
-          },
-          '&.x_disconnected': {
-            bgcolor: 'primary.main',
-          },
-          '&.x_connecting': {
-            bgcolor: '#e91e63',
-          },
-        },
       }}
     >
       <HardwareImageBox src={LOGO_IMG_URL} />
       <HardwareNameBox title={HW_NAME.en} />
-      <MediaIconBox mediaIcon={BLUETOOTH_IMG_URL} />
+      <MediaIconBox mediaIcon={MEDIA_ICON} />
       <ConnectButton
         connectionState={connectionState}
         onClickConnectBtn={handleClickConnectBtn}

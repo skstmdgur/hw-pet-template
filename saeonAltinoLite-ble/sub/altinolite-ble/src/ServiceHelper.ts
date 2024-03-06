@@ -59,6 +59,7 @@ export class ServiceHelper {
     const characteristic = await this.getCharacteristic(uuid);
 
     if (!characteristic) {
+      console.warn('characteristic is null, uuid=', uuid);
       return;
     }
 
@@ -70,9 +71,9 @@ export class ServiceHelper {
         return;
       }
 
-      return ServiceHelper.queue.add(async () =>
-        { characteristic.addEventListener('characteristicvaluechanged', handler); },
-      );
+      return ServiceHelper.queue.add(async () => {
+        characteristic.addEventListener('characteristicvaluechanged', handler);
+      });
     });
 
     // eslint-disable-next-line @typescript-eslint/no-misused-promises

@@ -41,12 +41,14 @@ await hw.echo('hello'); // response 'hello'
   - eslint 설정이 포함되어 있습니다.
 - `sub/typescript-config/`
   - TypeScript 설정이 포함되어 있습니다.
+- `sub/ui/`
+  - UI 컴포넌트 및 간단한 유틸리티 함수들이 포함되어 있습니다.
 
 ## 소스 코드 수정
 
 - 기본적으로 `sub/` 폴더는 수정할 필요가 없습니다.
-- 하지만 규모가 큰 프로젝트의 경우 기능의 일부를 커스텀 라이브러리로 만들어 `sub/` 폴더에 넣을 수 있습니다.
-  - 이 프로젝트는 `sub/alitinolite-ble`와 `sub/ui` 라이브러리를 추가하였습니다.
+- 하지만 규모가 큰 프로젝트의 경우 기능의 일부를 라이브러리로 만들어 `sub/` 폴더에 넣을 수 있습니다.
+  - 이 프로젝트는 `sub/alitinolite-ble` 라이브러리를 추가하였습니다.
 - `main/` 폴더의 소스코드에서 수정할 부분은 다음과 같습니다.
   - `main/public/logo.png` - 하드웨어 이미지 파일
   - `main/src/constants.ts` - 하드웨어 ID 설정
