@@ -243,99 +243,53 @@ export class CommandRunnerG3 extends CommandRunnerBase {
   sendMatrixPicture = async (cubeNum, picture): Promise<void> => {}
 
   fishMatrixPicture = async (cubeNum, picture): Promise<void> => {
-    this.enqueue(
-      PingPongUtil.stringToByte('ff ff ff 02 00 e2 a2 00 12 70 00 00 00 00 01 01 00 00'),
-    )
+    this.enqueue(PingPongUtil.stringToByte('ff ff ff 02 00 e2 a2 00 12 70 00 00 00 00 01 01 00 00'))
     sleepAsync(50)
-    this.enqueue(
-      PingPongUtil.stringToByte('ff ff ff 02 00 e2 a2 00 12 70 00 00 00 01 03 03 00 00'),
-    )
+    this.enqueue(PingPongUtil.stringToByte('ff ff ff 02 00 e2 a2 00 12 70 00 00 00 01 03 03 00 00'))
     sleepAsync(50)
-    this.enqueue(
-      PingPongUtil.stringToByte('ff ff ff 02 00 e2 a2 00 12 70 00 00 01 03 06 07 00 00'),
-    )
+    this.enqueue(PingPongUtil.stringToByte('ff ff ff 02 00 e2 a2 00 12 70 00 00 01 03 06 07 00 00'))
     sleepAsync(50)
-    this.enqueue(
-      PingPongUtil.stringToByte('ff ff ff 02 00 e2 a2 00 12 70 00 01 03 07 0d 0f 01 00'),
-    )
+    this.enqueue(PingPongUtil.stringToByte('ff ff ff 02 00 e2 a2 00 12 70 00 01 03 07 0d 0f 01 00'))
     sleepAsync(50)
-    this.enqueue(
-      PingPongUtil.stringToByte('ff ff ff 02 00 e2 a2 00 12 70 00 02 07 0f 1b 1f 03 01'),
-    )
+    this.enqueue(PingPongUtil.stringToByte('ff ff ff 02 00 e2 a2 00 12 70 00 02 07 0f 1b 1f 03 01'))
     sleepAsync(50)
-    this.enqueue(
-      PingPongUtil.stringToByte('ff ff ff 02 00 e2 a2 00 12 70 00 04 0f 1f 37 3f 06 02'),
-    )
+    this.enqueue(PingPongUtil.stringToByte('ff ff ff 02 00 e2 a2 00 12 70 00 04 0f 1f 37 3f 06 02'))
     sleepAsync(50)
-    this.enqueue(
-      PingPongUtil.stringToByte('ff ff ff 02 00 e2 a2 00 12 70 00 08 1e 3f 6f 7e 0c 04'),
-    )
+    this.enqueue(PingPongUtil.stringToByte('ff ff ff 02 00 e2 a2 00 12 70 00 08 1e 3f 6f 7e 0c 04'))
     sleepAsync(50)
-    this.enqueue(
-      PingPongUtil.stringToByte('ff ff ff 02 00 e2 a2 00 12 70 00 10 3d 7f df fd 18 08'),
-    )
+    this.enqueue(PingPongUtil.stringToByte('ff ff ff 02 00 e2 a2 00 12 70 00 10 3d 7f df fd 18 08'))
     sleepAsync(50)
 
-    this.enqueue(
-      PingPongUtil.stringToByte('ff ff ff 02 00 e2 a2 00 12 70 00 20 7a fe be fa 30 10'),
-    )
+    this.enqueue(PingPongUtil.stringToByte('ff ff ff 02 00 e2 a2 00 12 70 00 20 7a fe be fa 30 10'))
     sleepAsync(50)
-    this.enqueue(
-      PingPongUtil.stringToByte('ff ff ff 01 00 e2 a2 00 12 70 00 00 00 00 01 01 00 00'),
-    )
+    this.enqueue(PingPongUtil.stringToByte('ff ff ff 01 00 e2 a2 00 12 70 00 00 00 00 01 01 00 00'))
     sleepAsync(10)
-    this.enqueue(
-      PingPongUtil.stringToByte('ff ff ff 02 00 e2 a2 00 12 70 00 40 f4 fc 7c f4 60 20'),
-    )
+    this.enqueue(PingPongUtil.stringToByte('ff ff ff 02 00 e2 a2 00 12 70 00 40 f4 fc 7c f4 60 20'))
     sleepAsync(50)
-    this.enqueue(
-      PingPongUtil.stringToByte('ff ff ff 01 00 e2 a2 00 12 70 00 00 00 01 03 03 00 00'),
-    )
+    this.enqueue(PingPongUtil.stringToByte('ff ff ff 01 00 e2 a2 00 12 70 00 00 00 01 03 03 00 00'))
     sleepAsync(10)
-    this.enqueue(
-      PingPongUtil.stringToByte('ff ff ff 02 00 e2 a2 00 12 70 00 80 e8 f8 f8 e8 c0 40'),
-    )
+    this.enqueue(PingPongUtil.stringToByte('ff ff ff 02 00 e2 a2 00 12 70 00 80 e8 f8 f8 e8 c0 40'))
     sleepAsync(50)
-    this.enqueue(
-      PingPongUtil.stringToByte('ff ff ff 01 00 e2 a2 00 12 70 00 00 01 03 06 07 00 00'),
-    )
+    this.enqueue(PingPongUtil.stringToByte('ff ff ff 01 00 e2 a2 00 12 70 00 00 01 03 06 07 00 00'))
     sleepAsync(10)
-    this.enqueue(
-      PingPongUtil.stringToByte('ff ff ff 02 00 e2 a2 00 12 70 00 00 d0 f0 f0 d0 80 80'),
-    )
+    this.enqueue(PingPongUtil.stringToByte('ff ff ff 02 00 e2 a2 00 12 70 00 00 d0 f0 f0 d0 80 80'))
     sleepAsync(50)
-    this.enqueue(
-      PingPongUtil.stringToByte('ff ff ff 01 00 e2 a2 00 12 70 00 01 03 07 0d 0f 01 00'),
-    )
+    this.enqueue(PingPongUtil.stringToByte('ff ff ff 01 00 e2 a2 00 12 70 00 01 03 07 0d 0f 01 00'))
     sleepAsync(10)
-    this.enqueue(
-      PingPongUtil.stringToByte('ff ff ff 02 00 e2 a2 00 12 70 00 00 40 c0 c0 40 00 00'),
-    )
+    this.enqueue(PingPongUtil.stringToByte('ff ff ff 02 00 e2 a2 00 12 70 00 00 40 c0 c0 40 00 00'))
     sleepAsync(50)
-    this.enqueue(
-      PingPongUtil.stringToByte('ff ff ff 01 00 e2 a2 00 12 70 00 02 07 0f 1b 1f 03 01'),
-    )
+    this.enqueue(PingPongUtil.stringToByte('ff ff ff 01 00 e2 a2 00 12 70 00 02 07 0f 1b 1f 03 01'))
     sleepAsync(10)
-    this.enqueue(
-      PingPongUtil.stringToByte('ff ff ff 02 00 e2 a2 00 12 70 00 00 80 80 80 80 00 00'),
-    )
+    this.enqueue(PingPongUtil.stringToByte('ff ff ff 02 00 e2 a2 00 12 70 00 00 80 80 80 80 00 00'))
     sleepAsync(50)
-    this.enqueue(
-      PingPongUtil.stringToByte('ff ff ff 01 00 e2 a2 00 12 70 00 04 0f 1f 37 3f 06 02'),
-    )
+    this.enqueue(PingPongUtil.stringToByte('ff ff ff 01 00 e2 a2 00 12 70 00 04 0f 1f 37 3f 06 02'))
     sleepAsync(10)
-    this.enqueue(
-      PingPongUtil.stringToByte('ff ff ff 02 00 e2 a2 00 12 70 00 00 00 00 00 00 00 00'),
-    )
+    this.enqueue(PingPongUtil.stringToByte('ff ff ff 02 00 e2 a2 00 12 70 00 00 00 00 00 00 00 00'))
     sleepAsync(50)
-    this.enqueue(
-      PingPongUtil.stringToByte('ff ff ff 01 00 e2 a2 00 12 70 00 08 1e 3f 6f 7e 0c 04'),
-    )
+    this.enqueue(PingPongUtil.stringToByte('ff ff ff 01 00 e2 a2 00 12 70 00 08 1e 3f 6f 7e 0c 04'))
     sleepAsync(10)
 
-    this.enqueue(
-      PingPongUtil.stringToByte('ff ff ff 01 00 e2 a2 00 12 70 00 10 3d 7f df fd 18 08'),
-    )
+    this.enqueue(PingPongUtil.stringToByte('ff ff ff 01 00 e2 a2 00 12 70 00 10 3d 7f df fd 18 08'))
     sleepAsync(10)
   }
 

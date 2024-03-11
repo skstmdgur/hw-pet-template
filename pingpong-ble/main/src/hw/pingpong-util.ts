@@ -70,7 +70,7 @@ export const makeSingleStep = (cubeNum, cubeID, speed, step): Uint8Array => {
   return data
 }
 
-export const makeContinuousStep = (cubeNum, cubeID, speed): Uint8Array =>{
+export const makeContinuousStep = (cubeNum, cubeID, speed): Uint8Array => {
   const data = new Uint8Array(15)
 
   data[0] = 0xff
@@ -97,7 +97,7 @@ export const makeContinuousStep = (cubeNum, cubeID, speed): Uint8Array =>{
   return data
 }
 
-export const makeAggregateStep = (cubeNum, innerData, method): Uint8Array =>{
+export const makeAggregateStep = (cubeNum, innerData, method): Uint8Array => {
   const packetSize = 13 + innerData[0].length * innerData.length
   const data = new Uint8Array(packetSize)
 
@@ -135,7 +135,7 @@ export const makeAggregateStep = (cubeNum, innerData, method): Uint8Array =>{
 /** ____________________________________________________________________________________________________ */
 
 // torque : 0(min) ~ 1(max)
-export const setInstantTorque = (cubeNum, torque): Uint8Array =>{
+export const setInstantTorque = (cubeNum, torque): Uint8Array => {
   const data = new Uint8Array(10)
   data[0] = 0xff
   data[1] = 0xff
