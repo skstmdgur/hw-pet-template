@@ -1,6 +1,6 @@
 import { type IHPetContext } from '@ktaicoder/hw-pet'
 import { CommandRunnerBase } from './CommandRunnerBase'
-import { PingPongUtill } from './pingpong-util'
+import * as PingPongUtil from './pingpong-util'
 
 /**
  * Inherits from the CommandRunnerBase class.
@@ -13,8 +13,6 @@ export class CommandRunnerG2 extends CommandRunnerBase {
   private bleNusCharTXUUID = '6e400003-b5a3-f393-e0a9-e50e24dcca9e'
   private rxCharacteristic: BluetoothRemoteGATTCharacteristic | undefined = undefined
   private txCharacteristic: BluetoothRemoteGATTCharacteristic | undefined = undefined
-
-  protected pingpongutill = new PingPongUtill()
 
   queue: any
   isSending: boolean
@@ -119,22 +117,7 @@ export class CommandRunnerG2 extends CommandRunnerBase {
 
   // 받는 데이터
   receivedBytes = (event: any): void => {
-    console.log(`Receive ${String(this.pingpongutill.byteToString(event.target.value.buffer))}`)
-  }
-
-  receiveEventByteToString = (event: any): String => {
-    let hexStr = ''
-    const hexSpace = ' '
-
-    for (let i = 0; i < event.target.value.byteLength; i++) {
-      // 각 바이트를 16진수로 변환
-      const hex = event.target.value.getUint8(i).toString(16).padStart(2, '0')
-      hexStr += hex + hexSpace
-    }
-
-    // 공백 제거
-    hexStr.trim()
-    return hexStr
+    console.log(`Receive ${String(PingPongUtil.byteToStringReceive(event))}`)
   }
 
   /** ____________________________________________________________________________________________________ */
@@ -144,12 +127,12 @@ export class CommandRunnerG2 extends CommandRunnerBase {
   }
 
   sendTest = async (packet: string): Promise<void> => {
-    this.enqueue(this.pingpongutill.stringToByte(packet))
+    this.enqueue(PingPongUtil.stringToByte(packet))
   }
 
   // 데이터를 큐에 추가하는 메소드
   enqueue(data) {
-    console.log(`Send : + ${String(this.pingpongutill.byteToString(data))}`)
+    console.log(`Send : + ${String(PingPongUtil.byteToString(data))}`)
     // 데이터를 20바이트씩 분할하여 큐에 추가
     for (let i = 0; i < data.length; i += 20) {
       const chunk = data.slice(i, i + 20)
@@ -190,17 +173,17 @@ export class CommandRunnerG2 extends CommandRunnerBase {
   }
 
   setInstantTorque = async (cubeNum, torque): Promise<void> => {
-    this.enqueue(this.pingpongutill.setInstantTorque(cubeNum, torque))
+    this.enqueue(PingPongUtil.setInstantTorque(cubeNum, torque))
   }
   /** ____________________________________________________________________________________________________ */
 
   connectToCube = async (): Promise<void> => {
-    this.enqueue(this.pingpongutill.getOrangeForSoundData())
+    this.enqueue(PingPongUtil.getOrangeForSoundData())
   }
 
   // cubeNum : 큐브 총 갯수
   connectToCubeWithNum = async (cubeNum): Promise<void> => {
-    this.enqueue(this.pingpongutill.getSetMultiroleInAction(cubeNum))
+    this.enqueue(PingPongUtil.getSetMultiroleInAction(cubeNum))
   }
 
   // cubeNum : 큐브 총 갯수
@@ -208,14 +191,14 @@ export class CommandRunnerG2 extends CommandRunnerBase {
   // speed : 속도 (100 ~ 1000)
   // step : 스텝 (0 ~ 1980)
   sendSingleStep = async (cubeNum, cubeID, speed, step): Promise<void> => {
-    this.enqueue(this.pingpongutill.makeSingleStep(cubeNum, cubeID, speed, step))
+    this.enqueue(PingPongUtil.makeSingleStep(cubeNum, cubeID, speed, step))
   }
 
   // cubeNum : 큐브 총 갯수
   // cubeID : 큐브 순서 (0부터 시작)
   // speed : 속도 (100 ~ 1000)
   sendContinuousStep = async (cubeNum, cubeID, speed): Promise<void> => {
-    this.enqueue(this.pingpongutill.makeContinuousStep(cubeNum, cubeID, speed))
+    this.enqueue(PingPongUtil.makeContinuousStep(cubeNum, cubeID, speed))
   }
 
   sendAggregator = async (cubeNum, method, speed0, step0, speed1, step1): Promise<void> => {
@@ -223,13 +206,13 @@ export class CommandRunnerG2 extends CommandRunnerBase {
 
     switch (method) {
       case 0:
-        innerData[0] = this.pingpongutill.makeContinuousStep(cubeNum, 0, speed0)
-        innerData[1] = this.pingpongutill.makeContinuousStep(cubeNum, 1, speed1)
+        innerData[0] = PingPongUtil.makeContinuousStep(cubeNum, 0, speed0)
+        innerData[1] = PingPongUtil.makeContinuousStep(cubeNum, 1, speed1)
         break
 
       case 1:
-        innerData[0] = this.pingpongutill.makeSingleStep(cubeNum, 0, speed0, step0)
-        innerData[1] = this.pingpongutill.makeSingleStep(cubeNum, 1, speed1, step1)
+        innerData[0] = PingPongUtil.makeSingleStep(cubeNum, 0, speed0, step0)
+        innerData[1] = PingPongUtil.makeSingleStep(cubeNum, 1, speed1, step1)
         break
 
       case 3:
@@ -242,7 +225,7 @@ export class CommandRunnerG2 extends CommandRunnerBase {
         break
     }
 
-    this.enqueue(this.pingpongutill.makeAggregateStep(cubeNum, innerData, method))
+    this.enqueue(PingPongUtil.makeAggregateStep(cubeNum, innerData, method))
   }
 
   // Auto Car ____________________________________________________________________________________________________
@@ -251,34 +234,34 @@ export class CommandRunnerG2 extends CommandRunnerBase {
     const innerAutoCarData = new Array(2)
 
     if (distance < 0) {
-      innerAutoCarData[0] = this.pingpongutill.makeSingleStep(
+      innerAutoCarData[0] = PingPongUtil.makeSingleStep(
         2,
         0,
-        this.pingpongutill.changeSpeedToSps(speed),
+        PingPongUtil.changeSpeedToSps(speed),
         Math.round(Math.abs(distance) * 24.44444),
       )
-      innerAutoCarData[1] = this.pingpongutill.makeSingleStep(
+      innerAutoCarData[1] = PingPongUtil.makeSingleStep(
         2,
         1,
-        this.pingpongutill.changeSpeedToSps(speed) * -1,
+        PingPongUtil.changeSpeedToSps(speed) * -1,
         Math.round(Math.abs(distance) * 24.44444),
       )
     } else {
-      innerAutoCarData[0] = this.pingpongutill.makeSingleStep(
+      innerAutoCarData[0] = PingPongUtil.makeSingleStep(
         2,
         0,
-        this.pingpongutill.changeSpeedToSps(speed) * -1,
+        PingPongUtil.changeSpeedToSps(speed) * -1,
         Math.round(Math.abs(distance) * 24.44444),
       )
-      innerAutoCarData[1] = this.pingpongutill.makeSingleStep(
+      innerAutoCarData[1] = PingPongUtil.makeSingleStep(
         2,
         1,
-        this.pingpongutill.changeSpeedToSps(speed),
+        PingPongUtil.changeSpeedToSps(speed),
         Math.round(Math.abs(distance) * 24.44444),
       )
     }
 
-    this.enqueue(this.pingpongutill.makeAggregateStep(2, innerAutoCarData, 1))
+    this.enqueue(PingPongUtil.makeAggregateStep(2, innerAutoCarData, 1))
   }
 
   // speed (0 ~ 100)
@@ -286,34 +269,34 @@ export class CommandRunnerG2 extends CommandRunnerBase {
     const innerAutoCarData = new Array(2)
 
     if (angle < 0) {
-      innerAutoCarData[0] = this.pingpongutill.makeSingleStep(
+      innerAutoCarData[0] = PingPongUtil.makeSingleStep(
         2,
         0,
-        this.pingpongutill.changeSpeedToSps(speed),
+        PingPongUtil.changeSpeedToSps(speed),
         Math.round(Math.abs(angle) * 2.25),
       )
-      innerAutoCarData[1] = this.pingpongutill.makeSingleStep(
+      innerAutoCarData[1] = PingPongUtil.makeSingleStep(
         2,
         1,
-        this.pingpongutill.changeSpeedToSps(speed),
+        PingPongUtil.changeSpeedToSps(speed),
         Math.round(Math.abs(angle) * 2.25),
       )
     } else {
-      innerAutoCarData[0] = this.pingpongutill.makeSingleStep(
+      innerAutoCarData[0] = PingPongUtil.makeSingleStep(
         2,
         0,
-        this.pingpongutill.changeSpeedToSps(speed) * -1,
+        PingPongUtil.changeSpeedToSps(speed) * -1,
         Math.round(Math.abs(angle) * 2.25),
       )
-      innerAutoCarData[1] = this.pingpongutill.makeSingleStep(
+      innerAutoCarData[1] = PingPongUtil.makeSingleStep(
         2,
         1,
-        this.pingpongutill.changeSpeedToSps(speed) * -1,
+        PingPongUtil.changeSpeedToSps(speed) * -1,
         Math.round(Math.abs(angle) * 2.25),
       )
     }
 
-    this.enqueue(this.pingpongutill.makeAggregateStep(2, innerAutoCarData, 1))
+    this.enqueue(PingPongUtil.makeAggregateStep(2, innerAutoCarData, 1))
   }
 
   // Rolling Car ____________________________________________________________________________________________________
@@ -322,24 +305,24 @@ export class CommandRunnerG2 extends CommandRunnerBase {
     const innerAutoCarData = new Array(2)
 
     if (distance < 0) {
-      innerAutoCarData[0] = this.pingpongutill.makeSingleStep(
+      innerAutoCarData[0] = PingPongUtil.makeSingleStep(
         2,
         0,
-        this.pingpongutill.changeSpeedToSps(speed),
+        PingPongUtil.changeSpeedToSps(speed),
         495 * Math.abs(distance),
       )
-      innerAutoCarData[1] = this.pingpongutill.makeSingleStep(2, 1, 0, 0)
+      innerAutoCarData[1] = PingPongUtil.makeSingleStep(2, 1, 0, 0)
     } else {
-      innerAutoCarData[0] = this.pingpongutill.makeSingleStep(
+      innerAutoCarData[0] = PingPongUtil.makeSingleStep(
         2,
         0,
-        this.pingpongutill.changeSpeedToSps(speed) * -1,
+        PingPongUtil.changeSpeedToSps(speed) * -1,
         495 * Math.abs(distance),
       )
-      innerAutoCarData[1] = this.pingpongutill.makeSingleStep(2, 1, 0, 0)
+      innerAutoCarData[1] = PingPongUtil.makeSingleStep(2, 1, 0, 0)
     }
 
-    this.enqueue(this.pingpongutill.makeAggregateStep(2, innerAutoCarData, 1))
+    this.enqueue(PingPongUtil.makeAggregateStep(2, innerAutoCarData, 1))
   }
 
   // speed (0 ~ 100)
@@ -347,24 +330,24 @@ export class CommandRunnerG2 extends CommandRunnerBase {
     const innerAutoCarData = new Array(2)
 
     if (angle < 0) {
-      innerAutoCarData[0] = this.pingpongutill.makeSingleStep(2, 0, 0, 0)
-      innerAutoCarData[1] = this.pingpongutill.makeSingleStep(
+      innerAutoCarData[0] = PingPongUtil.makeSingleStep(2, 0, 0, 0)
+      innerAutoCarData[1] = PingPongUtil.makeSingleStep(
         2,
         1,
-        this.pingpongutill.changeSpeedToSps(speed),
+        PingPongUtil.changeSpeedToSps(speed),
         Math.round((Math.abs(angle) / 360) * 1980 * 1.35),
       )
     } else {
-      innerAutoCarData[0] = this.pingpongutill.makeSingleStep(2, 0, 0, 0)
-      innerAutoCarData[1] = this.pingpongutill.makeSingleStep(
+      innerAutoCarData[0] = PingPongUtil.makeSingleStep(2, 0, 0, 0)
+      innerAutoCarData[1] = PingPongUtil.makeSingleStep(
         2,
         1,
-        this.pingpongutill.changeSpeedToSps(speed) * -1,
+        PingPongUtil.changeSpeedToSps(speed) * -1,
         Math.round((Math.abs(angle) / 360) * 1980 * 1.35),
       )
     }
 
-    this.enqueue(this.pingpongutill.makeAggregateStep(2, innerAutoCarData, 1))
+    this.enqueue(PingPongUtil.makeAggregateStep(2, innerAutoCarData, 1))
   }
 
   // Worm Bot ____________________________________________________________________________________________________
