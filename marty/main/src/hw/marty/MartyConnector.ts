@@ -383,23 +383,23 @@ export class MartyConnector {
     let resultsTimeout: NodeJS.Timeout
     const results: RICOKFail | RICWifiScanResults = await new Promise(
       (resolve, reject) =>
-        (resultsTimeout = setTimeout(() => {
-          ricSystem
-            .wifiScanResults()
-            .then((wifiscanMsgResults: boolean | RICOKFail | RICWifiScanResults) => {
-              if (typeof wifiscanMsgResults !== 'boolean') {
-                resolve(wifiscanMsgResults)
-              } else {
-                reject(new Error('wifiScanResults failed'))
-              }
-            })
-            .catch((err: unknown) => {
-              reject(err)
-            })
-            .finally(() => {
-              clearTimeout(resultsTimeout)
-            })
-        }, this._wifiScanDuration)),
+      (resultsTimeout = setTimeout(() => {
+        ricSystem
+          .wifiScanResults()
+          .then((wifiscanMsgResults: boolean | RICOKFail | RICWifiScanResults) => {
+            if (typeof wifiscanMsgResults !== 'boolean') {
+              resolve(wifiscanMsgResults)
+            } else {
+              reject(new Error('wifiScanResults failed'))
+            }
+          })
+          .catch((err: unknown) => {
+            reject(err)
+          })
+          .finally(() => {
+            clearTimeout(resultsTimeout)
+          })
+      }, this._wifiScanDuration)),
     )
     if ((results as RICWifiScanResults).hasOwnProperty('wifi')) {
       return results as RICWifiScanResults
@@ -458,6 +458,40 @@ export class MartyConnector {
     return ricStateInfo.smartServos.smartServos[jointNum].pos
   }
 
+  getIRFObstacleSensorReading() {
+    const ricStateInfo = this._ricConnector.getRICStateInfo()
+    const addons = ricStateInfo.addOnInfo.addons
+    let dsVal: number | null = null
+    for (const addon of addons) {
+      if (addon.whoAmI === RIC_WHOAMI_TYPE_CODE_ADDON_IRFOOT) {
+        for (const val in addon.vals) {
+          if (val.includes('Touch_IR')) {
+            dsVal = addon.vals[val] as number
+          }
+        }
+      }
+    }
+    if (dsVal !== null) return dsVal
+    return 0
+  }
+
+  getObstacleSensorReadingFromColorSensor() {
+    const ricStateInfo = this._ricConnector.getRICStateInfo()
+    const addons = ricStateInfo.addOnInfo.addons
+    let dsVal: number | null = null
+    for (const addon of addons) {
+      if (addon.whoAmI === RIC_WHOAMI_TYPE_CODE_ADDON_COLOUR) {
+        for (const val in addon.vals) {
+          if (val.includes('IRVal')) {
+            dsVal = addon.vals[val] as number
+          }
+        }
+      }
+    }
+    if (dsVal !== null) return dsVal
+    return 0
+  }
+
   getReadingFromDistanceSensor(): number {
     const ricStateInfo = this._ricConnector.getRICStateInfo()
     const addons = ricStateInfo.addOnInfo.addons
@@ -476,33 +510,41 @@ export class MartyConnector {
     return 0
   }
 
-  isFootOnGround(): boolean {
+  isFootOnGround(sensor: "color" | "IRF"): boolean {
     const ricStateInfo = this._ricConnector.getRICStateInfo()
     const addons = ricStateInfo.addOnInfo.addons
-    for (const addon of addons) {
-      if (addon.whoAmI === RIC_WHOAMI_TYPE_CODE_ADDON_COLOUR) {
-        return SensorHelper.getGroundHelper(addon)
+    if (sensor === 'color') {
+      for (const addon of addons) {
+        if (addon.whoAmI === RIC_WHOAMI_TYPE_CODE_ADDON_COLOUR) {
+          return SensorHelper.getGroundHelper(addon)
+        }
       }
     }
-    for (const addon of addons) {
-      if (addon.whoAmI === RIC_WHOAMI_TYPE_CODE_ADDON_IRFOOT) {
-        return SensorHelper.getGroundHelper(addon)
+    if (sensor === 'IRF') {
+      for (const addon of addons) {
+        if (addon.whoAmI === RIC_WHOAMI_TYPE_CODE_ADDON_IRFOOT) {
+          return SensorHelper.getGroundHelper(addon)
+        }
       }
     }
     return false
   }
 
-  isFootObstacle(): boolean {
+  isFootObstacle(sensor: "color" | "IRF"): boolean {
     const ricStateInfo = this._ricConnector.getRICStateInfo()
     const addons = ricStateInfo.addOnInfo.addons
-    for (const addon of addons) {
-      if (addon.whoAmI === RIC_WHOAMI_TYPE_CODE_ADDON_COLOUR) {
-        return SensorHelper.getObstacleHelper(addon)
+    if (sensor === 'color') {
+      for (const addon of addons) {
+        if (addon.whoAmI === RIC_WHOAMI_TYPE_CODE_ADDON_COLOUR) {
+          return SensorHelper.getObstacleHelper(addon)
+        }
       }
     }
-    for (const addon of addons) {
-      if (addon.whoAmI === RIC_WHOAMI_TYPE_CODE_ADDON_IRFOOT) {
-        return SensorHelper.getObstacleHelper(addon)
+    if (sensor === 'IRF') {
+      for (const addon of addons) {
+        if (addon.whoAmI === RIC_WHOAMI_TYPE_CODE_ADDON_IRFOOT) {
+          return SensorHelper.getObstacleHelper(addon)
+        }
       }
     }
     return false

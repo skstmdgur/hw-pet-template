@@ -1,6 +1,5 @@
 export default class SensorHelper {
   static getGroundHelper(addon) {
-    console.log('getGroundHelper', addon)
     for (const addonValKey in addon.vals) {
       const addonVal = addon.vals[addonValKey]
       if (addonValKey.includes('Air')) {

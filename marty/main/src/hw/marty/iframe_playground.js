@@ -31,9 +31,9 @@ hw.accelerometer(axis);
 hw.remaining_battery();
 hw.current(joint);
 hw.position(joint);
-hw.distance();
-hw.foot_on_ground();
-hw.foot_obstacle();
+hw.distance(); // @param sensor - color or distance or IRF (obstacle)
+hw.foot_on_ground(); // @param sensor - color or obstacle (IRF)
+hw.foot_obstacle(); // @param sensor - color or obstacle (IRF)
 hw.colour_sensor();
 hw.colour_sensor_channel(channel);
 hw.noise_sensor();

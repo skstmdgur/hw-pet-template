@@ -442,26 +442,36 @@ export class MartyBlocks {
   }
 
   /**
+   * @param sensor - color or distance or IRF (obstacle)
    * @returns distance sensor reading
    */
-  distance = async (): Promise<number> => {
-    const distance = martyConnector.getReadingFromDistanceSensor()
+  distance = async (sensor: "color" | "distance" | "IRF"): Promise<number> => {
+    let distance = 0;
+    if (sensor === "distance") {
+      distance = martyConnector.getReadingFromDistanceSensor();
+    } else if (sensor === "IRF") {
+      distance = martyConnector.getIRFObstacleSensorReading();
+    } else {
+      distance = martyConnector.getObstacleSensorReadingFromColorSensor();
+    }
     return distance || 0
   }
 
   /**
+   * @param sensor - color or obstacle (IRF)
    * @return is foot on the ground? (boolean)
    */
-  foot_on_ground = async (): Promise<boolean> => {
-    const footOnGround = martyConnector.isFootOnGround()
+  foot_on_ground = async (sensor: "color" | "IRF"): Promise<boolean> => {
+    const footOnGround = martyConnector.isFootOnGround(sensor)
     return footOnGround || false
   }
 
   /**
+   * @param sensor - color or obstacle (IRF)
    * @return is foot obstacle detected? (boolean)
    */
-  foot_obstacle = async (): Promise<boolean> => {
-    const footObstacle = martyConnector.isFootObstacle()
+  foot_obstacle = async (sensor: "color" | "IRF"): Promise<boolean> => {
+    const footObstacle = martyConnector.isFootObstacle(sensor)
     return footObstacle || false
   }
 
