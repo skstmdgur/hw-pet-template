@@ -1,6 +1,6 @@
 import { type IHPetContext } from '@ktaicoder/hw-pet'
 import { CommandRunnerBase } from './CommandRunnerBase'
-import { PingPongUtill } from './pingpong-util'
+import * as PingPongUtil from './pingpong-util'
 
 /**
  * Inherits from the CommandRunnerBase class.
@@ -13,8 +13,6 @@ export class CommandRunnerG4 extends CommandRunnerBase {
   private bleNusCharTXUUID = '6e400003-b5a3-f393-e0a9-e50e24dcca9e'
   private rxCharacteristic: BluetoothRemoteGATTCharacteristic | undefined = undefined
   private txCharacteristic: BluetoothRemoteGATTCharacteristic | undefined = undefined
-
-  protected pingpongutill = new PingPongUtill()
 
   queue: any
   isSending: boolean
@@ -119,21 +117,7 @@ export class CommandRunnerG4 extends CommandRunnerBase {
 
   // 받는 데이터
   receivedBytes = (event: any): void => {
-    console.log(`Receive ${String(this.pingpongutill.byteToString(event.target.value.buffer))}`)
-  }
-  receiveEventByteToString = (event: any): String => {
-    let hexStr = ''
-    const hexSpace = ' '
-
-    for (let i = 0; i < event.target.value.byteLength; i++) {
-      // 각 바이트를 16진수로 변환
-      const hex = event.target.value.getUint8(i).toString(16).padStart(2, '0')
-      hexStr += hex + hexSpace
-    }
-
-    // 공백 제거
-    hexStr.trim()
-    return hexStr
+    console.log(`Receive ${String(PingPongUtil.byteToStringReceive(event))}`)
   }
 
   /** ____________________________________________________________________________________________________ */
@@ -143,12 +127,12 @@ export class CommandRunnerG4 extends CommandRunnerBase {
   }
 
   sendTest = async (packet: string): Promise<void> => {
-    this.enqueue(this.pingpongutill.stringToByte(packet))
+    this.enqueue(PingPongUtil.stringToByte(packet))
   }
 
   // 데이터를 큐에 추가하는 메소드
   enqueue(data) {
-    console.log(`Send : + ${String(this.pingpongutill.byteToString(data))}`)
+    console.log(`Send : + ${String(PingPongUtil.byteToString(data))}`)
     // 데이터를 20바이트씩 분할하여 큐에 추가
     for (let i = 0; i < data.length; i += 20) {
       const chunk = data.slice(i, i + 20)
@@ -189,17 +173,17 @@ export class CommandRunnerG4 extends CommandRunnerBase {
   }
 
   setInstantTorque = async (cubeNum, torque): Promise<void> => {
-    this.enqueue(this.pingpongutill.setInstantTorque(cubeNum, torque))
+    this.enqueue(PingPongUtil.setInstantTorque(cubeNum, torque))
   }
   /** ____________________________________________________________________________________________________ */
 
   connectToCube = async (): Promise<void> => {
-    this.enqueue(this.pingpongutill.getOrangeForSoundData())
+    this.enqueue(PingPongUtil.getOrangeForSoundData())
   }
 
   // cubeNum : 큐브 총 갯수
   connectToCubeWithNum = async (cubeNum): Promise<void> => {
-    this.enqueue(this.pingpongutill.getSetMultiroleInAction(cubeNum))
+    this.enqueue(PingPongUtil.getSetMultiroleInAction(cubeNum))
   }
 
   // cubeNum : 큐브 총 갯수
@@ -207,14 +191,14 @@ export class CommandRunnerG4 extends CommandRunnerBase {
   // speed : 속도 (100 ~ 1000)
   // step : 스텝 (0 ~ 1980)
   sendSingleStep = async (cubeNum, cubeID, speed, step): Promise<void> => {
-    this.enqueue(this.pingpongutill.makeSingleStep(cubeNum, cubeID, speed, step))
+    this.enqueue(PingPongUtil.makeSingleStep(cubeNum, cubeID, speed, step))
   }
 
   // cubeNum : 큐브 총 갯수
   // cubeID : 큐브 순서 (0부터 시작)
   // speed : 속도 (100 ~ 1000)
   sendContinuousStep = async (cubeNum, cubeID, speed): Promise<void> => {
-    this.enqueue(this.pingpongutill.makeContinuousStep(cubeNum, cubeID, speed))
+    this.enqueue(PingPongUtil.makeContinuousStep(cubeNum, cubeID, speed))
   }
 
   sendAggregator = async (
@@ -233,17 +217,17 @@ export class CommandRunnerG4 extends CommandRunnerBase {
 
     switch (method) {
       case 0:
-        innerData[0] = this.pingpongutill.makeContinuousStep(cubeNum, 0, speed0)
-        innerData[1] = this.pingpongutill.makeContinuousStep(cubeNum, 1, speed1)
-        innerData[2] = this.pingpongutill.makeContinuousStep(cubeNum, 2, speed2)
-        innerData[3] = this.pingpongutill.makeContinuousStep(cubeNum, 3, speed3)
+        innerData[0] = PingPongUtil.makeContinuousStep(cubeNum, 0, speed0)
+        innerData[1] = PingPongUtil.makeContinuousStep(cubeNum, 1, speed1)
+        innerData[2] = PingPongUtil.makeContinuousStep(cubeNum, 2, speed2)
+        innerData[3] = PingPongUtil.makeContinuousStep(cubeNum, 3, speed3)
         break
 
       case 1:
-        innerData[0] = this.pingpongutill.makeSingleStep(cubeNum, 0, speed0, step0)
-        innerData[1] = this.pingpongutill.makeSingleStep(cubeNum, 1, speed1, step1)
-        innerData[2] = this.pingpongutill.makeSingleStep(cubeNum, 2, speed2, step2)
-        innerData[3] = this.pingpongutill.makeSingleStep(cubeNum, 3, speed3, step3)
+        innerData[0] = PingPongUtil.makeSingleStep(cubeNum, 0, speed0, step0)
+        innerData[1] = PingPongUtil.makeSingleStep(cubeNum, 1, speed1, step1)
+        innerData[2] = PingPongUtil.makeSingleStep(cubeNum, 2, speed2, step2)
+        innerData[3] = PingPongUtil.makeSingleStep(cubeNum, 3, speed3, step3)
         break
 
       case 3:
@@ -256,7 +240,7 @@ export class CommandRunnerG4 extends CommandRunnerBase {
         break
     }
 
-    this.enqueue(this.pingpongutill.makeAggregateStep(cubeNum, innerData, method))
+    this.enqueue(PingPongUtil.makeAggregateStep(cubeNum, innerData, method))
   }
 
   // Crawling Bot ____________________________________________________________________________________________________
