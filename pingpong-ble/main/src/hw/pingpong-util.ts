@@ -1,4 +1,4 @@
-import exp from "constants"
+import exp from 'constants'
 
 //connect
 export const getOrangeForSoundData = (): Uint8Array => {
@@ -66,9 +66,7 @@ export const getSensor = (): Uint8Array => {
   return data
 }
 
-
-
-export const makeServoDegreeData = (cubeID, degree): Uint8Array =>{
+export const makeServoDegreeData = (cubeID, degree): Uint8Array => {
   const data = new Uint8Array(13)
 
   if (degree > 180) degree = 180
@@ -93,12 +91,18 @@ export const makeServoDegreeData = (cubeID, degree): Uint8Array =>{
   data[11] = degree
   data[12] = 0x00
 
-  return data;
+  return data
 }
 
 // playAndStop : play : 0x02, stop : 0x01
 // notesAndRests : note, rest
-export const makeMusicData = (cubeID, playAndStop, notesAndRests, pianoKey, duration): Uint8Array =>{
+export const makeMusicData = (
+  cubeID,
+  playAndStop,
+  notesAndRests,
+  pianoKey,
+  duration,
+): Uint8Array => {
   const data = new Uint8Array(14)
 
   data[0] = 0xff
@@ -125,20 +129,20 @@ export const makeMusicData = (cubeID, playAndStop, notesAndRests, pianoKey, dura
   // Rest
   data[13] = 0x00
 
-  if(notesAndRests === 'note'){
+  if (notesAndRests === 'note') {
     data[12] = duration
     data[13] = 0x00
   }
-  if(notesAndRests === 'rest'){
+  if (notesAndRests === 'rest') {
     data[12] = 0x00
     data[13] = duration
   }
 
-  return data;
+  return data
 }
 
 //playAndStop : play : 0x02, stop : 0x01
-export const makeMusicPlay = (playAndStop): Uint8Array =>{
+export const makeMusicPlay = (playAndStop): Uint8Array => {
   const data = new Uint8Array(11)
 
   data[0] = 0xff
@@ -157,7 +161,7 @@ export const makeMusicPlay = (playAndStop): Uint8Array =>{
   data[9] = playAndStop
   data[10] = 0x00
 
-  return data;
+  return data
 }
 
 export const makeSingleStep = (cubeNum, cubeID, speed, step): Uint8Array => {
@@ -251,20 +255,18 @@ export const makeAggregateStep = (cubeNum, innerData, method): Uint8Array => {
   return data
 }
 
-export const makeDelayTimeFromSpeedStep = (speed, step): number =>{
-
+export const makeDelayTimeFromSpeedStep = (speed, step): number => {
   // 1회전당 걸리는 시간
-  const oneRotationSecond = Math.pow(2, (1000 - speed) / 100);
+  const oneRotationSecond = Math.pow(2, (1000 - speed) / 100)
   // 1980 = 1회전당 스텝
-  const oneRotationStep = step/1980;
-  const delayTime = oneRotationSecond * oneRotationStep * 1000;
+  const oneRotationStep = step / 1980
+  const delayTime = oneRotationSecond * oneRotationStep * 1000
 
   console.log(`oneRotationSecond : ${oneRotationSecond}, oneRotationStep : ${oneRotationStep}`)
   console.log(`delayTime : ${delayTime}`)
 
-  return delayTime + 1000;
+  return delayTime + 1000
 }
-
 
 /** ____________________________________________________________________________________________________ */
 
@@ -336,26 +338,24 @@ export const changeSpeedToSps = (speed: number): number => {
   return (speed * 1100 - 10000) / speed
 }
 
-export const getSignedIntFromByteData = (byteData): number =>{
+export const getSignedIntFromByteData = (byteData): number => {
   // 입력 값을 10진수로 파싱하고, 8비트로 제한하기 위해 & 0xFF를 사용
-  var data = parseInt(byteData, 10) & 0xFF;
+  var data = parseInt(byteData, 10) & 0xff
   // 0x80은 128을 16진수로 표현
-  // 비트 7이 설정되어 있다면(즉, 값이 128 이상이라면), 0xFFFFFF00을 AND 연산 
+  // 비트 7이 설정되어 있다면(즉, 값이 128 이상이라면), 0xFFFFFF00을 AND 연산
   // 부호 있는 32비트 정수로 확장
-  if (data & 0x80) data = (data & 0xFF) - 0x100;
+  if (data & 0x80) data = (data & 0xff) - 0x100
 
   // 최대 90도까지만 표현
-  if (data > 90) data = 90;
-  if (data < -90) data = -90;
+  if (data > 90) data = 90
+  if (data < -90) data = -90
 
-  return data;
+  return data
 }
-
 
 /** ____________________________________________________________________________________________________ */
 
-export const changeMusicNotesAndRests = (notesAndRests : string): number => {
-
+export const changeMusicNotesAndRests = (notesAndRests: string): number => {
   let notesAndRestsData = 0
 
   switch (notesAndRests) {
@@ -367,11 +367,10 @@ export const changeMusicNotesAndRests = (notesAndRests : string): number => {
       break
   }
 
-  return notesAndRestsData;
-
+  return notesAndRestsData
 }
 
-export const changeMusicPianoKey = (pianoKey : string): number => {
+export const changeMusicPianoKey = (pianoKey: string): number => {
   let pianoKeyData = 0
 
   switch (pianoKey) {
@@ -460,11 +459,11 @@ export const changeMusicPianoKey = (pianoKey : string): number => {
       pianoKeyData = 64
       break
   }
-  
-  return pianoKeyData;
+
+  return pianoKeyData
 }
 
-export const changeMusicDuration = (duration : string): number => {
+export const changeMusicDuration = (duration: string): number => {
   let durationData = 0
 
   console.log(`duration : ${duration}`)
@@ -502,5 +501,5 @@ export const changeMusicDuration = (duration : string): number => {
 
   console.log(`durationData : ${durationData}`)
 
-  return durationData;
+  return durationData
 }
