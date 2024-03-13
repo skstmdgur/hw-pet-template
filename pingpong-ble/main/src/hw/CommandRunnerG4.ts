@@ -1,4 +1,5 @@
 import { type IHPetContext } from '@ktaicoder/hw-pet'
+import { sleepAsync } from '@repo/ui'
 import { CommandRunnerBase } from './CommandRunnerBase'
 import * as PingPongUtil from './pingpong-util'
 

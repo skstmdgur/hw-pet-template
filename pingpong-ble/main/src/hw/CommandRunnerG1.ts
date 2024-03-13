@@ -1,4 +1,5 @@
 import { type IHPetContext } from '@ktaicoder/hw-pet'
+import { sleepAsync } from '@repo/ui'
 import { CommandRunnerBase } from './CommandRunnerBase'
 import * as PingPongUtil from './pingpong-util'
 
@@ -16,11 +17,28 @@ export class CommandRunnerG1 extends CommandRunnerBase {
 
   queue: any
   isSending: boolean
+  defaultDelay: number
+
+  sensorG1: { [key: string]: number }
+  modelSetting: { [key: string]: { [key: string]: number } }
 
   constructor(options: IHPetContext) {
     super(options)
     this.queue = []
     this.isSending = false
+    this.defaultDelay = 50
+
+    this.sensorG1 = {}
+    for (let i = 0; i < 20; i++) {
+      this.sensorG1[`Sensor_Byte_${i}`] = 0
+    }
+
+    this.modelSetting = {
+      'MONO': {
+        'defaultSpeed': 900,
+        'defaultStepToCM': 49.5
+      }
+    }
   }
 
   /**
@@ -86,6 +104,9 @@ export class CommandRunnerG1 extends CommandRunnerBase {
     this.txCharacteristic?.addEventListener('characteristicvaluechanged', this.receivedBytes)
     this.updateConnectionState_('connected')
 
+    await this.connectToCube()
+    await this.startSensor()
+
     return true
   }
 
@@ -117,14 +138,25 @@ export class CommandRunnerG1 extends CommandRunnerBase {
 
   // 받는 데이터
   receivedBytes = (event: any): void => {
-    console.log(`Receive ${String(PingPongUtil.byteToStringReceive(event))}`)
+    if (event.target.value.byteLength != 0) {
+      // 데이터 LOG 확인용
+      console.log(`Receive ${String(PingPongUtil.byteToStringReceive(event))}`)
+
+      // G1 센서 데이터
+      if (
+        event.target.value.byteLength === 20 &&
+        event.target.value.getUint8(0) === 0xa7 &&
+        event.target.value.getUint8(6) === 0xb8
+      ) {
+        for (let i = 0; i < 20; i++) {
+          this.sensorG1[`Sensor_Byte_${i}`] = event.target.value.getUint8(i)
+        }
+        // console.log(`Receive ${String(event.target.value.getUint8(15))}, ${String(event.target.value.getUint8(16))}, ${String(event.target.value.getUint8(17))}`)
+      }
+    }
   }
 
   /** ____________________________________________________________________________________________________ */
-  // Test 데이터 보내기
-  test = async (): Promise<void> => {
-    console.log('test')
-  }
 
   sendTest = async (packet: string): Promise<void> => {
     this.enqueue(PingPongUtil.stringToByte(packet))
@@ -177,14 +209,32 @@ export class CommandRunnerG1 extends CommandRunnerBase {
   }
   /** ____________________________________________________________________________________________________ */
 
-  connectToCube = async (): Promise<void> => {
+  test1: () => Promise<void> = async () => {
+    console.log('test1')
+    return new Promise<void>((resolve) => {
+      setTimeout(() => {
+        console.log('test1 done');
+        resolve();
+      }, 1000);
+    });
+  };
+
+  connectToCube = async () : Promise<void> => {
     this.enqueue(PingPongUtil.getOrangeForSoundData())
+    return new Promise<void>((resolve) => {
+      setTimeout(() => {
+        console.log('connectToCube done');
+        resolve();
+      }, 1000);
+    });
   }
 
-  // cubeNum : 큐브 총 갯수
-  connectToCubeWithNum = async (cubeNum): Promise<void> => {
-    this.enqueue(PingPongUtil.getSetMultiroleInAction(cubeNum))
+  startSensor = async (): Promise<void> => {
+    console.log('startSensor')
+    this.enqueue(PingPongUtil.getSensor())
   }
+
+
 
   // cubeNum : 큐브 총 갯수
   // cubeID : 큐브 순서 (0부터 시작)
@@ -200,4 +250,90 @@ export class CommandRunnerG1 extends CommandRunnerBase {
   sendContinuousStep = async (cubeNum, cubeID, speed): Promise<void> => {
     this.enqueue(PingPongUtil.makeContinuousStep(cubeNum, cubeID, speed))
   }
+
+  /** G1 ____________________________________________________________________________________________________ */
+
+  getButtonSensor = async (): Promise<number> => {
+    console.log(`getButtonSensor : ${this.sensorG1['Sensor_Byte_11']}`)
+    return this.sensorG1['Sensor_Byte_11']
+  }
+
+  getProximitySensor = async (): Promise<number> => {
+    console.log(`getButtonSensor : ${this.sensorG1['Sensor_Byte_18']}`)
+    return this.sensorG1['Sensor_Byte_18']
+  }
+
+  getSoundSensor = async (): Promise<number> => {
+    console.log(`getButtonSensor : ${this.sensorG1['Sensor_Byte_19']}`)
+    return this.sensorG1['Sensor_Byte_19']
+  }
+
+  getFaceTiltAngle = async (figure: String): Promise<number> => {
+    if (figure === 'Star') {
+      return (PingPongUtil.getSignedIntFromByteData(this.sensorG1['Sensor_Byte_16']) * -1)
+    } else if (figure === 'Triangle') {
+      return (PingPongUtil.getSignedIntFromByteData(this.sensorG1['Sensor_Byte_15']))
+    } else if (figure === 'Square') {
+      return (PingPongUtil.getSignedIntFromByteData(this.sensorG1['Sensor_Byte_16']))
+    } else if (figure === 'Circle') {
+      return (PingPongUtil.getSignedIntFromByteData(this.sensorG1['Sensor_Byte_15']) * -1)
+    }
+    return 0
+  }
+
+  setServoDegree = async (cubeID, degree): Promise<void> => {
+    this.enqueue(PingPongUtil.makeServoDegreeData(cubeID, degree))
+
+    return new Promise<void>((resolve) => {
+      setTimeout(() => {
+        console.log(`setServoDegree done`);
+        resolve();
+      }, this.defaultDelay);
+    });
+  }
+
+  /** Mono ____________________________________________________________________________________________________ */
+
+  setDistance: (cubeID: number, distance: number) => Promise<void> = async (cubeID, distance) => {
+    this.enqueue(PingPongUtil.makeSingleStep(1, 7, this.modelSetting['MONO']['defaultSpeed'], distance * this.modelSetting['MONO']['defaultStepToCM']))
+    const delayTime = PingPongUtil.makeDelayTimeFromSpeedStep(this.modelSetting['MONO']['defaultSpeed'], distance * this.modelSetting['MONO']['defaultStepToCM'])
+    return new Promise<void>((resolve) => {
+      setTimeout(() => {
+        console.log(`Cube ${cubeID} distance ${distance} delay ${delayTime} done`);
+        resolve();
+      }, delayTime);
+    });
+  };
+
+  distanceTest = async (cubeID, distance): Promise<void> => {
+    await this.setDistance(cubeID, distance)
+    await this.setDistance(cubeID, distance)
+  }
+
+  // test1: () => Promise<void> = async () => {
+  //   console.log('test1')
+  //   return new Promise<void>((resolve) => {
+  //     setTimeout(() => {
+  //       console.log('test1 done');
+  //       resolve();
+  //     }, 1000);
+  //   });
+  // };
+
+  // test2: () => Promise<void> = async () => {
+  //   console.log('test2')
+  //   return new Promise<void>((resolve) => {
+  //     setTimeout(() => {
+  //       console.log('test2 done');
+  //       resolve();
+  //     }, 1000);
+  //   });
+  // };
+
+  // testall: () => Promise<void> = async () => {
+  //   console.log('testall')
+  //   await this.test1()
+  //   await this.test2()
+  // }
+
 }
