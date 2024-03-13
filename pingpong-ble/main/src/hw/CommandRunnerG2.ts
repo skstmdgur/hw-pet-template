@@ -1,6 +1,8 @@
 import { type IHPetContext } from '@ktaicoder/hw-pet'
+import { sleepAsync } from '@repo/ui'
 import { CommandRunnerBase } from './CommandRunnerBase'
 import * as PingPongUtil from './pingpong-util'
+import { promises } from 'dns'
 
 /**
  * Inherits from the CommandRunnerBase class.
@@ -16,11 +18,33 @@ export class CommandRunnerG2 extends CommandRunnerBase {
 
   queue: any
   isSending: boolean
+  defaultDelay: number
+
+  sensorG1: { [key: string]: number }
+  sensorG2: { [key: string]: number }
+  modelSetting: { [key: string]: { [key: string]: number } }
 
   constructor(options: IHPetContext) {
     super(options)
     this.queue = []
     this.isSending = false
+    this.defaultDelay = 50
+
+    this.sensorG1 = {}
+    for (let i = 0; i < 20; i++) {
+      this.sensorG1[`Sensor_Byte_${i}`] = 0
+    }
+    this.sensorG2 = {}
+    for (let i = 0; i < 20; i++) {
+      this.sensorG2[`Sensor_Byte_${i}`] = 0
+    }
+
+    this.modelSetting = {
+      'AUTO CAR': {
+        defaultSpeed: 900,
+        defaultStepToCM: 24.44444,
+      },
+    }
   }
 
   /**
@@ -86,6 +110,8 @@ export class CommandRunnerG2 extends CommandRunnerBase {
     this.txCharacteristic?.addEventListener('characteristicvaluechanged', this.receivedBytes)
     this.updateConnectionState_('connected')
 
+    await this.connectToCubeWithNum(2)
+
     return true
   }
 
@@ -117,7 +143,53 @@ export class CommandRunnerG2 extends CommandRunnerBase {
 
   // 받는 데이터
   receivedBytes = (event: any): void => {
-    console.log(`Receive ${String(PingPongUtil.byteToStringReceive(event))}`)
+    if (event.target.value.byteLength != 0) {
+      // 데이터 LOG 확인용
+      // console.log(`Receive ${String(PingPongUtil.byteToStringReceive(event))}`)
+
+      // 2개 연결 완료
+      if (
+        event.target.value.byteLength === 18 &&
+        event.target.value.getUint8(4) === 0x20 &&
+        event.target.value.getUint8(6) === 0xad &&
+        event.target.value.getUint8(10) === 0x00 &&
+        event.target.value.getUint8(11) === 0x01
+      ) {
+        console.log('Connect 2 Cube')
+        this.awaitStartSensor()
+      }
+
+      // G1 센서 데이터
+      if (
+        event.target.value.byteLength === 20 &&
+        event.target.value.getUint8(0) === 0xa0 &&
+        event.target.value.getUint8(6) === 0xb8
+      ) {
+        for (let i = 0; i < 20; i++) {
+          this.sensorG1[`Sensor_Byte_${i}`] = event.target.value.getUint8(i)
+        }
+      }
+      // G2 센서 데이터
+      if (
+        event.target.value.byteLength === 20 &&
+        event.target.value.getUint8(0) === 0xa1 &&
+        event.target.value.getUint8(6) === 0xb8
+      ) {
+        for (let i = 0; i < 20; i++) {
+          this.sensorG2[`Sensor_Byte_${i}`] = event.target.value.getUint8(i)
+        }
+      }
+
+      // 음악 데이터
+      if (
+        event.target.value.byteLength === 11 &&
+        event.target.value.getUint8(5) === 0xa1 &&
+        event.target.value.getUint8(6) === 0xe8 &&
+        event.target.value.getUint8(10) === 0x01
+      ) {
+        this.startMusic()
+      }
+    }
   }
 
   /** ____________________________________________________________________________________________________ */
@@ -177,13 +249,34 @@ export class CommandRunnerG2 extends CommandRunnerBase {
   }
   /** ____________________________________________________________________________________________________ */
 
-  connectToCube = async (): Promise<void> => {
+  connectToCube: () => Promise<void> = async () => {
     this.enqueue(PingPongUtil.getOrangeForSoundData())
+    return new Promise<void>((resolve) => {
+      setTimeout(() => {
+        console.log('connectToCube done')
+        resolve()
+      }, 1000)
+    })
   }
 
   // cubeNum : 큐브 총 갯수
-  connectToCubeWithNum = async (cubeNum): Promise<void> => {
+  connectToCubeWithNum: (cubeNum: number) => Promise<void> = async (cubeNum: number) => {
     this.enqueue(PingPongUtil.getSetMultiroleInAction(cubeNum))
+    return new Promise<void>((resolve) => {
+      setTimeout(() => {
+        console.log('connectToCubeWithNum done')
+        resolve()
+      }, 1000)
+    })
+  }
+
+  awaitStartSensor: () => Promise<void> = async () => {
+    await sleepAsync(3000)
+    await this.startSensor()
+  }
+
+  startSensor: () => Promise<void> = async () => {
+    this.enqueue(PingPongUtil.getSensor())
   }
 
   // cubeNum : 큐브 총 갯수
@@ -191,7 +284,17 @@ export class CommandRunnerG2 extends CommandRunnerBase {
   // speed : 속도 (100 ~ 1000)
   // step : 스텝 (0 ~ 1980)
   sendSingleStep = async (cubeNum, cubeID, speed, step): Promise<void> => {
+    const delay = PingPongUtil.makeDelayTimeFromSpeedStep(
+      PingPongUtil.changeSpeedToSps(speed),
+      Math.round(Math.abs(step)),
+    )
     this.enqueue(PingPongUtil.makeSingleStep(cubeNum, cubeID, speed, step))
+    return new Promise<void>((resolve) => {
+      setTimeout(() => {
+        console.log('sendSingleStep done')
+        resolve()
+      }, delay)
+    })
   }
 
   // cubeNum : 큐브 총 갯수
@@ -199,10 +302,25 @@ export class CommandRunnerG2 extends CommandRunnerBase {
   // speed : 속도 (100 ~ 1000)
   sendContinuousStep = async (cubeNum, cubeID, speed): Promise<void> => {
     this.enqueue(PingPongUtil.makeContinuousStep(cubeNum, cubeID, speed))
+    return new Promise<void>((resolve) => {
+      setTimeout(() => {
+        console.log('sendContinuousStep done')
+        resolve()
+      }, this.defaultDelay)
+    })
   }
 
   sendAggregator = async (cubeNum, method, speed0, step0, speed1, step1): Promise<void> => {
     const innerData = new Array(2)
+    const delay1 = PingPongUtil.makeDelayTimeFromSpeedStep(
+      PingPongUtil.changeSpeedToSps(speed0),
+      Math.round(Math.abs(step0)),
+    )
+    const delay2 = PingPongUtil.makeDelayTimeFromSpeedStep(
+      PingPongUtil.changeSpeedToSps(speed1),
+      Math.round(Math.abs(step1)),
+    )
+    const delay = delay1 > delay2 ? delay1 : delay2
 
     switch (method) {
       case 0:
@@ -226,12 +344,135 @@ export class CommandRunnerG2 extends CommandRunnerBase {
     }
 
     this.enqueue(PingPongUtil.makeAggregateStep(cubeNum, innerData, method))
+
+    return new Promise<void>((resolve) => {
+      setTimeout(() => {
+        console.log('sendAggregator done')
+        resolve()
+      }, delay)
+    })
+  }
+
+  // notesAndRests : note, rest
+  // pianoKey : La_3 ~ Do_6
+  // duration : 4, 3, 2, 1.5, 1, 0.5, 0.25
+  sendMusic = async (
+    cubeID: number,
+    notesAndRests: string,
+    pianoKey: string,
+    duration: string,
+  ): Promise<void> => {
+    const pianoKeyData = PingPongUtil.changeMusicPianoKey(pianoKey)
+    const durationData = PingPongUtil.changeMusicDuration(duration)
+
+    this.enqueue(PingPongUtil.makeMusicData(cubeID, 1, notesAndRests, pianoKeyData, durationData))
+
+    return new Promise<void>((resolve) => {
+      setTimeout(() => {
+        console.log('sendMusic done')
+        resolve()
+      }, durationData * 20)
+    })
+  }
+
+  startMusic = async (): Promise<void> => {
+    this.enqueue(PingPongUtil.makeMusicPlay(2))
+    return new Promise<void>((resolve) => {
+      setTimeout(() => {
+        console.log('startMusic done')
+        resolve()
+      }, this.defaultDelay)
+    })
+  }
+
+  musicTest = async (): Promise<void> => {
+    await this.sendMusic(0, 'note', 'Do_4', 'Whole')
+    await this.sendMusic(0, 'note', 'Re_4', 'DottedHalf')
+    await this.sendMusic(0, 'note', 'Mi_4', 'Half')
+    await this.sendMusic(0, 'note', 'Fa_4', 'DottedQuarter')
+    await this.sendMusic(0, 'note', 'Sol_4', 'Quarter')
+    await this.sendMusic(0, 'note', 'La_4', 'Eighth')
+    await this.sendMusic(0, 'note', 'Si_4', 'Sixteenth')
+  }
+
+  getFaceTiltAngle = async (cubeID: number, figure: String): Promise<number> => {
+    let faceTiltAngleData = 0
+
+    switch (cubeID) {
+      case 0:
+        console.log(`cubeID 0 : ${cubeID}`)
+        switch (figure) {
+          case 'Star':
+            console.log(`figure Star : ${figure}`)
+            faceTiltAngleData =
+              PingPongUtil.getSignedIntFromByteData(this.sensorG1['Sensor_Byte_16']) * -1
+            break
+          case 'Triangle':
+            console.log(`figure Triangle : ${figure}`)
+            faceTiltAngleData = PingPongUtil.getSignedIntFromByteData(
+              this.sensorG1['Sensor_Byte_15'],
+            )
+            break
+          case 'Square':
+            console.log(`figure Square : ${figure}`)
+            faceTiltAngleData = PingPongUtil.getSignedIntFromByteData(
+              this.sensorG1['Sensor_Byte_16'],
+            )
+            break
+          case 'Circle':
+            console.log(`figure Circle : ${figure}`)
+            faceTiltAngleData =
+              PingPongUtil.getSignedIntFromByteData(this.sensorG1['Sensor_Byte_15']) * -1
+            break
+          default:
+            break
+        }
+        break
+      case 1:
+        console.log(`cubeID 1 : ${cubeID}`)
+        switch (figure) {
+          case 'Star':
+            console.log(`figure Star : ${figure}`)
+            faceTiltAngleData =
+              PingPongUtil.getSignedIntFromByteData(this.sensorG2['Sensor_Byte_16']) * -1
+            break
+          case 'Triangle':
+            console.log(`figure Triangle : ${figure}`)
+            faceTiltAngleData = PingPongUtil.getSignedIntFromByteData(
+              this.sensorG2['Sensor_Byte_15'],
+            )
+            break
+          case 'Square':
+            console.log(`figure Square : ${figure}`)
+            faceTiltAngleData = PingPongUtil.getSignedIntFromByteData(
+              this.sensorG2['Sensor_Byte_16'],
+            )
+            break
+          case 'Circle':
+            console.log(`figure Circle : ${figure}`)
+            faceTiltAngleData =
+              PingPongUtil.getSignedIntFromByteData(this.sensorG2['Sensor_Byte_15']) * -1
+            break
+          default:
+            break
+        }
+        break
+      default:
+        break
+    }
+
+    console.log(`faceTiltAngleData : ${faceTiltAngleData}`)
+    return faceTiltAngleData
   }
 
   // Auto Car ____________________________________________________________________________________________________
   // speed (0 ~ 100)
-  moveAutoCar = async (speed, distance): Promise<void> => {
+  moveAutoCar = async (speed: number, distance: number): Promise<void> => {
     const innerAutoCarData = new Array(2)
+    const delay = PingPongUtil.makeDelayTimeFromSpeedStep(
+      PingPongUtil.changeSpeedToSps(speed),
+      Math.round(Math.abs(distance) * 24.44444),
+    )
 
     if (distance < 0) {
       innerAutoCarData[0] = PingPongUtil.makeSingleStep(
@@ -262,11 +503,22 @@ export class CommandRunnerG2 extends CommandRunnerBase {
     }
 
     this.enqueue(PingPongUtil.makeAggregateStep(2, innerAutoCarData, 1))
+
+    return new Promise<void>((resolve) => {
+      setTimeout(() => {
+        console.log('moveAutoCar done')
+        resolve()
+      }, delay)
+    })
   }
 
   // speed (0 ~ 100)
-  turnAutoCar = async (speed, angle): Promise<void> => {
+  turnAutoCar = async (speed: number, angle: number): Promise<void> => {
     const innerAutoCarData = new Array(2)
+    const delay = PingPongUtil.makeDelayTimeFromSpeedStep(
+      PingPongUtil.changeSpeedToSps(speed),
+      Math.round(Math.abs(angle) * 2.25),
+    )
 
     if (angle < 0) {
       innerAutoCarData[0] = PingPongUtil.makeSingleStep(
@@ -297,6 +549,13 @@ export class CommandRunnerG2 extends CommandRunnerBase {
     }
 
     this.enqueue(PingPongUtil.makeAggregateStep(2, innerAutoCarData, 1))
+
+    return new Promise<void>((resolve) => {
+      setTimeout(() => {
+        console.log('turnAutoCar done')
+        resolve()
+      }, delay)
+    })
   }
 
   // Rolling Car ____________________________________________________________________________________________________
