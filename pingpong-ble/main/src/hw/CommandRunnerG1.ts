@@ -22,6 +22,8 @@ export class CommandRunnerG1 extends CommandRunnerBase {
   sensorG1: { [key: string]: number }
   modelSetting: { [key: string]: { [key: string]: number } }
 
+  groupNumber : string
+
   constructor(options: IHPetContext) {
     super(options)
     this.queue = []
@@ -39,6 +41,8 @@ export class CommandRunnerG1 extends CommandRunnerBase {
         defaultStepToCM: 49.5,
       },
     }
+
+    this.groupNumber = '0'
   }
 
   /**
@@ -90,9 +94,10 @@ export class CommandRunnerG1 extends CommandRunnerBase {
    * @returns The return value is meaningless.
    */
   connect = async (): Promise<boolean> => {
-    console.log('connect')
+    console.log('connect', this.groupNumber)
     const device = await this.scan()
     if (!device) {
+      console.log('not device')
       return false
     }
     const server = await device.gatt?.connect()

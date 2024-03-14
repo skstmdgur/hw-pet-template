@@ -20,11 +20,11 @@ export function HardwareImageBox(props: Props) {
         {
           width: '100%',
           maxWidth: '100%',
-          height: 80,
+          height: 60,
           display: 'flex',
           justifyContent: 'center',
           '& img': {
-            height: 80,
+            height: 60,
             objectFit: 'contain',
           },
         },
