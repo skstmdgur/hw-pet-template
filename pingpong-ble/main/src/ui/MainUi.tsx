@@ -5,7 +5,7 @@ import type { CubeType } from '@/types'
 import type { HPetCommandRunnerClassType } from '@ktaicoder/hw-pet'
 import { Box } from '@mui/material'
 import { ConnectButton, HardwareImageBox, HardwareNameBox, MediaIconBox, usePet } from '@repo/ui'
-import React, {Suspense, useState} from "react";
+import React, {Suspense, useEffect, useState} from "react";
 
 const MEDIA_ICON = 'bluetooth.svg'
 
@@ -49,6 +49,21 @@ export default function MainUi(props: Props) {
     setSelectGroupNumber(selectGroupNumber.charAt(0) + selectedValue); // 두 번째 자리만 업데이트
   };
 
+    const [checked, setChecked] = useState(false);
+
+    useEffect(()=>{
+        if(selectGroupNumber.charAt(0) == selectGroupNumber.charAt(1)) {
+            if(selectGroupNumber.charAt(0)!= '0') {
+                setChecked(true);
+                setSelectGroupNumber('00');
+            }
+        }
+    });
+
+    const handleCloseModal = () => {
+        setChecked(false);
+    };
+
   return (
       <Suspense>
           <Box
@@ -62,6 +77,30 @@ export default function MainUi(props: Props) {
               }}
           >
               <div>
+                  {checked && (
+                      <div
+                          style={{
+                              position: 'fixed',
+                              top: '50%',
+                              left: '50%',
+                              transform: 'translate(-50%, -50%)',
+                              background: 'rgba(0, 0, 0, 0.8)',
+                              color: '#fff',
+                              padding: '5px',
+                              borderRadius: '10px',
+                              zIndex: '9999',
+                              width : '200px'
+
+                          }}
+                          onClick={handleCloseModal}
+                      >
+                          <p
+                              style={{
+                                  fontSize : '14px'
+                              }}
+                          >동일한 앞뒤 번호는 설정할 수 없습니다.</p>
+                      </div>
+                  )}
                   <h4 style={{
                       textAlign: 'center',
                       margin: 0
