@@ -8,21 +8,24 @@ import { Suspense } from 'react'
 import { useSearchParams } from 'next/navigation';
 export default function Page() {
     const params= useSearchParams();
-
-    console.log('Query parameters:', params.get('groupNumber'));
+    const groupNumber = params.get('groupNumber');
+    console.log('Query parameters:', groupNumber);
   return (
-    <Box
-      sx={{
-        pt: 2,
-        bgcolor: '#fff',
-      }}
-      style={{
-          padding : 0
-      }}
-    >
       <Suspense>
-        <MainUi commandRunnerClass={CommandRunnerG4} cubeType="g4" logoImageUrl="logo_g4.png" groupNumber={params.get('groupNumber')}/>
+          <Box
+              sx={{
+                  pt: 2,
+                  bgcolor: '#fff',
+              }}
+              style={{
+                  padding : 0
+              }}
+          >
+              <Suspense>
+                  <MainUi commandRunnerClass={CommandRunnerG4} cubeType="g4" logoImageUrl="logo_g4.png" groupNumber={groupNumber}/>
+              </Suspense>
+          </Box>
       </Suspense>
-    </Box>
+
   )
 }

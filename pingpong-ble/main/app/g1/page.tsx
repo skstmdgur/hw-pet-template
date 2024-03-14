@@ -10,22 +10,23 @@ import { useSearchParams } from 'next/navigation';
 export default function Page() {
 
     const params= useSearchParams();
-
-    console.log('Query parameters:', params.get('groupNumber'));
+    const groupNumber = params.get('groupNumber');
+    console.log('Query parameters:', groupNumber);
 
   return (
-    <Box
-      sx={{
-        pt: 2,
-        bgcolor: '#fff',
-      }}
-      style={{
-          padding : 0
-      }}
-    >
       <Suspense>
-        <MainUi commandRunnerClass={CommandRunnerG1} cubeType="g1" logoImageUrl="logo_g1.png" groupNumber={params.get('groupNumber')}/>
+          <Box
+              sx={{
+                  pt: 2,
+                  bgcolor: '#fff',
+              }}
+              style={{
+                  padding : 0
+              }}
+          >
+              <MainUi commandRunnerClass={CommandRunnerG1} cubeType="g1" logoImageUrl="logo_g1.png" groupNumber={groupNumber}/>
+          </Box>
       </Suspense>
-    </Box>
+
   )
 }

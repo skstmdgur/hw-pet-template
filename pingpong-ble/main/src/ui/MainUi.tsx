@@ -5,7 +5,7 @@ import type { CubeType } from '@/types'
 import type { HPetCommandRunnerClassType } from '@ktaicoder/hw-pet'
 import { Box } from '@mui/material'
 import { ConnectButton, HardwareImageBox, HardwareNameBox, MediaIconBox, usePet } from '@repo/ui'
-import React, {useState} from "react";
+import React, {Suspense, useState} from "react";
 
 const MEDIA_ICON = 'bluetooth.svg'
 
@@ -50,67 +50,70 @@ export default function MainUi(props: Props) {
   };
 
   return (
-      <Box
-          sx={{
-            pt: 2,
-            bgcolor: '#fff',
+      <Suspense>
+          <Box
+              sx={{
+                  pt: 2,
+                  bgcolor: '#fff',
 
-          }}
-          style={{
-              padding : 0
-          }}
-      >
-        <div>
-            <h4 style={{
-                textAlign: 'center',
-                margin: 0
-            }}>그룹번호 설정</h4>
-            <div style={{
-                textAlign: 'center',
-            }}>
-                <select
-                    onChange={handleChangeNumber1}
-                    value={selectGroupNumber.charAt(0)}
-                    style={{
-                        border: 'none',
-                        height: '30px',
-                        fontSize: '25px',
-                        background: '#ffd558',
-                        borderRadius: '8px'
-                    }}>
-                    {[...Array(10).keys()].map((number) => (
-                        <option key={number} value={number}>
-                            {number}
-                        </option>
-                    ))}
-                </select>
-                <select
-                    onChange={handleChangeNumber2}
-                    value={selectGroupNumber.charAt(1)}
-                    style={{
-                        border: 'none',
-                        height: '30px',
-                        fontSize: '25px',
-                        background: '#ffd558',
-                        borderRadius: '8px'
-                    }}>
-                    {[...Array(10).keys()].map((number) => (
-                        <option key={number} value={number}>
-                            {number}
-                        </option>
-                    ))}
-                </select>
-            </div>
+              }}
+              style={{
+                  padding : 0
+              }}
+          >
+              <div>
+                  <h4 style={{
+                      textAlign: 'center',
+                      margin: 0
+                  }}>그룹번호 설정</h4>
+                  <div style={{
+                      textAlign: 'center',
+                  }}>
+                      <select
+                          onChange={handleChangeNumber1}
+                          value={selectGroupNumber.charAt(0)}
+                          style={{
+                              border: 'none',
+                              height: '30px',
+                              fontSize: '25px',
+                              background: '#ffd558',
+                              borderRadius: '8px'
+                          }}>
+                          {[...Array(10).keys()].map((number) => (
+                              <option key={number} value={number}>
+                                  {number}
+                              </option>
+                          ))}
+                      </select>
+                      <select
+                          onChange={handleChangeNumber2}
+                          value={selectGroupNumber.charAt(1)}
+                          style={{
+                              border: 'none',
+                              height: '30px',
+                              fontSize: '25px',
+                              background: '#ffd558',
+                              borderRadius: '8px'
+                          }}>
+                          {[...Array(10).keys()].map((number) => (
+                              <option key={number} value={number}>
+                                  {number}
+                              </option>
+                          ))}
+                      </select>
+                  </div>
 
-        </div>
-          <HardwareImageBox src={logoImageUrl}/>
-          <HardwareNameBox title={HW_NAME.en}/>
-          <MediaIconBox mediaIcon={MEDIA_ICON}/>
-          <ConnectButton
-              connectionState={connectionState}
-              onClickConnectBtn={handleClickConnectBtn}
-              onClickDisconnectBtn={handleClickDisconnectBtn}
-          />
-      </Box>
+              </div>
+              <HardwareImageBox src={logoImageUrl}/>
+              <HardwareNameBox title={HW_NAME.en}/>
+              <MediaIconBox mediaIcon={MEDIA_ICON}/>
+              <ConnectButton
+                  connectionState={connectionState}
+                  onClickConnectBtn={handleClickConnectBtn}
+                  onClickDisconnectBtn={handleClickDisconnectBtn}
+              />
+          </Box>
+      </Suspense>
+
   )
 }
