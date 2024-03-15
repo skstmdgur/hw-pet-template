@@ -162,7 +162,7 @@ export class CommandRunnerG3 extends CommandRunnerBase {
   }
   // 데이터를 큐에 추가하는 메소드
   enqueue(data) {
-    console.log(`Send : + ${String(PingPongUtil.byteToString(data))}`)
+    console.log(`Send : ${String(PingPongUtil.byteToString(data))}`)
     // 데이터를 20바이트씩 분할하여 큐에 추가
     for (let i = 0; i < data.length; i += 20) {
       const chunk = data.slice(i, i + 20)

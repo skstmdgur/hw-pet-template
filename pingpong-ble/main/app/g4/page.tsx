@@ -9,7 +9,7 @@ import { useSearchParams } from 'next/navigation';
 export default function Page() {
     const params= useSearchParams();
     const groupNumber = params.get('groupNumber');
-    console.log('Query parameters:', groupNumber);
+    // console.log('Query parameters:', groupNumber);
   return (
       <Suspense>
           <Box

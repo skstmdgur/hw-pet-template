@@ -99,10 +99,10 @@ export class CommandRunnerG2 extends CommandRunnerBase {
    * @returns The return value is meaningless.
    */
   connect = async (): Promise<boolean> => {
-    console.log('connect', this.groupNumber)
+    // console.log('connect', this.groupNumber)
     const device = await this.scan()
     if (!device) {
-      console.log('not device')
+      // console.log('not device')
       return false
     }
     const server = await device.gatt?.connect()
@@ -139,7 +139,7 @@ export class CommandRunnerG2 extends CommandRunnerBase {
         filters: [{ namePrefix: 'PINGPONG' }],
         optionalServices: [this.bleNusServiceUUID],
       })
-      console.log('블루투스 디바이스:', device);
+      // console.log('블루투스 디바이스:', device);
       return device
     } catch (e) {
       return null
@@ -183,7 +183,7 @@ export class CommandRunnerG2 extends CommandRunnerBase {
         event.target.value.getUint8(10) === 0x00 &&
         event.target.value.getUint8(11) === 0x01
       ) {
-        console.log('Connect 2 Cube')
+        // console.log('Connect 2 Cube')
         this.awaitStartSensor()
       }
 
@@ -221,18 +221,10 @@ export class CommandRunnerG2 extends CommandRunnerBase {
   }
 
   /** ____________________________________________________________________________________________________ */
-  // Test 데이터 보내기
-  test = async (): Promise<void> => {
-    console.log('test')
-  }
-
-  sendTest = async (packet: string): Promise<void> => {
-    this.enqueue(PingPongUtil.stringToByte(packet))
-  }
 
   // 데이터를 큐에 추가하는 메소드
   enqueue(data) {
-    console.log(`Send : + ${String(PingPongUtil.byteToString(data))}`)
+    // console.log(`Send : ${String(PingPongUtil.byteToString(data))}`)
     // 데이터를 20바이트씩 분할하여 큐에 추가
     for (let i = 0; i < data.length; i += 20) {
       const chunk = data.slice(i, i + 20)
@@ -410,27 +402,22 @@ export class CommandRunnerG2 extends CommandRunnerBase {
 
     switch (cubeID) {
       case 0:
-        console.log(`cubeID 0 : ${cubeID}`)
         switch (figure) {
           case 'Star':
-            console.log(`figure Star : ${figure}`)
             faceTiltAngleData =
               PingPongUtil.getSignedIntFromByteData(this.sensorG1['Sensor_Byte_16']) * -1
             break
           case 'Triangle':
-            console.log(`figure Triangle : ${figure}`)
             faceTiltAngleData = PingPongUtil.getSignedIntFromByteData(
               this.sensorG1['Sensor_Byte_15'],
             )
             break
           case 'Square':
-            console.log(`figure Square : ${figure}`)
             faceTiltAngleData = PingPongUtil.getSignedIntFromByteData(
               this.sensorG1['Sensor_Byte_16'],
             )
             break
           case 'Circle':
-            console.log(`figure Circle : ${figure}`)
             faceTiltAngleData =
               PingPongUtil.getSignedIntFromByteData(this.sensorG1['Sensor_Byte_15']) * -1
             break
@@ -439,27 +426,22 @@ export class CommandRunnerG2 extends CommandRunnerBase {
         }
         break
       case 1:
-        console.log(`cubeID 1 : ${cubeID}`)
         switch (figure) {
           case 'Star':
-            console.log(`figure Star : ${figure}`)
             faceTiltAngleData =
               PingPongUtil.getSignedIntFromByteData(this.sensorG2['Sensor_Byte_16']) * -1
             break
           case 'Triangle':
-            console.log(`figure Triangle : ${figure}`)
             faceTiltAngleData = PingPongUtil.getSignedIntFromByteData(
               this.sensorG2['Sensor_Byte_15'],
             )
             break
           case 'Square':
-            console.log(`figure Square : ${figure}`)
             faceTiltAngleData = PingPongUtil.getSignedIntFromByteData(
               this.sensorG2['Sensor_Byte_16'],
             )
             break
           case 'Circle':
-            console.log(`figure Circle : ${figure}`)
             faceTiltAngleData =
               PingPongUtil.getSignedIntFromByteData(this.sensorG2['Sensor_Byte_15']) * -1
             break
@@ -471,7 +453,6 @@ export class CommandRunnerG2 extends CommandRunnerBase {
         break
     }
 
-    console.log(`faceTiltAngleData : ${faceTiltAngleData}`)
     return faceTiltAngleData
   }
 
@@ -516,7 +497,7 @@ export class CommandRunnerG2 extends CommandRunnerBase {
 
     return new Promise<void>((resolve) => {
       setTimeout(() => {
-        console.log('moveAutoCar done')
+        // console.log('moveAutoCar done')
         resolve()
       }, delay)
     })
@@ -562,7 +543,7 @@ export class CommandRunnerG2 extends CommandRunnerBase {
 
     return new Promise<void>((resolve) => {
       setTimeout(() => {
-        console.log('turnAutoCar done')
+        // console.log('turnAutoCar done')
         resolve()
       }, delay)
     })
@@ -622,32 +603,30 @@ export class CommandRunnerG2 extends CommandRunnerBase {
   // Worm Bot ____________________________________________________________________________________________________
 
   sendSchedule = async (): Promise<void> => {
-    this.sendTest(
-      'ff ff ff aa 20 00 cd 02 43 02 03 00 00 ff ff ff 00 00 00 ca 01 1b 02 03 00 01 c5 17 fc a5 00 f8 03 5b 00 f8 fc 7c 00 f8 00 00 02 58 03 5b 00 f8 fc 7c 00 f8 00 00 02 58 03 5b 00 f8 00 00 02 58 00 00 03 20 fc a5 00 f8 00 00 02 58 03 84 00 f8 fc a5 00 f8 00 00 02 58 03 84 00 f8 fc a5 00 f8 00 00 02 58 03 5b 00 f8 00 00 03 20 fc 41 01 ef 03 97 01 ef 03 97 01 ef 01 1a 00 6e fc 48 02 5d 00 00 02 26 02 ff 00 a5 fd 5c 00 a5 00 00 03 20 fc f2 00 dc 02 b3 00 dc 01 1a 00 6e 03 3c 01 4a fc 80 01 b8 fc 23 01 ef 03 dd 01 ef 00 00 02 bc 00 00 03 20 fc 41 01 ef 03 97 01 ef 00 00 03 20 fc 23 01 ef 03 dd 01 ef 00 00 02 bc 00 00 03 20 02 b9 00 f8 fc 8d 00 8a 03 73 00 8a fc 8d 00 8a 03 73 00 8a fc 7d 01 f0 03 73 00 8a fc 8d 00 8a 03 73 00 8a fc 8d 00 8a fc 7e 00 f7 03 82 01 ef fc 7d 00 f8 03 ab 01 f0 fc 55 01 f0 03 ab 01 f0 fc 55 00 f8 fc 23 01 ef 03 dd 01 ef 00 00 02 bc 00 00 03 20 00 00 03 e8 ff ff ff 01 00 00 ca 01 1b 02 03 00 01 48 bf fc a5 00 f8 00 00 02 58 03 84 00 f8 fc a5 00 f8 00 00 02 58 03 84 00 f8 fc a5 00 f8 00 00 02 58 03 5b 00 f8 00 00 03 20 fc a5 00 f8 03 5b 00 f8 fc 7c 00 f8 00 00 02 58 03 5b 00 f8 fc 7c 00 f8 00 00 02 58 03 5b 00 f8 00 00 02 58 00 00 03 20 fc f2 00 dc 02 b3 00 dc 01 1a 00 6e 03 3c 01 4a fc 80 01 b8 fc 23 01 ef 03 dd 01 ef 00 00 02 bc 00 00 03 20 fc 41 01 ef 03 97 01 ef 03 97 01 ef 01 1a 00 6e fc 48 02 5d 00 00 02 26 02 ff 00 a5 fd 5c 00 a5 00 00 03 20 fc f2 00 dc 02 b3 00 dc 00 00 03 20 00 00 02 26 02 ff 00 a5 fd 5c 00 a5 00 00 03 20 02 b9 00 f8 fc 8d 00 8a 03 73 00 8a fc 8d 00 8a 03 73 00 8a fc 7d 01 f0 03 73 00 8a fc 8d 00 8a 03 73 00 8a fc 8d 00 8a fd 20 00 89 03 49 01 81 03 83 00 f8 fc 55 01 f0 03 ab 01 f0 fc 55 01 f0 03 ab 00 f8 00 00 02 26 02 ff 00 a5 fd 5c 00 a5 00 00 03 20 00 00 03 e8',
-    )
+    this.enqueue(PingPongUtil.stringToByte('ff ff ff aa 20 00 cd 02 43 02 03 00 00 ff ff ff 00 00 00 ca 01 1b 02 03 00 01 c5 17 fc a5 00 f8 03 5b 00 f8 fc 7c 00 f8 00 00 02 58 03 5b 00 f8 fc 7c 00 f8 00 00 02 58 03 5b 00 f8 00 00 02 58 00 00 03 20 fc a5 00 f8 00 00 02 58 03 84 00 f8 fc a5 00 f8 00 00 02 58 03 84 00 f8 fc a5 00 f8 00 00 02 58 03 5b 00 f8 00 00 03 20 fc 41 01 ef 03 97 01 ef 03 97 01 ef 01 1a 00 6e fc 48 02 5d 00 00 02 26 02 ff 00 a5 fd 5c 00 a5 00 00 03 20 fc f2 00 dc 02 b3 00 dc 01 1a 00 6e 03 3c 01 4a fc 80 01 b8 fc 23 01 ef 03 dd 01 ef 00 00 02 bc 00 00 03 20 fc 41 01 ef 03 97 01 ef 00 00 03 20 fc 23 01 ef 03 dd 01 ef 00 00 02 bc 00 00 03 20 02 b9 00 f8 fc 8d 00 8a 03 73 00 8a fc 8d 00 8a 03 73 00 8a fc 7d 01 f0 03 73 00 8a fc 8d 00 8a 03 73 00 8a fc 8d 00 8a fc 7e 00 f7 03 82 01 ef fc 7d 00 f8 03 ab 01 f0 fc 55 01 f0 03 ab 01 f0 fc 55 00 f8 fc 23 01 ef 03 dd 01 ef 00 00 02 bc 00 00 03 20 00 00 03 e8 ff ff ff 01 00 00 ca 01 1b 02 03 00 01 48 bf fc a5 00 f8 00 00 02 58 03 84 00 f8 fc a5 00 f8 00 00 02 58 03 84 00 f8 fc a5 00 f8 00 00 02 58 03 5b 00 f8 00 00 03 20 fc a5 00 f8 03 5b 00 f8 fc 7c 00 f8 00 00 02 58 03 5b 00 f8 fc 7c 00 f8 00 00 02 58 03 5b 00 f8 00 00 02 58 00 00 03 20 fc f2 00 dc 02 b3 00 dc 01 1a 00 6e 03 3c 01 4a fc 80 01 b8 fc 23 01 ef 03 dd 01 ef 00 00 02 bc 00 00 03 20 fc 41 01 ef 03 97 01 ef 03 97 01 ef 01 1a 00 6e fc 48 02 5d 00 00 02 26 02 ff 00 a5 fd 5c 00 a5 00 00 03 20 fc f2 00 dc 02 b3 00 dc 00 00 03 20 00 00 02 26 02 ff 00 a5 fd 5c 00 a5 00 00 03 20 02 b9 00 f8 fc 8d 00 8a 03 73 00 8a fc 8d 00 8a 03 73 00 8a fc 7d 01 f0 03 73 00 8a fc 8d 00 8a 03 73 00 8a fc 8d 00 8a fd 20 00 89 03 49 01 81 03 83 00 f8 fc 55 01 f0 03 ab 01 f0 fc 55 01 f0 03 ab 00 f8 00 00 02 26 02 ff 00 a5 fd 5c 00 a5 00 00 03 20 00 00 03 e8'))
   }
 
   sendStart = async (): Promise<void> => {
-    this.sendTest('ff ff ff ff 00 00 c0 00 0a 02')
+    this.enqueue(PingPongUtil.stringToByte('ff ff ff ff 00 00 c0 00 0a 02'))
   }
 
   sendFront = async (): Promise<void> => {
-    this.sendTest('ff ff ff ff 00 00 cb 00 14 02 04 04 01 00 00 00 00 00 09 01')
+    this.enqueue(PingPongUtil.stringToByte('ff ff ff ff 00 00 cb 00 14 02 04 04 01 00 00 00 00 00 09 01'))
   }
 
   sendBack = async (): Promise<void> => {
-    this.sendTest('ff ff ff ff 00 00 cb 00 14 02 04 04 01 00 00 00 0a 00 13 01')
+    this.enqueue(PingPongUtil.stringToByte('ff ff ff ff 00 00 cb 00 14 02 04 04 01 00 00 00 0a 00 13 01'))
   }
 
   sendDumbFront = async (): Promise<void> => {
-    this.sendTest('ff ff ff ff 00 00 cb 00 14 02 04 04 01 00 00 00 14 00 1c 01')
+    this.enqueue(PingPongUtil.stringToByte('ff ff ff ff 00 00 cb 00 14 02 04 04 01 00 00 00 14 00 1c 01'))
   }
 
   sendDumbBack = async (): Promise<void> => {
-    this.sendTest('ff ff ff ff 00 00 cb 00 14 02 04 04 01 00 00 00 1d 00 25 01')
+    this.enqueue(PingPongUtil.stringToByte('ff ff ff ff 00 00 cb 00 14 02 04 04 01 00 00 00 1d 00 25 01'))
   }
 
   sendDance = async (): Promise<void> => {
-    this.sendTest('ff ff ff ff 00 00 cb 00 14 02 04 04 01 00 00 00 2d 00 41 01')
+    this.enqueue(PingPongUtil.stringToByte('ff ff ff ff 00 00 cb 00 14 02 04 04 01 00 00 00 2d 00 41 01'))
   }
 }
