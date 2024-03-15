@@ -92,6 +92,8 @@ export class CommandRunnerG4 extends CommandRunnerBase {
     this.txCharacteristic?.addEventListener('characteristicvaluechanged', this.receivedBytes)
     this.updateConnectionState_('connected')
 
+    await this.connectToCubeWithNum(4, this.groupNumber)
+
     return true
   }
 
@@ -103,7 +105,7 @@ export class CommandRunnerG4 extends CommandRunnerBase {
    * @returns The return value is meaningless.
    */
   disconnect = async () => {
-    // await this.rxCharacteristic?.writeValue(this.rebootMultiroleAggregator(""))
+    this.enqueue(PingPongUtil.rebootMultiroleAggregator())
 
     // When changing the connection state, be sure to call updateConnectionState_()
     this.updateConnectionState_('disconnected')
@@ -115,11 +117,35 @@ export class CommandRunnerG4 extends CommandRunnerBase {
         filters: [{ namePrefix: 'PINGPONG' }],
         optionalServices: [this.bleNusServiceUUID],
       })
+      console.log('블루투스 디바이스:', device);
       return device
     } catch (e) {
       return null
     }
   }
+
+  // scan = async (): Promise<BluetoothDevice | null> => {
+  //   try {
+  //     if (this.groupNumber === '00') {
+  //       const device = await navigator.bluetooth.requestDevice({
+  //         filters: [{ namePrefix: 'PINGPONG' }],
+  //         optionalServices: [this.bleNusServiceUUID],
+  //       })
+  //       console.log('블루투스 디바이스:', device);
+  //       return device
+  //     } else {
+  //       console.log(`test = PINGPONG.${this.groupNumber}`)
+  //       const device = await navigator.bluetooth.requestDevice({
+  //         // `name` 필터를 사용하여 정확한 이름으로 검색
+  //         filters: [{ name: `PINGPONG.${this.groupNumber}` }],
+  //         optionalServices: [this.bleNusServiceUUID],
+  //       });
+  //       return device;
+  //     }
+  //   } catch (e) {
+  //     return null
+  //   }
+  // }
 
   // 받는 데이터
   receivedBytes = (event: any): void => {
@@ -170,26 +196,20 @@ export class CommandRunnerG4 extends CommandRunnerBase {
     })
   }
 
-  rebootMultiroleAggregator = (event: any): Uint8Array => {
-    const hexArray = 'ff ff ff ff 00 00 a8 00 0a 01'.split(' ')
-    const byteArray = hexArray.map((hex) => parseInt(hex, 16))
-
-    const buffer = new Uint8Array(byteArray)
-    return buffer
-  }
-
   setInstantTorque = async (cubeNum, torque): Promise<void> => {
     this.enqueue(PingPongUtil.setInstantTorque(cubeNum, torque))
   }
   /** ____________________________________________________________________________________________________ */
 
-  connectToCube = async (): Promise<void> => {
-    this.enqueue(PingPongUtil.getOrangeForSoundData())
-  }
-
   // cubeNum : 큐브 총 갯수
-  connectToCubeWithNum = async (cubeNum): Promise<void> => {
-    this.enqueue(PingPongUtil.getSetMultiroleInAction(cubeNum))
+  connectToCubeWithNum = async (cubeNum: number, groupID: string): Promise<void> => {
+    this.enqueue(PingPongUtil.getSetMultiroleInAction(cubeNum, groupID))
+    return new Promise<void>((resolve) => {
+      setTimeout(() => {
+        console.log('connectToCubeWithNum 4 done')
+        resolve()
+      }, 1000)
+    })
   }
 
   // cubeNum : 큐브 총 갯수

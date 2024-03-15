@@ -21,7 +21,7 @@ export const getOrangeForSoundData = (): Uint8Array => {
   return data
 }
 
-export const getSetMultiroleInAction = (cubeNum: number): Uint8Array => {
+export const getSetMultiroleInAction = (cubeNum: number, groupID: string): Uint8Array => {
   const data = new Uint8Array(11)
 
   data[0] = 0xff
@@ -36,12 +36,36 @@ export const getSetMultiroleInAction = (cubeNum: number): Uint8Array => {
   data[9] = 0x0a
   data[10] = 0x00
 
-  // if(GroupPid != 0){
-  //     txCharSendTest[9] = 0x1a;
-  //     txCharSendTest[10] = GroupPid;
-  // }
+  if(groupID === '00'){
+    data[9] = 0x0a
+    data[10] = 0x00
+  } else {
+    data[9] = 0x1a;
+    data[10] = parseInt(groupID, 10);
+  }
 
   return data
+}
+
+export const rebootMultiroleAggregator = (): Uint8Array => {
+  const data = new Uint8Array(10)
+
+  data[0] = 0xff
+  data[1] = 0xff
+  data[2] = 0xff
+  data[3] = 0xff
+  //assign id
+  data[4] = 0x00
+  data[5] = 0x00
+  //opcode
+  data[6] = 0xA8
+  //packet size
+  data[7] = 0x00
+  data[8] = 0x0A
+  //method
+  data[9] = 0x01
+
+  return data  
 }
 
 export const getSensor = (): Uint8Array => {
