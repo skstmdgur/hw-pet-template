@@ -22,7 +22,7 @@ export class CommandRunnerG1 extends CommandRunnerBase {
   sensorG1: { [key: string]: number }
   modelSetting: { [key: string]: { [key: string]: number } }
 
-  groupNumber : string
+  groupNumber: string
 
   constructor(options: IHPetContext) {
     super(options)
@@ -322,5 +322,4 @@ export class CommandRunnerG1 extends CommandRunnerBase {
       }, delayTime)
     })
   }
-
 }

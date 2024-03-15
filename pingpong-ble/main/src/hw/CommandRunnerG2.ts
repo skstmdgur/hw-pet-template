@@ -24,7 +24,7 @@ export class CommandRunnerG2 extends CommandRunnerBase {
   sensorG2: { [key: string]: number }
   modelSetting: { [key: string]: { [key: string]: number } }
 
-  groupNumber : string
+  groupNumber: string
   constructor(options: IHPetContext) {
     super(options)
     this.queue = []
@@ -603,7 +603,11 @@ export class CommandRunnerG2 extends CommandRunnerBase {
   // Worm Bot ____________________________________________________________________________________________________
 
   sendSchedule = async (): Promise<void> => {
-    this.enqueue(PingPongUtil.stringToByte('ff ff ff aa 20 00 cd 02 43 02 03 00 00 ff ff ff 00 00 00 ca 01 1b 02 03 00 01 c5 17 fc a5 00 f8 03 5b 00 f8 fc 7c 00 f8 00 00 02 58 03 5b 00 f8 fc 7c 00 f8 00 00 02 58 03 5b 00 f8 00 00 02 58 00 00 03 20 fc a5 00 f8 00 00 02 58 03 84 00 f8 fc a5 00 f8 00 00 02 58 03 84 00 f8 fc a5 00 f8 00 00 02 58 03 5b 00 f8 00 00 03 20 fc 41 01 ef 03 97 01 ef 03 97 01 ef 01 1a 00 6e fc 48 02 5d 00 00 02 26 02 ff 00 a5 fd 5c 00 a5 00 00 03 20 fc f2 00 dc 02 b3 00 dc 01 1a 00 6e 03 3c 01 4a fc 80 01 b8 fc 23 01 ef 03 dd 01 ef 00 00 02 bc 00 00 03 20 fc 41 01 ef 03 97 01 ef 00 00 03 20 fc 23 01 ef 03 dd 01 ef 00 00 02 bc 00 00 03 20 02 b9 00 f8 fc 8d 00 8a 03 73 00 8a fc 8d 00 8a 03 73 00 8a fc 7d 01 f0 03 73 00 8a fc 8d 00 8a 03 73 00 8a fc 8d 00 8a fc 7e 00 f7 03 82 01 ef fc 7d 00 f8 03 ab 01 f0 fc 55 01 f0 03 ab 01 f0 fc 55 00 f8 fc 23 01 ef 03 dd 01 ef 00 00 02 bc 00 00 03 20 00 00 03 e8 ff ff ff 01 00 00 ca 01 1b 02 03 00 01 48 bf fc a5 00 f8 00 00 02 58 03 84 00 f8 fc a5 00 f8 00 00 02 58 03 84 00 f8 fc a5 00 f8 00 00 02 58 03 5b 00 f8 00 00 03 20 fc a5 00 f8 03 5b 00 f8 fc 7c 00 f8 00 00 02 58 03 5b 00 f8 fc 7c 00 f8 00 00 02 58 03 5b 00 f8 00 00 02 58 00 00 03 20 fc f2 00 dc 02 b3 00 dc 01 1a 00 6e 03 3c 01 4a fc 80 01 b8 fc 23 01 ef 03 dd 01 ef 00 00 02 bc 00 00 03 20 fc 41 01 ef 03 97 01 ef 03 97 01 ef 01 1a 00 6e fc 48 02 5d 00 00 02 26 02 ff 00 a5 fd 5c 00 a5 00 00 03 20 fc f2 00 dc 02 b3 00 dc 00 00 03 20 00 00 02 26 02 ff 00 a5 fd 5c 00 a5 00 00 03 20 02 b9 00 f8 fc 8d 00 8a 03 73 00 8a fc 8d 00 8a 03 73 00 8a fc 7d 01 f0 03 73 00 8a fc 8d 00 8a 03 73 00 8a fc 8d 00 8a fd 20 00 89 03 49 01 81 03 83 00 f8 fc 55 01 f0 03 ab 01 f0 fc 55 01 f0 03 ab 00 f8 00 00 02 26 02 ff 00 a5 fd 5c 00 a5 00 00 03 20 00 00 03 e8'))
+    this.enqueue(
+      PingPongUtil.stringToByte(
+        'ff ff ff aa 20 00 cd 02 43 02 03 00 00 ff ff ff 00 00 00 ca 01 1b 02 03 00 01 c5 17 fc a5 00 f8 03 5b 00 f8 fc 7c 00 f8 00 00 02 58 03 5b 00 f8 fc 7c 00 f8 00 00 02 58 03 5b 00 f8 00 00 02 58 00 00 03 20 fc a5 00 f8 00 00 02 58 03 84 00 f8 fc a5 00 f8 00 00 02 58 03 84 00 f8 fc a5 00 f8 00 00 02 58 03 5b 00 f8 00 00 03 20 fc 41 01 ef 03 97 01 ef 03 97 01 ef 01 1a 00 6e fc 48 02 5d 00 00 02 26 02 ff 00 a5 fd 5c 00 a5 00 00 03 20 fc f2 00 dc 02 b3 00 dc 01 1a 00 6e 03 3c 01 4a fc 80 01 b8 fc 23 01 ef 03 dd 01 ef 00 00 02 bc 00 00 03 20 fc 41 01 ef 03 97 01 ef 00 00 03 20 fc 23 01 ef 03 dd 01 ef 00 00 02 bc 00 00 03 20 02 b9 00 f8 fc 8d 00 8a 03 73 00 8a fc 8d 00 8a 03 73 00 8a fc 7d 01 f0 03 73 00 8a fc 8d 00 8a 03 73 00 8a fc 8d 00 8a fc 7e 00 f7 03 82 01 ef fc 7d 00 f8 03 ab 01 f0 fc 55 01 f0 03 ab 01 f0 fc 55 00 f8 fc 23 01 ef 03 dd 01 ef 00 00 02 bc 00 00 03 20 00 00 03 e8 ff ff ff 01 00 00 ca 01 1b 02 03 00 01 48 bf fc a5 00 f8 00 00 02 58 03 84 00 f8 fc a5 00 f8 00 00 02 58 03 84 00 f8 fc a5 00 f8 00 00 02 58 03 5b 00 f8 00 00 03 20 fc a5 00 f8 03 5b 00 f8 fc 7c 00 f8 00 00 02 58 03 5b 00 f8 fc 7c 00 f8 00 00 02 58 03 5b 00 f8 00 00 02 58 00 00 03 20 fc f2 00 dc 02 b3 00 dc 01 1a 00 6e 03 3c 01 4a fc 80 01 b8 fc 23 01 ef 03 dd 01 ef 00 00 02 bc 00 00 03 20 fc 41 01 ef 03 97 01 ef 03 97 01 ef 01 1a 00 6e fc 48 02 5d 00 00 02 26 02 ff 00 a5 fd 5c 00 a5 00 00 03 20 fc f2 00 dc 02 b3 00 dc 00 00 03 20 00 00 02 26 02 ff 00 a5 fd 5c 00 a5 00 00 03 20 02 b9 00 f8 fc 8d 00 8a 03 73 00 8a fc 8d 00 8a 03 73 00 8a fc 7d 01 f0 03 73 00 8a fc 8d 00 8a 03 73 00 8a fc 8d 00 8a fd 20 00 89 03 49 01 81 03 83 00 f8 fc 55 01 f0 03 ab 01 f0 fc 55 01 f0 03 ab 00 f8 00 00 02 26 02 ff 00 a5 fd 5c 00 a5 00 00 03 20 00 00 03 e8',
+      ),
+    )
   }
 
   sendStart = async (): Promise<void> => {
@@ -611,22 +615,32 @@ export class CommandRunnerG2 extends CommandRunnerBase {
   }
 
   sendFront = async (): Promise<void> => {
-    this.enqueue(PingPongUtil.stringToByte('ff ff ff ff 00 00 cb 00 14 02 04 04 01 00 00 00 00 00 09 01'))
+    this.enqueue(
+      PingPongUtil.stringToByte('ff ff ff ff 00 00 cb 00 14 02 04 04 01 00 00 00 00 00 09 01'),
+    )
   }
 
   sendBack = async (): Promise<void> => {
-    this.enqueue(PingPongUtil.stringToByte('ff ff ff ff 00 00 cb 00 14 02 04 04 01 00 00 00 0a 00 13 01'))
+    this.enqueue(
+      PingPongUtil.stringToByte('ff ff ff ff 00 00 cb 00 14 02 04 04 01 00 00 00 0a 00 13 01'),
+    )
   }
 
   sendDumbFront = async (): Promise<void> => {
-    this.enqueue(PingPongUtil.stringToByte('ff ff ff ff 00 00 cb 00 14 02 04 04 01 00 00 00 14 00 1c 01'))
+    this.enqueue(
+      PingPongUtil.stringToByte('ff ff ff ff 00 00 cb 00 14 02 04 04 01 00 00 00 14 00 1c 01'),
+    )
   }
 
   sendDumbBack = async (): Promise<void> => {
-    this.enqueue(PingPongUtil.stringToByte('ff ff ff ff 00 00 cb 00 14 02 04 04 01 00 00 00 1d 00 25 01'))
+    this.enqueue(
+      PingPongUtil.stringToByte('ff ff ff ff 00 00 cb 00 14 02 04 04 01 00 00 00 1d 00 25 01'),
+    )
   }
 
   sendDance = async (): Promise<void> => {
-    this.enqueue(PingPongUtil.stringToByte('ff ff ff ff 00 00 cb 00 14 02 04 04 01 00 00 00 2d 00 41 01'))
+    this.enqueue(
+      PingPongUtil.stringToByte('ff ff ff ff 00 00 cb 00 14 02 04 04 01 00 00 00 2d 00 41 01'),
+    )
   }
 }

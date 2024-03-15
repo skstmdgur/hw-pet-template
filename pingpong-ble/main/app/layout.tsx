@@ -15,9 +15,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }):
         <AppRouterCacheProvider options={{ enableCssLayer: true }}>
           <ThemeProvider theme={theme}>
             <CssBaseline />
-              <Suspense>
-                {children}
-              </Suspense>
+            <Suspense>{children}</Suspense>
           </ThemeProvider>
         </AppRouterCacheProvider>
       </body>

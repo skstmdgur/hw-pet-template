@@ -18,7 +18,7 @@ export class CommandRunnerG3 extends CommandRunnerBase {
   queue: any
   isSending: boolean
 
-  groupNumber : string
+  groupNumber: string
 
   constructor(options: IHPetContext) {
     super(options)
@@ -117,7 +117,7 @@ export class CommandRunnerG3 extends CommandRunnerBase {
         filters: [{ namePrefix: 'PINGPONG' }],
         optionalServices: [this.bleNusServiceUUID],
       })
-      console.log('블루투스 디바이스:', device);
+      console.log('블루투스 디바이스:', device)
       return device
     } catch (e) {
       return null
