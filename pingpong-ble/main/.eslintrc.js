@@ -26,6 +26,14 @@ module.exports = {
     'prefer-named-capture-group': 'off',
     '@typescript-eslint/ban-ts-comment': 'off',
     'jsx-a11y/no-autofocus': 'off',
+    // Roborisen Add
     'no-bitwise': 'off',
+    // 임시로 off
+    'react-hooks/exhaustive-deps': 'off',
+    'react/jsx-no-leaked-render': 'off',
+    'jsx-a11y/click-events-have-key-events': 'off',
+    'react/jsx-sort-props': 'off',
+    'jsx-a11y/no-static-element-interactions': 'off',
+    'jsx-a11y/alt-text': 'off',
   },
 }

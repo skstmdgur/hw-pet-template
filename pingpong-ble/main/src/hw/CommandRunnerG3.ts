@@ -18,10 +18,14 @@ export class CommandRunnerG3 extends CommandRunnerBase {
   queue: any
   isSending: boolean
 
+  groupNumber: string
+
   constructor(options: IHPetContext) {
     super(options)
     this.queue = []
     this.isSending = false
+
+    this.groupNumber = '0'
   }
 
   /**
@@ -73,9 +77,10 @@ export class CommandRunnerG3 extends CommandRunnerBase {
    * @returns The return value is meaningless.
    */
   connect = async (): Promise<boolean> => {
-    console.log('connect')
+    console.log('connect', this.groupNumber)
     const device = await this.scan()
     if (!device) {
+      console.log('not device')
       return false
     }
     const server = await device.gatt?.connect()
@@ -86,6 +91,8 @@ export class CommandRunnerG3 extends CommandRunnerBase {
     await this.txCharacteristic?.startNotifications()
     this.txCharacteristic?.addEventListener('characteristicvaluechanged', this.receivedBytes)
     this.updateConnectionState_('connected')
+
+    await this.connectToCubeWithNum(3, this.groupNumber)
 
     return true
   }
@@ -98,7 +105,7 @@ export class CommandRunnerG3 extends CommandRunnerBase {
    * @returns The return value is meaningless.
    */
   disconnect = async () => {
-    // await this.rxCharacteristic?.writeValue(this.rebootMultiroleAggregator(""))
+    this.enqueue(PingPongUtil.rebootMultiroleAggregator())
 
     // When changing the connection state, be sure to call updateConnectionState_()
     this.updateConnectionState_('disconnected')
@@ -110,12 +117,35 @@ export class CommandRunnerG3 extends CommandRunnerBase {
         filters: [{ namePrefix: 'PINGPONG' }],
         optionalServices: [this.bleNusServiceUUID],
       })
+      console.log('블루투스 디바이스:', device)
       return device
     } catch (e) {
       return null
     }
   }
 
+  // scan = async (): Promise<BluetoothDevice | null> => {
+  //   try {
+  //     if (this.groupNumber === '00') {
+  //       const device = await navigator.bluetooth.requestDevice({
+  //         filters: [{ namePrefix: 'PINGPONG' }],
+  //         optionalServices: [this.bleNusServiceUUID],
+  //       })
+  //       console.log('블루투스 디바이스:', device);
+  //       return device
+  //     } else {
+  //       console.log(`test = PINGPONG.${this.groupNumber}`)
+  //       const device = await navigator.bluetooth.requestDevice({
+  //         // `name` 필터를 사용하여 정확한 이름으로 검색
+  //         filters: [{ name: `PINGPONG.${this.groupNumber}` }],
+  //         optionalServices: [this.bleNusServiceUUID],
+  //       });
+  //       return device;
+  //     }
+  //   } catch (e) {
+  //     return null
+  //   }
+  // }
   // 받는 데이터
   receivedBytes = (event: any): void => {
     console.log(`Receive ${String(PingPongUtil.byteToStringReceive(event))}`)
@@ -132,7 +162,7 @@ export class CommandRunnerG3 extends CommandRunnerBase {
   }
   // 데이터를 큐에 추가하는 메소드
   enqueue(data) {
-    console.log(`Send : + ${String(PingPongUtil.byteToString(data))}`)
+    console.log(`Send : ${String(PingPongUtil.byteToString(data))}`)
     // 데이터를 20바이트씩 분할하여 큐에 추가
     for (let i = 0; i < data.length; i += 20) {
       const chunk = data.slice(i, i + 20)
@@ -164,26 +194,20 @@ export class CommandRunnerG3 extends CommandRunnerBase {
     })
   }
 
-  rebootMultiroleAggregator = (event: any): Uint8Array => {
-    const hexArray = 'ff ff ff ff 00 00 a8 00 0a 01'.split(' ')
-    const byteArray = hexArray.map((hex) => parseInt(hex, 16))
-
-    const buffer = new Uint8Array(byteArray)
-    return buffer
-  }
-
   setInstantTorque = async (cubeNum, torque): Promise<void> => {
     this.enqueue(PingPongUtil.setInstantTorque(cubeNum, torque))
   }
   /** ____________________________________________________________________________________________________ */
 
-  connectToCube = async (): Promise<void> => {
-    this.enqueue(PingPongUtil.getOrangeForSoundData())
-  }
-
   // cubeNum : 큐브 총 갯수
-  connectToCubeWithNum = async (cubeNum): Promise<void> => {
-    this.enqueue(PingPongUtil.getSetMultiroleInAction(cubeNum))
+  connectToCubeWithNum = async (cubeNum: number, groupID: string): Promise<void> => {
+    this.enqueue(PingPongUtil.getSetMultiroleInAction(cubeNum, groupID))
+    return new Promise<void>((resolve) => {
+      setTimeout(() => {
+        console.log('connectToCubeWithNum 3 done')
+        resolve()
+      }, 1000)
+    })
   }
 
   // cubeNum : 큐브 총 갯수
