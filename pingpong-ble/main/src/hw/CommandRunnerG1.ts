@@ -17,6 +17,7 @@ export class CommandRunnerG1 extends CommandRunnerBase {
 
   queue: any
   isSending: boolean
+  isSendingDone: boolean
   defaultDelay: number
 
   sensorG1: { [key: string]: number }
@@ -64,26 +65,6 @@ export class CommandRunnerG1 extends CommandRunnerBase {
   destroy = async () => {
     // empty
   }
-
-  /**
-   * Update the connection state variable,
-   * emit an event if the connection state has changed,
-   * and notify the parent frame (CODINY).
-   * @param state - The connection state
-   */
-  // private updateConnectionState_ = (state: ConnectionState) => {
-  //   if (state !== this.connectionState) {
-  //     this.connectionState = state
-  //     this.notifyEvents.emit(HPetNotifyEventKeys.connectionStateChanged, this.connectionState)
-
-  //     // notify to parent frame (CODINY)
-  //     this.toParent.notifyConnectionState(this.connectionState)
-
-  // 연결은 connect()에서 작성해주세요
-  //     // connect cube
-  //     this.connectToCube()
-  //   }
-  // }
 
   /**
    * command: connect
@@ -162,7 +143,9 @@ export class CommandRunnerG1 extends CommandRunnerBase {
   //   }
   // }
 
-  // 받는 데이터
+  /** 
+   * 받는 데이터 
+   */ 
   receivedBytes = (event: any): void => {
     if (event.target.value.byteLength != 0) {
       // 데이터 LOG 확인용
@@ -183,8 +166,10 @@ export class CommandRunnerG1 extends CommandRunnerBase {
 
   /** ____________________________________________________________________________________________________ */
 
-  // 데이터를 큐에 추가하는 메소드
-  enqueue(data) {
+  /** 
+   * 데이터를 큐에 추가하는 메소드 
+   */ 
+  enqueue(data: Uint8Array) {
     // console.log(`Send : ${String(PingPongUtil.byteToString(data))}`)
     // 데이터를 20바이트씩 분할하여 큐에 추가
     for (let i = 0; i < data.length; i += 20) {
@@ -194,7 +179,9 @@ export class CommandRunnerG1 extends CommandRunnerBase {
     this.processQueue()
   }
 
-  // 큐를 처리하는 메소드
+  /** 
+   * 큐를 처리하는 메소드
+   */ 
   async processQueue() {
     if (this.isSending || this.queue.length === 0) {
       return
@@ -217,13 +204,18 @@ export class CommandRunnerG1 extends CommandRunnerBase {
     })
   }
 
-  // 모터 토그 강도 설정
-  setInstantTorque = async (cubeNum, torque): Promise<void> => {
-    this.enqueue(PingPongUtil.setInstantTorque(cubeNum, torque))
-  }
   /** ____________________________________________________________________________________________________ */
 
-  // 1개 큐브 연결
+  /** 
+   * 모터 토그 강도 설정 
+   */ 
+  setInstantTorque = async (cubeNum: number, torque: number): Promise<void> => {
+    this.enqueue(PingPongUtil.setInstantTorque(cubeNum, torque))
+  }
+
+  /** 
+   * 1개 큐브 연결 
+   */ 
   connectToCube = async (): Promise<void> => {
     this.enqueue(PingPongUtil.getOrangeForSoundData())
     return new Promise<void>((resolve) => {
@@ -234,47 +226,62 @@ export class CommandRunnerG1 extends CommandRunnerBase {
     })
   }
 
-  // 센서 받아오기 시작
+  /** 
+   * 센서 받아오기 시작 
+   */
   startSensor = async (): Promise<void> => {
     // console.log('startSensor')
     this.enqueue(PingPongUtil.getSensor())
   }
 
-  // 큐브 모터 하나만 움직이기
-  // cubeNum : 큐브 총 갯수
-  // cubeID : 큐브 순서 (0부터 시작)
-  // speed : 속도 (100 ~ 1000)
-  // step : 스텝 (0 ~ 1980)
-  sendSingleStep = async (cubeNum, cubeID, speed, step): Promise<void> => {
+  /** 
+   * 큐브 모터 하나만 움직이기
+   * cubeNum : 큐브 총 갯수
+   * cubeID : 큐브 순서 (0부터 시작)
+   * speed : 속도 (100 ~ 1000)
+   * step : 스텝 (0 ~ 1980)
+   */ 
+  sendSingleStep = async (cubeNum: number, cubeID: number, speed: number, step: number): Promise<void> => {
     this.enqueue(PingPongUtil.makeSingleStep(cubeNum, cubeID, speed, step))
   }
 
-  // 큐브 모터 하나만 계속 움직이기
-  // cubeNum : 큐브 총 갯수
-  // cubeID : 큐브 순서 (0부터 시작)
-  // speed : 속도 (100 ~ 1000)
-  sendContinuousStep = async (cubeNum, cubeID, speed): Promise<void> => {
+  /** 
+   * 근접 센서 값
+   * 큐브 모터 하나만 계속 움직이기
+   * cubeNum : 큐브 총 갯수
+   * cubeID : 큐브 순서 (0부터 시작)
+   * speed : 속도 (100 ~ 1000)
+   */ 
+  sendContinuousStep = async (cubeNum: number, cubeID: number, speed: number): Promise<void> => {
     this.enqueue(PingPongUtil.makeContinuousStep(cubeNum, cubeID, speed))
   }
 
   /** G1 ____________________________________________________________________________________________________ */
 
-  // 버튼 센서값 0~2
+  /** 
+   * 버튼 센서값 0~2
+   */ 
   getButtonSensor = async (): Promise<number> => {
     return this.sensorG1['Sensor_Byte_11']
   }
 
-  // 근접 센서 값
+  /** 
+   * 근접 센서 값
+   */ 
   getProximitySensor = async (): Promise<number> => {
     return this.sensorG1['Sensor_Byte_18']
   }
 
-  // 소리 센서 값
+  /** 
+   * 소리 센서 값
+   */ 
   getSoundSensor = async (): Promise<number> => {
     return this.sensorG1['Sensor_Byte_19']
   }
 
-  // 어떤 방향 기울기 센서 값
+  /** 
+   * 어떤 방향 기울기 센서 값
+   */ 
   getFaceTiltAngle = async (figure: String): Promise<number> => {
     if (figure === 'Star') {
       return PingPongUtil.getSignedIntFromByteData(this.sensorG1['Sensor_Byte_16']) * -1
@@ -288,8 +295,10 @@ export class CommandRunnerG1 extends CommandRunnerBase {
     return 0
   }
 
-  // 서브 모터 움직이기
-  setServoDegree = async (cubeID, degree): Promise<void> => {
+  /** 
+   * 서브 모터 움직이기
+   */ 
+  setServoDegree = async (cubeID: number, degree: number): Promise<void> => {
     this.enqueue(PingPongUtil.makeServoDegreeData(cubeID, degree))
 
     return new Promise<void>((resolve) => {

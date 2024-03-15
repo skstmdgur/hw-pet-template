@@ -71,26 +71,6 @@ export class CommandRunnerG2 extends CommandRunnerBase {
   }
 
   /**
-   * Update the connection state variable,
-   * emit an event if the connection state has changed,
-   * and notify the parent frame (CODINY).
-   * @param state - The connection state
-   */
-  // private updateConnectionState_ = (state: ConnectionState) => {
-  //   if (state !== this.connectionState) {
-  //     this.connectionState = state
-  //     this.notifyEvents.emit(HPetNotifyEventKeys.connectionStateChanged, this.connectionState)
-
-  //     // notify to parent frame (CODINY)
-  //     this.toParent.notifyConnectionState(this.connectionState)
-
-  // 연결은 connect()에서 작성해주세요
-  //     // connect cube
-  //     this.connectToCube()
-  //   }
-  // }
-
-  /**
    * command: connect
    *
    * Function to connect to the hardware.
@@ -223,7 +203,7 @@ export class CommandRunnerG2 extends CommandRunnerBase {
   /** ____________________________________________________________________________________________________ */
 
   // 데이터를 큐에 추가하는 메소드
-  enqueue(data) {
+  enqueue(data: Uint8Array) {
     // console.log(`Send : ${String(PingPongUtil.byteToString(data))}`)
     // 데이터를 20바이트씩 분할하여 큐에 추가
     for (let i = 0; i < data.length; i += 20) {
@@ -256,10 +236,11 @@ export class CommandRunnerG2 extends CommandRunnerBase {
     })
   }
 
-  setInstantTorque = async (cubeNum, torque): Promise<void> => {
+  /** ____________________________________________________________________________________________________ */
+
+  setInstantTorque = async (cubeNum: number, torque: number): Promise<void> => {
     this.enqueue(PingPongUtil.setInstantTorque(cubeNum, torque))
   }
-  /** ____________________________________________________________________________________________________ */
 
   // cubeNum : 큐브 총 갯수
   connectToCubeWithNum = async (cubeNum: number, groupID: string): Promise<void> => {
@@ -285,7 +266,7 @@ export class CommandRunnerG2 extends CommandRunnerBase {
   // cubeID : 큐브 순서 (0부터 시작)
   // speed : 속도 (100 ~ 1000)
   // step : 스텝 (0 ~ 1980)
-  sendSingleStep = async (cubeNum, cubeID, speed, step): Promise<void> => {
+  sendSingleStep = async (cubeNum: number, cubeID: number, speed: number, step: number): Promise<void> => {
     const delay = PingPongUtil.makeDelayTimeFromSpeedStep(
       PingPongUtil.changeSpeedToSps(speed),
       Math.round(Math.abs(step)),
@@ -302,7 +283,7 @@ export class CommandRunnerG2 extends CommandRunnerBase {
   // cubeNum : 큐브 총 갯수
   // cubeID : 큐브 순서 (0부터 시작)
   // speed : 속도 (100 ~ 1000)
-  sendContinuousStep = async (cubeNum, cubeID, speed): Promise<void> => {
+  sendContinuousStep = async (cubeNum: number, cubeID: number, speed: number): Promise<void> => {
     this.enqueue(PingPongUtil.makeContinuousStep(cubeNum, cubeID, speed))
     return new Promise<void>((resolve) => {
       setTimeout(() => {
@@ -312,7 +293,7 @@ export class CommandRunnerG2 extends CommandRunnerBase {
     })
   }
 
-  sendAggregator = async (cubeNum, method, speed0, step0, speed1, step1): Promise<void> => {
+  sendAggregator = async (cubeNum: number, method: number, speed0: number, step0: number, speed1: number, step1: number): Promise<void> => {
     const innerData = new Array(2)
     const delay1 = PingPongUtil.makeDelayTimeFromSpeedStep(
       PingPongUtil.changeSpeedToSps(speed0),
@@ -551,7 +532,7 @@ export class CommandRunnerG2 extends CommandRunnerBase {
 
   // Rolling Car ____________________________________________________________________________________________________
   // distance 1 = 큐브 1면 90도 회전
-  moveRollingCar = async (speed, distance): Promise<void> => {
+  moveRollingCar = async (speed: number, distance: number): Promise<void> => {
     const innerAutoCarData = new Array(2)
 
     if (distance < 0) {
