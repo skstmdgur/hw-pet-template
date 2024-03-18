@@ -265,6 +265,11 @@ export class CommandRunnerG1 extends CommandRunnerBase {
     return this.sensorG1['Sensor_Byte_11']
   }
 
+  ifButtonSensor = async (): Promise<boolean> => {
+    if (this.sensorG1['Sensor_Byte_11'] > 0) 
+    return true;
+  }
+
   /** 
    * 근접 센서 값
    */ 
