@@ -31,7 +31,10 @@ export function HardwareImageBox(props: Props) {
         sx,
       )}
     >
-      <img alt="" src={src} />
+      <img alt="" src={src} style={{
+          height : "50px",
+          paddingTop : "10px"
+      }}/>
     </Box>
   )
 }

@@ -186,48 +186,52 @@ export default function Page() {
         </div>
         <Link
           href={`/g1?groupNumber=${combinedValue}`}
-          style={{ display: 'inline-block', padding: 16 }}
+          style={{ display: 'inline-block', padding: 16}}
         >
           <img
             style={{
-              width: '70px',
+                width: '170px',
+                borderRadius : '10px'
             }}
-            src="logo_g1.png"
+            src="G1_logo.jpg"
           />
         </Link>
-        <Link
-          href={`/g2?groupNumber=${combinedValue}`}
-          style={{ display: 'inline-block', padding: 16 }}
-        >
-          <img
-            style={{
-              width: '70px',
-            }}
-            src="logo_g2.png"
-          />
-        </Link>
-        <Link
-          href={`/g3?groupNumber=${combinedValue}`}
-          style={{ display: 'inline-block', padding: 16 }}
-        >
-          <img
-            style={{
-              width: '70px',
-            }}
-            src="logo_g3.png"
-          />
-        </Link>
-        <Link
-          href={`/g4?groupNumber=${combinedValue}`}
-          style={{ display: 'inline-block', padding: 16 }}
-        >
-          <img
-            style={{
-              width: '70px',
-            }}
-            src="logo_g4.png"
-          />
-        </Link>
+          <Link
+              href={`/g2?groupNumber=${combinedValue}`}
+              style={{display: 'inline-block', padding: 16}}
+          >
+              <img
+                  style={{
+                      width: '170px',
+                      borderRadius: '10px'
+                  }}
+                  src="G2_logo.jpg"
+              />
+          </Link>
+          <Link
+              href={`/g3?groupNumber=${combinedValue}`}
+              style={{display: 'inline-block', padding: 16}}
+          >
+              <img
+                  style={{
+                      width: '170px',
+                      borderRadius: '10px'
+                  }}
+                  src="G3_logo.jpg"
+              />
+          </Link>
+          <Link
+              href={`/g4?groupNumber=${combinedValue}`}
+              style={{display: 'inline-block', padding: 16}}
+          >
+              <img
+                  style={{
+                      width: '170px',
+                      borderRadius: '10px'
+                  }}
+                  src="G4_logo.jpg"
+              />
+          </Link>
       </div>
     </Suspense>
   )
