@@ -301,6 +301,44 @@ export class CommandRunnerG1 extends CommandRunnerBase {
   }
 
   /** 
+   * 큐브 윗면에 어떤 모양이 있는가
+   */ 
+  ifUpperTilt = async (figure: String): Promise<boolean> => {
+
+    if (figure === 'Circle') {
+      if (PingPongUtil.getSignedIntFromByteData(this.sensorG1['Sensor_Byte_15']) < -70)
+      return true;
+    }
+    if (figure === 'Triangle') {
+      if (PingPongUtil.getSignedIntFromByteData(this.sensorG1['Sensor_Byte_15']) > 70)
+      return true;
+    }
+    if (figure === 'Star') {
+      if (PingPongUtil.getSignedIntFromByteData(this.sensorG1['Sensor_Byte_16']) > 70)
+      return true;
+    }
+    if (figure === 'Square') {
+      if (PingPongUtil.getSignedIntFromByteData(this.sensorG1['Sensor_Byte_16']) < -70)
+      return true;
+    }
+    if (figure === 'None') {
+      if (PingPongUtil.getSignedIntFromByteData(this.sensorG1['Sensor_Byte_16']) < -70)
+      return true;
+    }
+    if (figure === 'Heart') {
+      if (PingPongUtil.getSignedIntFromByteData(this.sensorG1['Sensor_Byte_16']) < -70)
+      return true;
+    }
+
+    
+    return false;
+
+  }
+
+
+
+
+  /** 
    * 서브 모터 움직이기
    */ 
   setServoDegree = async (cubeID: number, degree: number): Promise<void> => {
