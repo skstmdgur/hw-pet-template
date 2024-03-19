@@ -160,7 +160,7 @@ export class CommandRunnerG3 extends CommandRunnerBase {
   sendTest = async (packet: string): Promise<void> => {
     this.enqueue(PingPongUtil.stringToByte(packet))
   }
-  
+
   // 데이터를 큐에 추가하는 메소드
   enqueue(data) {
     console.log(`Send : ${String(PingPongUtil.byteToString(data))}`)

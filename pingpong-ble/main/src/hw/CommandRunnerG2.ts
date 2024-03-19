@@ -266,7 +266,12 @@ export class CommandRunnerG2 extends CommandRunnerBase {
   // cubeID : 큐브 순서 (0부터 시작)
   // speed : 속도 (100 ~ 1000)
   // step : 스텝 (0 ~ 1980)
-  sendSingleStep = async (cubeNum: number, cubeID: number, speed: number, step: number): Promise<void> => {
+  sendSingleStep = async (
+    cubeNum: number,
+    cubeID: number,
+    speed: number,
+    step: number,
+  ): Promise<void> => {
     const delay = PingPongUtil.makeDelayTimeFromSpeedStep(
       PingPongUtil.changeSpeedToSps(speed),
       Math.round(Math.abs(step)),
@@ -293,7 +298,14 @@ export class CommandRunnerG2 extends CommandRunnerBase {
     })
   }
 
-  sendAggregator = async (cubeNum: number, method: number, speed0: number, step0: number, speed1: number, step1: number): Promise<void> => {
+  sendAggregator = async (
+    cubeNum: number,
+    method: number,
+    speed0: number,
+    step0: number,
+    speed1: number,
+    step1: number,
+  ): Promise<void> => {
     const innerData = new Array(2)
     const delay1 = PingPongUtil.makeDelayTimeFromSpeedStep(
       PingPongUtil.changeSpeedToSps(speed0),
