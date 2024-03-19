@@ -190,9 +190,10 @@ export default function Page() {
         >
           <img
             style={{
-              width: '70px',
+              width: '170px',
+              borderRadius: '10px',
             }}
-            src="logo_g1.png"
+            src="G1_logo.jpg"
           />
         </Link>
         <Link
@@ -201,9 +202,10 @@ export default function Page() {
         >
           <img
             style={{
-              width: '70px',
+              width: '170px',
+              borderRadius: '10px',
             }}
-            src="logo_g2.png"
+            src="G2_logo.jpg"
           />
         </Link>
         <Link
@@ -212,9 +214,10 @@ export default function Page() {
         >
           <img
             style={{
-              width: '70px',
+              width: '170px',
+              borderRadius: '10px',
             }}
-            src="logo_g3.png"
+            src="G3_logo.jpg"
           />
         </Link>
         <Link
@@ -223,9 +226,10 @@ export default function Page() {
         >
           <img
             style={{
-              width: '70px',
+              width: '170px',
+              borderRadius: '10px',
             }}
-            src="logo_g4.png"
+            src="G4_logo.jpg"
           />
         </Link>
       </div>

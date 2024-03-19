@@ -27,7 +27,7 @@ export default function Page() {
           commandRunnerClass={CommandRunnerG1}
           cubeType="g1"
           groupNumber={groupNumber}
-          logoImageUrl="logo_g1.png"
+          logoImageUrl="G1.png"
         />
       </Box>
     </Suspense>
