@@ -279,21 +279,6 @@ export const makeAggregateStep = (cubeNum, innerData, method): Uint8Array => {
   return data
 }
 
-export const makeDelayTimeFromSpeedStep = (speed, step): number => {
-  // 1회전당 걸리는 시간
-  const oneRotationSecond = Math.pow(2, (1000 - speed) / 100)
-  // 1980 = 1회전당 스텝
-  const oneRotationStep = step / 1980
-  const delayTime = oneRotationSecond * oneRotationStep * 1000
-
-  console.log(`oneRotationSecond : ${oneRotationSecond}, oneRotationStep : ${oneRotationStep}`)
-  console.log(`delayTime : ${delayTime}`)
-
-  return delayTime + 1000
-}
-
-/** ____________________________________________________________________________________________________ */
-
 // torque : 0(min) ~ 1(max)
 export const setInstantTorque = (cubeNum, torque): Uint8Array => {
   const data = new Uint8Array(10)
@@ -308,6 +293,21 @@ export const setInstantTorque = (cubeNum, torque): Uint8Array => {
   data[8] = 0x0a
   data[9] = torque
   return data
+}
+
+/** ____________________________________________________________________________________________________ */
+
+export const makeDelayTimeFromSpeedStep = (speed: number, step: number): number => {
+  // 1회전당 걸리는 시간
+  const oneRotationSecond = Math.pow(2, (1000 - speed) / 100)
+  // 1980 = 1회전당 스텝
+  const oneRotationStep = step / 1980
+  const delayTime = oneRotationSecond * oneRotationStep * 1000
+
+  console.log(`oneRotationSecond : ${oneRotationSecond}, oneRotationStep : ${oneRotationStep}`)
+  console.log(`delayTime : ${delayTime}`)
+
+  return delayTime + 1000
 }
 
 export const byteToString = (data: Uint8Array): String => {
@@ -360,6 +360,10 @@ export const intToByte = (int: number): Uint8Array => {
 // Sps : 100 ~ 1000
 export const changeSpeedToSps = (speed: number): number => {
   return (speed * 1100 - 10000) / speed
+}
+
+export const changeDegreeToStep = (degree: number): number => {
+  return (degree * 1980) / 360
 }
 
 export const getSignedIntFromByteData = (byteData): number => {
@@ -487,7 +491,7 @@ export const changeMusicPianoKey = (pianoKey: string): number => {
   return pianoKeyData
 }
 
-export const changeMusicDuration = (duration: string): number => {
+export const changeMusicDuration = (duration: string, metronome: number): number => {
   let durationData = 0
 
   console.log(`duration : ${duration}`)
@@ -495,31 +499,80 @@ export const changeMusicDuration = (duration: string): number => {
   switch (duration) {
     case 'Whole':
       console.log(`Whole`)
-      durationData = 200
+      switch (metronome) {
+        case 60:
+          return (durationData = 4 * 50)
+        case 100:
+          return (durationData = 2.4 * 50)
+        case 150:
+          return (durationData = 1.6 * 50)
+      }
       break
     case 'DottedHalf':
       console.log(`DottedHalf`)
-      durationData = 150
+      switch (metronome) {
+        case 60:
+          return (durationData = 3 * 50)
+        case 100:
+          return (durationData = 1.8 * 50)
+        case 150:
+          return (durationData = 1.2 * 50)
+      }
       break
     case 'Half':
       console.log(`Half`)
-      durationData = 100
+      switch (metronome) {
+        case 60:
+          return (durationData = 2 * 50)
+        case 100:
+          return (durationData = 1.2 * 50)
+        case 150:
+          return (durationData = 0.8 * 50)
+      }
       break
     case 'DottedQuarter':
       console.log(`DottedQuarter`)
-      durationData = 75
+      switch (metronome) {
+        case 60:
+          return (durationData = 1.5 * 50)
+        case 100:
+          return (durationData = 0.9 * 50)
+        case 150:
+          return (durationData = 0.6 * 50)
+      }
       break
     case 'Quarter':
       console.log(`Quarter`)
-      durationData = 50
+      switch (metronome) {
+        case 60:
+          return (durationData = 1 * 50)
+        case 100:
+          return (durationData = 0.6 * 50)
+        case 150:
+          return (durationData = 0.4 * 50)
+      }
       break
     case 'Eighth':
       console.log(`Eighth`)
-      durationData = 25
+      switch (metronome) {
+        case 60:
+          return (durationData = 0.5 * 50)
+        case 100:
+          return (durationData = 0.3 * 50)
+        case 150:
+          return (durationData = 0.2 * 50)
+      }
       break
     case 'Sixteenth':
       console.log(`Sixteenth`)
-      durationData = 12
+      switch (metronome) {
+        case 60:
+          return (durationData = 0.25 * 50)
+        case 100:
+          return (durationData = 0.15 * 50)
+        case 150:
+          return (durationData = 0.1 * 50)
+      }
       break
   }
 
