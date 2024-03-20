@@ -1,6 +1,6 @@
 # PingPong G1 G2 G3 G4
 
-![PingPong G1](./main/public/logo.png)
+![PingPong Gcube](./main/public/logo.png)
 
 PingPong G1~G4
 
@@ -123,8 +123,8 @@ export const HW_ID = 'pingpong-ble'
  * hardware name
  */
 export const HW_NAME = {
-  en: 'PingPong G1',
-  ko: 'PingPong G1',
+  en: 'PingPong Robot',
+  ko: '핑퐁로봇',
 }
 ```
 

@@ -48,7 +48,7 @@ export default function Page() {
           background: '#fff',
         }}
       >
-        <div>
+        {/* <div>
           <div
             style={{
               display: 'flex',
@@ -183,7 +183,7 @@ export default function Page() {
               ))}
             </select>
           </div>
-        </div>
+        </div> */}
         <Link
           href={`/g1?groupNumber=${combinedValue}`}
           style={{ display: 'inline-block', padding: 16 }}

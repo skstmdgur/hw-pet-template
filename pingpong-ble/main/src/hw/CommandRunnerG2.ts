@@ -41,6 +41,10 @@ export class CommandRunnerG2 extends CommandRunnerBase {
     }
 
     this.modelSetting = {
+      DEFAULT: {
+        defaultSpeed: 900,
+        metronome: 60,
+      },
       'AUTO CAR': {
         defaultSpeed: 900,
         defaultStepToCM: 24.44444,
@@ -236,11 +240,11 @@ export class CommandRunnerG2 extends CommandRunnerBase {
     })
   }
 
-  /** ____________________________________________________________________________________________________ */
-
   setInstantTorque = async (cubeNum: number, torque: number): Promise<void> => {
     this.enqueue(PingPongUtil.setInstantTorque(cubeNum, torque))
   }
+
+  /** ____________________________________________________________________________________________________ */
 
   // cubeNum : 큐브 총 갯수
   connectToCubeWithNum = async (cubeNum: number, groupID: string): Promise<void> => {
@@ -339,55 +343,108 @@ export class CommandRunnerG2 extends CommandRunnerBase {
     }
 
     this.enqueue(PingPongUtil.makeAggregateStep(cubeNum, innerData, method))
-
-    return new Promise<void>((resolve) => {
-      setTimeout(() => {
-        console.log('sendAggregator done')
-        resolve()
-      }, delay)
-    })
   }
 
-  // notesAndRests : note, rest
-  // pianoKey : La_3 ~ Do_6
-  // duration : 4, 3, 2, 1.5, 1, 0.5, 0.25
-  sendMusic = async (
-    cubeID: number,
-    notesAndRests: string,
-    pianoKey: string,
-    duration: string,
+  /** G2 ____________________________________________________________________________________________________ */
+  /** __________ G2 Motor __________ */
+
+  setMotorStep = async (
+    speed0: number,
+    step0: number,
+    speed1: number,
+    step1: number,
   ): Promise<void> => {
-    const pianoKeyData = PingPongUtil.changeMusicPianoKey(pianoKey)
-    const durationData = PingPongUtil.changeMusicDuration(duration)
+    const delay1 = PingPongUtil.makeDelayTimeFromSpeedStep(
+      PingPongUtil.changeSpeedToSps(speed0),
+      step0,
+    )
+    const delay2 = PingPongUtil.makeDelayTimeFromSpeedStep(
+      PingPongUtil.changeSpeedToSps(speed1),
+      step1,
+    )
+    const delayTime = delay1 > delay2 ? delay1 : delay2
 
-    this.enqueue(PingPongUtil.makeMusicData(cubeID, 1, notesAndRests, pianoKeyData, durationData))
+    this.sendAggregator(
+      2,
+      1,
+      PingPongUtil.changeSpeedToSps(speed0),
+      step0,
+      PingPongUtil.changeSpeedToSps(speed1),
+      step1,
+    )
 
-    return new Promise<void>((resolve) => {
-      setTimeout(() => {
-        console.log('sendMusic done')
-        resolve()
-      }, durationData * 20)
-    })
+    sleepAsync(delayTime)
   }
 
-  startMusic = async (): Promise<void> => {
-    this.enqueue(PingPongUtil.makeMusicPlay(2))
-    return new Promise<void>((resolve) => {
-      setTimeout(() => {
-        console.log('startMusic done')
-        resolve()
-      }, this.defaultDelay)
-    })
+  setMotorDegree = async (
+    speed0: number,
+    degree0: number,
+    speed1: number,
+    degree1: number,
+  ): Promise<void> => {
+    const delay1 = PingPongUtil.makeDelayTimeFromSpeedStep(
+      PingPongUtil.changeSpeedToSps(speed0),
+      PingPongUtil.changeDegreeToStep(degree0),
+    )
+    const delay2 = PingPongUtil.makeDelayTimeFromSpeedStep(
+      PingPongUtil.changeSpeedToSps(speed1),
+      PingPongUtil.changeDegreeToStep(degree1),
+    )
+    const delayTime = delay1 > delay2 ? delay1 : delay2
+
+    this.sendAggregator(
+      2,
+      1,
+      speed0,
+      PingPongUtil.changeDegreeToStep(degree0),
+      speed1,
+      PingPongUtil.changeDegreeToStep(degree1),
+    )
+
+    sleepAsync(delayTime)
   }
 
-  musicTest = async (): Promise<void> => {
-    await this.sendMusic(0, 'note', 'Do_4', 'Whole')
-    await this.sendMusic(0, 'note', 'Re_4', 'DottedHalf')
-    await this.sendMusic(0, 'note', 'Mi_4', 'Half')
-    await this.sendMusic(0, 'note', 'Fa_4', 'DottedQuarter')
-    await this.sendMusic(0, 'note', 'Sol_4', 'Quarter')
-    await this.sendMusic(0, 'note', 'La_4', 'Eighth')
-    await this.sendMusic(0, 'note', 'Si_4', 'Sixteenth')
+  setMotorContinuous = async (speed0: number, speed1: number): Promise<void> => {
+    this.sendAggregator(
+      2,
+      0,
+      PingPongUtil.changeSpeedToSps(speed0),
+      0,
+      PingPongUtil.changeSpeedToSps(speed1),
+      0,
+    )
+  }
+
+  setMotorStop = async (): Promise<void> => {
+    this.sendAggregator(2, 0, 0, 0, 0, 0)
+  }
+
+  /** __________ G1 Sensor __________ */
+
+  /**
+   * 버튼 센서값 0~2
+   */
+  getButtonSensor = async (cubeID: number): Promise<number> => {
+    switch (cubeID) {
+      case 0:
+        return this.sensorG1['Sensor_Byte_11']
+
+      case 1:
+        return this.sensorG2['Sensor_Byte_11']
+    }
+  }
+
+  ifButtonSensor = async (cubeID: number): Promise<boolean> => {
+    switch (cubeID) {
+      case 0:
+        if (this.sensorG1['Sensor_Byte_11'] > 0) return true
+        break
+      case 1:
+        if (this.sensorG2['Sensor_Byte_11'] > 0) return true
+        break
+    }
+
+    return false
   }
 
   getFaceTiltAngle = async (cubeID: number, figure: String): Promise<number> => {
@@ -447,6 +504,42 @@ export class CommandRunnerG2 extends CommandRunnerBase {
     }
 
     return faceTiltAngleData
+  }
+
+  /** __________ G1 Music __________ */
+
+  setMetronome = async (metronome: number): Promise<void> => {
+    this.modelSetting['DEFAULT']['metronome'] = metronome
+  }
+
+  startMusic = async (): Promise<void> => {
+    this.enqueue(PingPongUtil.makeMusicPlay(2))
+    sleepAsync(this.defaultDelay)
+  }
+
+  // notesAndRests : note, rest
+  // pianoKey : La_3 ~ Do_6
+  // duration : 4, 3, 2, 1.5, 1, 0.5, 0.25
+  sendMusic = async (
+    cubeID: number,
+    notesAndRests: string,
+    pianoKey: string,
+    duration: string,
+  ): Promise<void> => {
+    const pianoKeyData = PingPongUtil.changeMusicPianoKey(pianoKey)
+    const durationData = PingPongUtil.changeMusicDuration(
+      duration,
+      this.modelSetting['DEFAULT']['metronome'],
+    )
+
+    this.enqueue(PingPongUtil.makeMusicData(cubeID, 1, notesAndRests, pianoKeyData, durationData))
+
+    return new Promise<void>((resolve) => {
+      setTimeout(() => {
+        console.log('sendMusic done')
+        resolve()
+      }, durationData * 20)
+    })
   }
 
   // Auto Car ____________________________________________________________________________________________________

@@ -37,6 +37,10 @@ export class CommandRunnerG1 extends CommandRunnerBase {
     }
 
     this.modelSetting = {
+      DEFAULT: {
+        defaultSpeed: 900,
+        metronome: 60,
+      },
       MONO: {
         defaultSpeed: 900,
         defaultStepToCM: 49.5,
@@ -151,7 +155,9 @@ export class CommandRunnerG1 extends CommandRunnerBase {
       // 데이터 LOG 확인용
       // console.log(`Receive ${String(PingPongUtil.byteToStringReceive(event))}`)
 
-      // G1 센서 데이터
+      /**
+       * G1 센서 데이터
+       */
       if (
         event.target.value.byteLength === 20 &&
         event.target.value.getUint8(0) === 0xa7 &&
@@ -160,6 +166,18 @@ export class CommandRunnerG1 extends CommandRunnerBase {
         for (let i = 0; i < 20; i++) {
           this.sensorG1[`Sensor_Byte_${i}`] = event.target.value.getUint8(i)
         }
+      }
+
+      /**
+       * 음악 데이터
+       */
+      if (
+        event.target.value.byteLength === 11 &&
+        event.target.value.getUint8(5) === 0xa1 &&
+        event.target.value.getUint8(6) === 0xe8 &&
+        event.target.value.getUint8(10) === 0x01
+      ) {
+        this.startMusic()
       }
     }
   }
@@ -248,6 +266,7 @@ export class CommandRunnerG1 extends CommandRunnerBase {
     step: number,
   ): Promise<void> => {
     this.enqueue(PingPongUtil.makeSingleStep(cubeNum, cubeID, speed, step))
+    sleepAsync(1000)
   }
 
   /**
@@ -262,6 +281,50 @@ export class CommandRunnerG1 extends CommandRunnerBase {
   }
 
   /** G1 ____________________________________________________________________________________________________ */
+
+  /** __________ G1 Motor __________ */
+
+  /**
+   * Cube = 1
+   * CubeID = 7
+   */
+
+  setMotorStep = async (speed: number, step: number): Promise<void> => {
+    const delayTime = PingPongUtil.makeDelayTimeFromSpeedStep(
+      PingPongUtil.changeSpeedToSps(speed),
+      step,
+    )
+
+    this.enqueue(PingPongUtil.makeSingleStep(1, 7, PingPongUtil.changeSpeedToSps(speed), step))
+    sleepAsync(delayTime)
+  }
+
+  setMotorDegree = async (speed: number, degree: number): Promise<void> => {
+    const delayTime = PingPongUtil.makeDelayTimeFromSpeedStep(
+      PingPongUtil.changeSpeedToSps(speed),
+      PingPongUtil.changeDegreeToStep(degree),
+    )
+
+    this.enqueue(
+      PingPongUtil.makeSingleStep(
+        1,
+        7,
+        PingPongUtil.changeSpeedToSps(speed),
+        PingPongUtil.changeDegreeToStep(degree),
+      ),
+    )
+    sleepAsync(delayTime)
+  }
+
+  setMotorContinuous = async (speed: number): Promise<void> => {
+    this.enqueue(PingPongUtil.makeContinuousStep(1, 7, PingPongUtil.changeSpeedToSps(speed)))
+  }
+
+  setMotorStop = async (): Promise<void> => {
+    this.enqueue(PingPongUtil.makeContinuousStep(1, 7, 0))
+  }
+
+  /** __________ G1 Sensor __________ */
 
   /**
    * 버튼 센서값 0~2
@@ -308,17 +371,17 @@ export class CommandRunnerG1 extends CommandRunnerBase {
    * 큐브 윗면에 어떤 모양이 있는가
    */
   ifUpperTilt = async (figure: String): Promise<boolean> => {
-    if (figure === 'Circle') {
-      if (PingPongUtil.getSignedIntFromByteData(this.sensorG1['Sensor_Byte_15']) < -70) return true
+    if (figure === 'Square') {
+      if (PingPongUtil.getSignedIntFromByteData(this.sensorG1['Sensor_Byte_16']) < -70) return true
     }
     if (figure === 'Triangle') {
-      if (PingPongUtil.getSignedIntFromByteData(this.sensorG1['Sensor_Byte_15']) > 70) return true
+      if (PingPongUtil.getSignedIntFromByteData(this.sensorG1['Sensor_Byte_15']) < -70) return true
     }
     if (figure === 'Star') {
       if (PingPongUtil.getSignedIntFromByteData(this.sensorG1['Sensor_Byte_16']) > 70) return true
     }
-    if (figure === 'Square') {
-      if (PingPongUtil.getSignedIntFromByteData(this.sensorG1['Sensor_Byte_16']) < -70) return true
+    if (figure === 'Circle') {
+      if (PingPongUtil.getSignedIntFromByteData(this.sensorG1['Sensor_Byte_15']) > 70) return true
     }
     if (figure === 'None') {
       if (PingPongUtil.getSignedIntFromByteData(this.sensorG1['Sensor_Byte_16']) < -70) return true
@@ -329,6 +392,46 @@ export class CommandRunnerG1 extends CommandRunnerBase {
 
     return false
   }
+
+  /** __________ G1 Music __________ */
+
+  setMetronome = async (metronome: number): Promise<void> => {
+    this.modelSetting['DEFAULT']['metronome'] = metronome
+  }
+
+  startMusic = async (): Promise<void> => {
+    this.enqueue(PingPongUtil.makeMusicPlay(2))
+    sleepAsync(this.defaultDelay)
+  }
+
+  /**
+   * notesAndRests : note, rest
+   * pianoKey : La_3 ~ Do_6
+   * duration : 4, 3, 2, 1.5, 1, 0.5, 0.25
+   */
+  sendMusic = async (
+    cubeID: number,
+    notesAndRests: string,
+    pianoKey: string,
+    duration: string,
+  ): Promise<void> => {
+    const pianoKeyData = PingPongUtil.changeMusicPianoKey(pianoKey)
+    const durationData = PingPongUtil.changeMusicDuration(
+      duration,
+      this.modelSetting['DEFAULT']['metronome'],
+    )
+
+    this.enqueue(PingPongUtil.makeMusicData(7, 1, notesAndRests, pianoKeyData, durationData))
+
+    return new Promise<void>((resolve) => {
+      setTimeout(() => {
+        console.log('sendMusic done')
+        resolve()
+      }, durationData * 20)
+    })
+  }
+
+  /** __________ G1 Arduino __________ */
 
   /**
    * 서브 모터 움직이기
