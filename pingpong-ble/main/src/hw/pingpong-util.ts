@@ -217,7 +217,7 @@ export const makeSingleStep = (cubeNum, cubeID, speed, step): Uint8Array => {
   return data
 }
 
-export const makeContinuousStep = (cubeNum, cubeID, speed): Uint8Array => {
+export const makeContinuousStep = (cubeNum: number, cubeID: number, speed: number): Uint8Array => {
   const data = new Uint8Array(15)
 
   data[0] = 0xff
@@ -304,8 +304,8 @@ export const makeDelayTimeFromSpeedStep = (speed: number, step: number): number 
   const oneRotationStep = step / 1980
   const delayTime = oneRotationSecond * oneRotationStep * 1000
 
-  console.log(`oneRotationSecond : ${oneRotationSecond}, oneRotationStep : ${oneRotationStep}`)
-  console.log(`delayTime : ${delayTime}`)
+  // console.log(`oneRotationSecond : ${oneRotationSecond}, oneRotationStep : ${oneRotationStep}`)
+  // console.log(`delayTime : ${delayTime}`)
 
   return delayTime + 1000
 }
@@ -356,10 +356,18 @@ export const intToByte = (int: number): Uint8Array => {
   return intToByteData
 }
 
-// Speed : 0 ~ 100
+// Speed : -100 ~ 100
 // Sps : 100 ~ 1000
 export const changeSpeedToSps = (speed: number): number => {
-  return (speed * 1100 - 10000) / speed
+  let sps = 0
+
+  if (speed < 0) {
+    sps = 65536 - (Math.abs(speed) * 1100 - 10000) / Math.abs(speed)
+  } else {
+    sps = (speed * 1100 - 10000) / speed
+  }
+
+  return sps
 }
 
 export const changeDegreeToStep = (degree: number): number => {
@@ -494,11 +502,11 @@ export const changeMusicPianoKey = (pianoKey: string): number => {
 export const changeMusicDuration = (duration: string, metronome: number): number => {
   let durationData = 0
 
-  console.log(`duration : ${duration}`)
+  // console.log(`duration : ${duration}`)
 
   switch (duration) {
     case 'Whole':
-      console.log(`Whole`)
+      // console.log(`Whole`)
       switch (metronome) {
         case 60:
           return (durationData = 4 * 50)
@@ -509,7 +517,7 @@ export const changeMusicDuration = (duration: string, metronome: number): number
       }
       break
     case 'DottedHalf':
-      console.log(`DottedHalf`)
+      // console.log(`DottedHalf`)
       switch (metronome) {
         case 60:
           return (durationData = 3 * 50)
@@ -520,7 +528,7 @@ export const changeMusicDuration = (duration: string, metronome: number): number
       }
       break
     case 'Half':
-      console.log(`Half`)
+      // console.log(`Half`)
       switch (metronome) {
         case 60:
           return (durationData = 2 * 50)
@@ -531,7 +539,7 @@ export const changeMusicDuration = (duration: string, metronome: number): number
       }
       break
     case 'DottedQuarter':
-      console.log(`DottedQuarter`)
+      // console.log(`DottedQuarter`)
       switch (metronome) {
         case 60:
           return (durationData = 1.5 * 50)
@@ -542,7 +550,7 @@ export const changeMusicDuration = (duration: string, metronome: number): number
       }
       break
     case 'Quarter':
-      console.log(`Quarter`)
+      // console.log(`Quarter`)
       switch (metronome) {
         case 60:
           return (durationData = 1 * 50)
@@ -553,7 +561,7 @@ export const changeMusicDuration = (duration: string, metronome: number): number
       }
       break
     case 'Eighth':
-      console.log(`Eighth`)
+      // console.log(`Eighth`)
       switch (metronome) {
         case 60:
           return (durationData = 0.5 * 50)
@@ -564,7 +572,7 @@ export const changeMusicDuration = (duration: string, metronome: number): number
       }
       break
     case 'Sixteenth':
-      console.log(`Sixteenth`)
+      // console.log(`Sixteenth`)
       switch (metronome) {
         case 60:
           return (durationData = 0.25 * 50)
@@ -576,7 +584,7 @@ export const changeMusicDuration = (duration: string, metronome: number): number
       break
   }
 
-  console.log(`durationData : ${durationData}`)
+  // console.log(`durationData : ${durationData}`)
 
   return durationData
 }
