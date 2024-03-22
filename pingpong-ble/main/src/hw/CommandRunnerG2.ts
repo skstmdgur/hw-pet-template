@@ -207,14 +207,14 @@ export class CommandRunnerG2 extends CommandRunnerBase {
   /** ____________________________________________________________________________________________________ */
 
   // 데이터를 큐에 추가하는 메소드
-  enqueue(data: Uint8Array) {
+  async enqueue(data: Uint8Array) {
     // console.log(`Send : ${String(PingPongUtil.byteToString(data))}`)
     // 데이터를 20바이트씩 분할하여 큐에 추가
     for (let i = 0; i < data.length; i += 20) {
       const chunk = data.slice(i, i + 20)
       this.queue.push(chunk)
     }
-    this.processQueue()
+    await this.processQueue()
   }
 
   // 큐를 처리하는 메소드
@@ -234,27 +234,24 @@ export class CommandRunnerG2 extends CommandRunnerBase {
   }
 
   async sendData(packet: Uint8Array) {
-    this.rxCharacteristic?.writeValue(packet)
-    await new Promise((resolve) => {
-      setTimeout(resolve, 500)
-    })
+    await this.rxCharacteristic?.writeValue(packet)
   }
+
+  /** ____________________________________________________________________________________________________ */
 
   setInstantTorque = async (cubeNum: number, torque: number): Promise<void> => {
     this.enqueue(PingPongUtil.setInstantTorque(cubeNum, torque))
   }
 
-  /** ____________________________________________________________________________________________________ */
-
   // cubeNum : 큐브 총 갯수
   connectToCubeWithNum = async (cubeNum: number, groupID: string): Promise<void> => {
     this.enqueue(PingPongUtil.getSetMultiroleInAction(cubeNum, groupID))
-    sleepAsync(1000)
+    await sleepAsync(3000)
   }
 
   awaitStartSensor = async (): Promise<void> => {
-    await sleepAsync(3000)
     await this.startSensor()
+    await sleepAsync(1000)
   }
 
   startSensor = async (): Promise<void> => {
@@ -276,7 +273,7 @@ export class CommandRunnerG2 extends CommandRunnerBase {
       Math.round(Math.abs(step)),
     )
     this.enqueue(PingPongUtil.makeSingleStep(cubeNum, cubeID, speed, step))
-    sleepAsync(delay)
+    await sleepAsync(delay)
   }
 
   // cubeNum : 큐브 총 갯수
@@ -284,7 +281,7 @@ export class CommandRunnerG2 extends CommandRunnerBase {
   // speed : 속도 (100 ~ 1000)
   sendContinuousStep = async (cubeNum: number, cubeID: number, speed: number): Promise<void> => {
     this.enqueue(PingPongUtil.makeContinuousStep(cubeNum, cubeID, speed))
-    sleepAsync(this.defaultDelay)
+    await sleepAsync(this.defaultDelay)
   }
 
   sendAggregator = async (
@@ -333,32 +330,29 @@ export class CommandRunnerG2 extends CommandRunnerBase {
   /** G2 ____________________________________________________________________________________________________ */
   /** __________ G2 Motor __________ */
 
+  setMotorContinuous = async (speed0: number, speed1: number): Promise<void> => {
+    const sps0 = PingPongUtil.changeSpeedToSps(speed0)
+    const sps1 = PingPongUtil.changeSpeedToSps(speed1)
+    await this.sendAggregator(2, 0, sps0, 0, sps1, 0)
+    await sleepAsync(this.defaultDelay)
+  }
+
   setMotorStep = async (
     speed0: number,
     step0: number,
     speed1: number,
     step1: number,
   ): Promise<void> => {
-    const delay1 = PingPongUtil.makeDelayTimeFromSpeedStep(
-      PingPongUtil.changeSpeedToSps(speed0),
-      step0,
-    )
-    const delay2 = PingPongUtil.makeDelayTimeFromSpeedStep(
-      PingPongUtil.changeSpeedToSps(speed1),
-      step1,
-    )
-    const delayTime = delay1 > delay2 ? delay1 : delay2
+    const sps0 = PingPongUtil.changeSpeedToSps(speed0)
+    const sps1 = PingPongUtil.changeSpeedToSps(speed1)
 
-    this.sendAggregator(
-      2,
-      1,
-      PingPongUtil.changeSpeedToSps(speed0),
-      step0,
-      PingPongUtil.changeSpeedToSps(speed1),
-      step1,
-    )
+    const delay0 = PingPongUtil.makeDelayTimeFromSpeedStep(sps0, step0)
+    const delay1 = PingPongUtil.makeDelayTimeFromSpeedStep(sps1, step1)
+    const delayTime = delay0 > delay1 ? delay0 : delay1
 
-    sleepAsync(delayTime)
+    await this.sendAggregator(2, 1, sps0, step0, sps1, step1)
+
+    await sleepAsync(delayTime)
   }
 
   setMotorDegree = async (
@@ -367,41 +361,22 @@ export class CommandRunnerG2 extends CommandRunnerBase {
     speed1: number,
     degree1: number,
   ): Promise<void> => {
-    const delay1 = PingPongUtil.makeDelayTimeFromSpeedStep(
-      PingPongUtil.changeSpeedToSps(speed0),
-      PingPongUtil.changeDegreeToStep(degree0),
-    )
-    const delay2 = PingPongUtil.makeDelayTimeFromSpeedStep(
-      PingPongUtil.changeSpeedToSps(speed1),
-      PingPongUtil.changeDegreeToStep(degree1),
-    )
-    const delayTime = delay1 > delay2 ? delay1 : delay2
+    const sps0 = PingPongUtil.changeSpeedToSps(speed0)
+    const sps1 = PingPongUtil.changeSpeedToSps(speed1)
+    const step0 = PingPongUtil.changeDegreeToStep(degree0)
+    const step1 = PingPongUtil.changeDegreeToStep(degree1)
 
-    this.sendAggregator(
-      2,
-      1,
-      speed0,
-      PingPongUtil.changeDegreeToStep(degree0),
-      speed1,
-      PingPongUtil.changeDegreeToStep(degree1),
-    )
+    const delay0 = PingPongUtil.makeDelayTimeFromSpeedStep(sps0, step0)
+    const delay1 = PingPongUtil.makeDelayTimeFromSpeedStep(sps1, step1)
+    const delayTime = delay0 > delay1 ? delay0 : delay1
 
-    sleepAsync(delayTime)
-  }
+    await this.sendAggregator(2, 1, sps0, step0, sps1, step1)
 
-  setMotorContinuous = async (speed0: number, speed1: number): Promise<void> => {
-    this.sendAggregator(
-      2,
-      0,
-      PingPongUtil.changeSpeedToSps(speed0),
-      0,
-      PingPongUtil.changeSpeedToSps(speed1),
-      0,
-    )
+    await sleepAsync(delayTime)
   }
 
   setMotorStop = async (): Promise<void> => {
-    this.sendAggregator(2, 0, 0, 0, 0, 0)
+    await this.sendAggregator(2, 0, 0, 0, 0, 0)
   }
 
   /** __________ G1 Sensor __________ */
@@ -491,7 +466,7 @@ export class CommandRunnerG2 extends CommandRunnerBase {
     return faceTiltAngleData
   }
 
-  /** __________ G1 Music __________ */
+  /** __________ G2 Music __________ */
 
   setMetronome = async (metronome: number): Promise<void> => {
     this.modelSetting['DEFAULT']['metronome'] = metronome
@@ -499,7 +474,7 @@ export class CommandRunnerG2 extends CommandRunnerBase {
 
   startMusic = async (): Promise<void> => {
     this.enqueue(PingPongUtil.makeMusicPlay(2))
-    sleepAsync(this.defaultDelay)
+    await sleepAsync(this.defaultDelay)
   }
 
   // notesAndRests : note, rest
@@ -518,7 +493,7 @@ export class CommandRunnerG2 extends CommandRunnerBase {
     )
 
     this.enqueue(PingPongUtil.makeMusicData(cubeID, 1, notesAndRests, pianoKeyData, durationData))
-    sleepAsync(durationData * 20)
+    await sleepAsync(durationData * 20)
   }
 
   // Auto Car ____________________________________________________________________________________________________
@@ -559,7 +534,7 @@ export class CommandRunnerG2 extends CommandRunnerBase {
     }
 
     this.enqueue(PingPongUtil.makeAggregateStep(2, innerAutoCarData, 1))
-    sleepAsync(delay)
+    await sleepAsync(delay)
   }
 
   // speed (0 ~ 100)
@@ -599,7 +574,7 @@ export class CommandRunnerG2 extends CommandRunnerBase {
     }
 
     this.enqueue(PingPongUtil.makeAggregateStep(2, innerAutoCarData, 1))
-    sleepAsync(delay)
+    await sleepAsync(delay)
   }
 
   // Rolling Car ____________________________________________________________________________________________________

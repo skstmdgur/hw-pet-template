@@ -1,4 +1,4 @@
-javascriptGenerator.forBlock['oz71_autocar_speed'] = function (block, generator) {
+javascriptGenerator.forBlock['oz71_autocar_motor_speed'] = function (block, generator) {
   const dropdown_direction = block.getFieldValue('DIRECTION')
   const number_speed = block.getFieldValue('ANGLE')
   let speed = number_speed

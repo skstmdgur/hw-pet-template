@@ -187,27 +187,19 @@ export class CommandRunnerG1 extends CommandRunnerBase {
 
   /** ____________________________________________________________________________________________________ */
 
-  sendTest = async (packet: string): Promise<void> => {
-    this.enqueue(PingPongUtil.stringToByte(packet))
-  }
-
-  /**
-   * 데이터를 큐에 추가하는 메소드
-   */
-  enqueue(data: Uint8Array) {
-    console.log(`Send : ${String(PingPongUtil.byteToString(data))}`)
+  // 데이터를 큐에 추가하는 메소드
+  async enqueue(data: Uint8Array) {
+    // console.log(`Send : ${String(PingPongUtil.byteToString(data))}`)
     // 데이터를 20바이트씩 분할하여 큐에 추가
     for (let i = 0; i < data.length; i += 20) {
       const chunk = data.slice(i, i + 20)
       this.queue.push(chunk)
     }
-    this.processQueue()
+    await this.processQueue()
   }
 
-  /**
-   * 큐를 처리하는 메소드
-   */
-  async processQueue(): Promise<void> {
+  // 큐를 처리하는 메소드
+  async processQueue() {
     if (this.isSending || this.queue.length === 0) {
       return
     }
@@ -223,7 +215,7 @@ export class CommandRunnerG1 extends CommandRunnerBase {
   }
 
   async sendData(packet: Uint8Array) {
-    this.rxCharacteristic?.writeValue(packet)
+    await this.rxCharacteristic?.writeValue(packet)
   }
 
   /** ____________________________________________________________________________________________________ */
