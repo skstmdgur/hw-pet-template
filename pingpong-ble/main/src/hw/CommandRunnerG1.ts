@@ -191,10 +191,10 @@ export class CommandRunnerG1 extends CommandRunnerBase {
     // console.log(`Send : ${String(PingPongUtil.byteToString(data))}`)
     // 데이터를 20바이트씩 분할하여 큐에 추가
     for (let i = 0; i < data.length; i += 20) {
-      const chunk = data.slice(i, i + 20);
-      this.queue.push(chunk);
+      const chunk = data.slice(i, i + 20)
+      this.queue.push(chunk)
     }
-    this.processQueue();
+    this.processQueue()
   }
 
   /**
@@ -388,7 +388,7 @@ export class CommandRunnerG1 extends CommandRunnerBase {
   }
 
   /** __________ G1 Music __________ */
-  
+
   startMusic = async (): Promise<void> => {
     this.enqueue(PingPongUtil.makeMusicPlay(2))
     sleepAsync(this.defaultDelay)

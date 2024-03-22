@@ -362,12 +362,12 @@ export const changeSpeedToSps = (speed: number): number => {
   let sps = 0
 
   if (speed < 0) {
-    sps = (Math.abs(speed) * 1100 + 10000) / speed * -1
+    sps = ((Math.abs(speed) * 1100 + 10000) / speed) * -1
   } else {
     sps = (speed * 1100 - 10000) / speed
   }
 
-  return 
+  return
 }
 
 export const changeDegreeToStep = (degree: number): number => {
