@@ -29,7 +29,7 @@ export class CommandRunnerG1 extends CommandRunnerBase {
     super(options)
     this.queue = []
     this.isSending = false
-    this.defaultDelay = 50
+    this.defaultDelay = 100
 
     this.sensorG1 = {}
     for (let i = 0; i < 20; i++) {
@@ -191,16 +191,16 @@ export class CommandRunnerG1 extends CommandRunnerBase {
     // console.log(`Send : ${String(PingPongUtil.byteToString(data))}`)
     // 데이터를 20바이트씩 분할하여 큐에 추가
     for (let i = 0; i < data.length; i += 20) {
-      const chunk = data.slice(i, i + 20)
-      this.queue.push(chunk)
+      const chunk = data.slice(i, i + 20);
+      this.queue.push(chunk);
     }
-    this.processQueue()
+    this.processQueue();
   }
 
   /**
    * 큐를 처리하는 메소드
    */
-  async processQueue() {
+  async processQueue(): Promise<void> {
     if (this.isSending || this.queue.length === 0) {
       return
     }
@@ -217,9 +217,6 @@ export class CommandRunnerG1 extends CommandRunnerBase {
 
   async sendData(packet: Uint8Array) {
     this.rxCharacteristic?.writeValue(packet)
-    await new Promise((resolve) => {
-      setTimeout(resolve, 500)
-    })
   }
 
   /** ____________________________________________________________________________________________________ */
@@ -236,12 +233,7 @@ export class CommandRunnerG1 extends CommandRunnerBase {
    */
   connectToCube = async (): Promise<void> => {
     this.enqueue(PingPongUtil.getOrangeForSoundData())
-    return new Promise<void>((resolve) => {
-      setTimeout(() => {
-        // console.log('connectToCube done')
-        resolve()
-      }, 1000)
-    })
+    sleepAsync(1000)
   }
 
   /**
@@ -289,14 +281,9 @@ export class CommandRunnerG1 extends CommandRunnerBase {
    * CubeID = 7
    */
 
-  setMotorStep = async (speed: number, step: number): Promise<void> => {
-    const delayTime = PingPongUtil.makeDelayTimeFromSpeedStep(
-      PingPongUtil.changeSpeedToSps(speed),
-      step,
-    )
-
-    this.enqueue(PingPongUtil.makeSingleStep(1, 7, PingPongUtil.changeSpeedToSps(speed), step))
-    sleepAsync(delayTime)
+  setMotorContinuous = async (speed: number): Promise<void> => {
+    this.enqueue(PingPongUtil.makeContinuousStep(1, 7, PingPongUtil.changeSpeedToSps(speed)))
+    sleepAsync(this.defaultDelay)
   }
 
   setMotorDegree = async (speed: number, degree: number): Promise<void> => {
@@ -316,12 +303,19 @@ export class CommandRunnerG1 extends CommandRunnerBase {
     sleepAsync(delayTime)
   }
 
-  setMotorContinuous = async (speed: number): Promise<void> => {
-    this.enqueue(PingPongUtil.makeContinuousStep(1, 7, PingPongUtil.changeSpeedToSps(speed)))
-  }
-
   setMotorStop = async (): Promise<void> => {
     this.enqueue(PingPongUtil.makeContinuousStep(1, 7, 0))
+    sleepAsync(this.defaultDelay)
+  }
+
+  setMotorStep = async (speed: number, step: number): Promise<void> => {
+    const delayTime = PingPongUtil.makeDelayTimeFromSpeedStep(
+      PingPongUtil.changeSpeedToSps(speed),
+      step,
+    )
+
+    this.enqueue(PingPongUtil.makeSingleStep(1, 7, PingPongUtil.changeSpeedToSps(speed), step))
+    sleepAsync(delayTime)
   }
 
   /** __________ G1 Sensor __________ */
@@ -355,12 +349,12 @@ export class CommandRunnerG1 extends CommandRunnerBase {
    * 어떤 방향 기울기 센서 값
    */
   getFaceTiltAngle = async (figure: String): Promise<number> => {
-    if (figure === 'Star') {
-      return PingPongUtil.getSignedIntFromByteData(this.sensorG1['Sensor_Byte_16']) * -1
+    if (figure === 'Square') {
+      return PingPongUtil.getSignedIntFromByteData(this.sensorG1['Sensor_Byte_16'])
     } else if (figure === 'Triangle') {
       return PingPongUtil.getSignedIntFromByteData(this.sensorG1['Sensor_Byte_15'])
-    } else if (figure === 'Square') {
-      return PingPongUtil.getSignedIntFromByteData(this.sensorG1['Sensor_Byte_16'])
+    } else if (figure === 'Star') {
+      return PingPongUtil.getSignedIntFromByteData(this.sensorG1['Sensor_Byte_16']) * -1
     } else if (figure === 'Circle') {
       return PingPongUtil.getSignedIntFromByteData(this.sensorG1['Sensor_Byte_15']) * -1
     }
@@ -394,14 +388,14 @@ export class CommandRunnerG1 extends CommandRunnerBase {
   }
 
   /** __________ G1 Music __________ */
-
-  setMetronome = async (metronome: number): Promise<void> => {
-    this.modelSetting['DEFAULT']['metronome'] = metronome
-  }
-
+  
   startMusic = async (): Promise<void> => {
     this.enqueue(PingPongUtil.makeMusicPlay(2))
     sleepAsync(this.defaultDelay)
+  }
+
+  setMusicMetronome = async (metronome: number): Promise<void> => {
+    this.modelSetting['DEFAULT']['metronome'] = metronome
   }
 
   /**
@@ -422,13 +416,7 @@ export class CommandRunnerG1 extends CommandRunnerBase {
     )
 
     this.enqueue(PingPongUtil.makeMusicData(7, 1, notesAndRests, pianoKeyData, durationData))
-
-    return new Promise<void>((resolve) => {
-      setTimeout(() => {
-        console.log('sendMusic done')
-        resolve()
-      }, durationData * 20)
-    })
+    sleepAsync(durationData * 20)
   }
 
   /** __________ G1 Arduino __________ */
@@ -438,35 +426,25 @@ export class CommandRunnerG1 extends CommandRunnerBase {
    */
   setServoDegree = async (cubeID: number, degree: number): Promise<void> => {
     this.enqueue(PingPongUtil.makeServoDegreeData(cubeID, degree))
-
-    return new Promise<void>((resolve) => {
-      setTimeout(() => {
-        // console.log(`setServoDegree done`)
-        resolve()
-      }, this.defaultDelay)
-    })
+    sleepAsync(this.defaultDelay)
   }
 
   /** Mono ____________________________________________________________________________________________________ */
 
   // 모노 거리 이동
-  setDistance = async (distance: number): Promise<void> => {
+  setDistance = async (speed: number, distance: number): Promise<void> => {
     this.enqueue(
       PingPongUtil.makeSingleStep(
         1,
         7,
-        this.modelSetting['MONO']['defaultSpeed'],
+        speed,
         distance * this.modelSetting['MONO']['defaultStepToCM'],
       ),
     )
     const delayTime = PingPongUtil.makeDelayTimeFromSpeedStep(
-      this.modelSetting['MONO']['defaultSpeed'],
+      speed,
       distance * this.modelSetting['MONO']['defaultStepToCM'],
     )
-    return new Promise<void>((resolve) => {
-      setTimeout(() => {
-        resolve()
-      }, delayTime)
-    })
+    sleepAsync(delayTime)
   }
 }

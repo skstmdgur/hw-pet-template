@@ -249,12 +249,7 @@ export class CommandRunnerG2 extends CommandRunnerBase {
   // cubeNum : 큐브 총 갯수
   connectToCubeWithNum = async (cubeNum: number, groupID: string): Promise<void> => {
     this.enqueue(PingPongUtil.getSetMultiroleInAction(cubeNum, groupID))
-    return new Promise<void>((resolve) => {
-      setTimeout(() => {
-        console.log('connectToCubeWithNum 2 done')
-        resolve()
-      }, 1000)
-    })
+    sleepAsync(1000)
   }
 
   awaitStartSensor = async (): Promise<void> => {
@@ -281,12 +276,7 @@ export class CommandRunnerG2 extends CommandRunnerBase {
       Math.round(Math.abs(step)),
     )
     this.enqueue(PingPongUtil.makeSingleStep(cubeNum, cubeID, speed, step))
-    return new Promise<void>((resolve) => {
-      setTimeout(() => {
-        console.log('sendSingleStep done')
-        resolve()
-      }, delay)
-    })
+    sleepAsync(delay)
   }
 
   // cubeNum : 큐브 총 갯수
@@ -294,12 +284,7 @@ export class CommandRunnerG2 extends CommandRunnerBase {
   // speed : 속도 (100 ~ 1000)
   sendContinuousStep = async (cubeNum: number, cubeID: number, speed: number): Promise<void> => {
     this.enqueue(PingPongUtil.makeContinuousStep(cubeNum, cubeID, speed))
-    return new Promise<void>((resolve) => {
-      setTimeout(() => {
-        console.log('sendContinuousStep done')
-        resolve()
-      }, this.defaultDelay)
-    })
+    sleepAsync(this.defaultDelay)
   }
 
   sendAggregator = async (
@@ -533,13 +518,7 @@ export class CommandRunnerG2 extends CommandRunnerBase {
     )
 
     this.enqueue(PingPongUtil.makeMusicData(cubeID, 1, notesAndRests, pianoKeyData, durationData))
-
-    return new Promise<void>((resolve) => {
-      setTimeout(() => {
-        console.log('sendMusic done')
-        resolve()
-      }, durationData * 20)
-    })
+    sleepAsync(durationData * 20)
   }
 
   // Auto Car ____________________________________________________________________________________________________
@@ -580,13 +559,7 @@ export class CommandRunnerG2 extends CommandRunnerBase {
     }
 
     this.enqueue(PingPongUtil.makeAggregateStep(2, innerAutoCarData, 1))
-
-    return new Promise<void>((resolve) => {
-      setTimeout(() => {
-        // console.log('moveAutoCar done')
-        resolve()
-      }, delay)
-    })
+    sleepAsync(delay)
   }
 
   // speed (0 ~ 100)
@@ -626,13 +599,7 @@ export class CommandRunnerG2 extends CommandRunnerBase {
     }
 
     this.enqueue(PingPongUtil.makeAggregateStep(2, innerAutoCarData, 1))
-
-    return new Promise<void>((resolve) => {
-      setTimeout(() => {
-        // console.log('turnAutoCar done')
-        resolve()
-      }, delay)
-    })
+    sleepAsync(delay)
   }
 
   // Rolling Car ____________________________________________________________________________________________________

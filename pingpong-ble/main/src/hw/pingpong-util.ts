@@ -356,10 +356,18 @@ export const intToByte = (int: number): Uint8Array => {
   return intToByteData
 }
 
-// Speed : 0 ~ 100
+// Speed : -100 ~ 100
 // Sps : 100 ~ 1000
 export const changeSpeedToSps = (speed: number): number => {
-  return (speed * 1100 - 10000) / speed
+  let sps = 0
+
+  if (speed < 0) {
+    sps = (Math.abs(speed) * 1100 + 10000) / speed * -1
+  } else {
+    sps = (speed * 1100 - 10000) / speed
+  }
+
+  return 
 }
 
 export const changeDegreeToStep = (degree: number): number => {
