@@ -2,6 +2,7 @@ import { type IHPetContext } from '@ktaicoder/hw-pet'
 import { sleepAsync } from '@repo/ui'
 import { CommandRunnerBase } from './CommandRunnerBase'
 import * as PingPongUtil from './pingpong-util'
+import { start } from 'repl'
 
 /**
  * Inherits from the CommandRunnerBase class.
@@ -166,6 +167,8 @@ export class CommandRunnerG1 extends CommandRunnerBase {
         for (let i = 0; i < 20; i++) {
           this.sensorG1[`Sensor_Byte_${i}`] = event.target.value.getUint8(i)
         }
+      } else {
+        console.log(`Receive ${String(PingPongUtil.byteToStringReceive(event))}`)
       }
 
       /**
@@ -177,18 +180,22 @@ export class CommandRunnerG1 extends CommandRunnerBase {
         event.target.value.getUint8(6) === 0xe8 &&
         event.target.value.getUint8(10) === 0x01
       ) {
-        this.startMusic()
+        // this.startMusic()
       }
     }
   }
 
   /** ____________________________________________________________________________________________________ */
 
+  sendTest = async (packet: string): Promise<void> => {
+    this.enqueue(PingPongUtil.stringToByte(packet))
+  }
+
   /**
    * 데이터를 큐에 추가하는 메소드
    */
   enqueue(data: Uint8Array) {
-    // console.log(`Send : ${String(PingPongUtil.byteToString(data))}`)
+    console.log(`Send : ${String(PingPongUtil.byteToString(data))}`)
     // 데이터를 20바이트씩 분할하여 큐에 추가
     for (let i = 0; i < data.length; i += 20) {
       const chunk = data.slice(i, i + 20)
@@ -233,7 +240,7 @@ export class CommandRunnerG1 extends CommandRunnerBase {
    */
   connectToCube = async (): Promise<void> => {
     this.enqueue(PingPongUtil.getOrangeForSoundData())
-    sleepAsync(1000)
+    await sleepAsync(3000)
   }
 
   /**
@@ -242,6 +249,7 @@ export class CommandRunnerG1 extends CommandRunnerBase {
   startSensor = async (): Promise<void> => {
     // console.log('startSensor')
     this.enqueue(PingPongUtil.getSensor())
+    await sleepAsync(1000)
   }
 
   /**
@@ -258,7 +266,7 @@ export class CommandRunnerG1 extends CommandRunnerBase {
     step: number,
   ): Promise<void> => {
     this.enqueue(PingPongUtil.makeSingleStep(cubeNum, cubeID, speed, step))
-    sleepAsync(1000)
+    await sleepAsync(1000)
   }
 
   /**
@@ -283,7 +291,7 @@ export class CommandRunnerG1 extends CommandRunnerBase {
 
   setMotorContinuous = async (speed: number): Promise<void> => {
     this.enqueue(PingPongUtil.makeContinuousStep(1, 7, PingPongUtil.changeSpeedToSps(speed)))
-    sleepAsync(this.defaultDelay)
+    await sleepAsync(this.defaultDelay)
   }
 
   setMotorDegree = async (speed: number, degree: number): Promise<void> => {
@@ -300,12 +308,12 @@ export class CommandRunnerG1 extends CommandRunnerBase {
         PingPongUtil.changeDegreeToStep(degree),
       ),
     )
-    sleepAsync(delayTime)
+    await sleepAsync(delayTime)
   }
 
   setMotorStop = async (): Promise<void> => {
     this.enqueue(PingPongUtil.makeContinuousStep(1, 7, 0))
-    sleepAsync(this.defaultDelay)
+    await sleepAsync(this.defaultDelay)
   }
 
   setMotorStep = async (speed: number, step: number): Promise<void> => {
@@ -315,7 +323,7 @@ export class CommandRunnerG1 extends CommandRunnerBase {
     )
 
     this.enqueue(PingPongUtil.makeSingleStep(1, 7, PingPongUtil.changeSpeedToSps(speed), step))
-    sleepAsync(delayTime)
+    await sleepAsync(delayTime)
   }
 
   /** __________ G1 Sensor __________ */
@@ -389,13 +397,23 @@ export class CommandRunnerG1 extends CommandRunnerBase {
 
   /** __________ G1 Music __________ */
 
-  startMusic = async (): Promise<void> => {
-    this.enqueue(PingPongUtil.makeMusicPlay(2))
-    sleepAsync(this.defaultDelay)
-  }
-
   setMusicMetronome = async (metronome: number): Promise<void> => {
     this.modelSetting['DEFAULT']['metronome'] = metronome
+  }
+
+  startMusic = async (delay: number): Promise<void> => {
+    this.enqueue(PingPongUtil.makeMusicPlay(2))
+    await sleepAsync(delay)
+  }
+
+  sendMusicData = async (
+    cubeID: number,
+    notesAndRests: string,
+    pianoKeyData: number,
+    durationData: number,
+  ): Promise<void> => {
+    this.enqueue(PingPongUtil.makeMusicData(cubeID, 2, notesAndRests, pianoKeyData, durationData))
+    await sleepAsync(this.defaultDelay)
   }
 
   /**
@@ -415,8 +433,9 @@ export class CommandRunnerG1 extends CommandRunnerBase {
       this.modelSetting['DEFAULT']['metronome'],
     )
 
-    this.enqueue(PingPongUtil.makeMusicData(7, 1, notesAndRests, pianoKeyData, durationData))
-    sleepAsync(durationData * 20)
+    await this.sendMusicData(cubeID, notesAndRests, pianoKeyData, durationData)
+    await sleepAsync(this.defaultDelay)
+    await this.startMusic(durationData * 20 + 50)
   }
 
   /** __________ G1 Arduino __________ */
@@ -426,7 +445,7 @@ export class CommandRunnerG1 extends CommandRunnerBase {
    */
   setServoDegree = async (cubeID: number, degree: number): Promise<void> => {
     this.enqueue(PingPongUtil.makeServoDegreeData(cubeID, degree))
-    sleepAsync(this.defaultDelay)
+    await sleepAsync(this.defaultDelay)
   }
 
   /** Mono ____________________________________________________________________________________________________ */
@@ -445,6 +464,6 @@ export class CommandRunnerG1 extends CommandRunnerBase {
       speed,
       distance * this.modelSetting['MONO']['defaultStepToCM'],
     )
-    sleepAsync(delayTime)
+    await sleepAsync(delayTime)
   }
 }
