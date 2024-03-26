@@ -1,4 +1,4 @@
-javascriptGenerator.forBlock['oz71_g2_motor_countinous'] = function (block, generator) {
+javascriptGenerator.forBlock['oz71_autocar_motor_countinous'] = function (block, generator) {
   const dropdown_direction0 = block.getFieldValue('DIRECTION0')
   const number_speed0 = block.getFieldValue('SPEED0')
   const dropdown_direction1 = block.getFieldValue('DIRECTION1')
