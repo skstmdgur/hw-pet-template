@@ -1,12 +1,16 @@
-javascriptGenerator.forBlock['oz71_set_distance'] = function (block, generator) {
-  const dropdown_direction = block.getFieldValue('DIRECTION')
+javascriptGenerator.forBlock['oz71_mono_motor_setdistance'] = function (block, generator) {
+  const number_speed = block.getFieldValue('SPEED')
   const number_distance = block.getFieldValue('DISTANCE')
-  let distance = number_distance
+  const dropdown_direction = block.getFieldValue('DIRECTION')
+
+  let sps = 0
 
   if (dropdown_direction === 'back') {
-    distance = number_distance * -1
+    sps = 65536 - (Math.abs(number_speed) * 1100 - 10000) / Math.abs(number_speed)
+  } else {
+    sps = (number_speed * 1100 - 10000) / number_speed
   }
 
-  const code = `await makerKit.hw.run(routineContext, "pingpong.setDistance", ${distance})`
+  const code = `await makerKit.hw.run(routineContext, "pingpong.setDistance", ${sps}, ${number_distance})\n`
   return code
 }

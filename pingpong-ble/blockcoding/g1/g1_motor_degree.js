@@ -8,6 +8,6 @@ javascriptGenerator.forBlock['oz71_g1_motor_degree'] = function (block, generato
     speed = number_speed * -1
   }
 
-  const code = `await makerKit.hw.run(routineContext, "pingpong.setMotorDegree", ${speed}, ${angle_angle})`
+  const code = `await makerKit.hw.run(routineContext, "pingpong.setMotorDegree", ${speed}, ${angle_angle});\n`
   return code
 }

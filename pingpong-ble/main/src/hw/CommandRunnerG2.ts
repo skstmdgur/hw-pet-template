@@ -157,7 +157,7 @@ export class CommandRunnerG2 extends CommandRunnerBase {
   receivedBytes = (event: any): void => {
     if (event.target.value.byteLength != 0) {
       // 데이터 LOG 확인용
-      // console.log(`Receive ${String(PingPongUtil.byteToStringReceive(event))}`)
+      console.log(`Receive ${String(PingPongUtil.byteToStringReceive(event))}`)
 
       // 2개 연결 완료
       if (
@@ -208,7 +208,7 @@ export class CommandRunnerG2 extends CommandRunnerBase {
 
   // 데이터를 큐에 추가하는 메소드
   async enqueue(data: Uint8Array) {
-    // console.log(`Send : ${String(PingPongUtil.byteToString(data))}`)
+    console.log(`Send : ${String(PingPongUtil.byteToString(data))}`)
     // 데이터를 20바이트씩 분할하여 큐에 추가
     for (let i = 0; i < data.length; i += 20) {
       const chunk = data.slice(i, i + 20)
@@ -250,8 +250,8 @@ export class CommandRunnerG2 extends CommandRunnerBase {
   }
 
   awaitStartSensor = async (): Promise<void> => {
-    await this.startSensor()
     await sleepAsync(1000)
+    await this.startSensor()
   }
 
   startSensor = async (): Promise<void> => {
@@ -466,6 +466,68 @@ export class CommandRunnerG2 extends CommandRunnerBase {
     return faceTiltAngleData
   }
 
+  /**
+   * 큐브 윗면에 어떤 모양이 있는가
+   */
+  ifUpperTilt = async (cubeID: number, figure: String): Promise<boolean> => {
+    switch (cubeID) {
+      case 0:
+        if (figure === 'Square') {
+          if (PingPongUtil.getSignedIntFromByteData(this.sensorG1['Sensor_Byte_16']) < -70)
+            return true
+        }
+        if (figure === 'Triangle') {
+          if (PingPongUtil.getSignedIntFromByteData(this.sensorG1['Sensor_Byte_15']) < -70)
+            return true
+        }
+        if (figure === 'Star') {
+          if (PingPongUtil.getSignedIntFromByteData(this.sensorG1['Sensor_Byte_16']) > 70)
+            return true
+        }
+        if (figure === 'Circle') {
+          if (PingPongUtil.getSignedIntFromByteData(this.sensorG1['Sensor_Byte_15']) > 70)
+            return true
+        }
+        if (figure === 'None') {
+          if (PingPongUtil.getSignedIntFromByteData(this.sensorG1['Sensor_Byte_16']) < -70)
+            return true
+        }
+        if (figure === 'Heart') {
+          if (PingPongUtil.getSignedIntFromByteData(this.sensorG1['Sensor_Byte_16']) < -70)
+            return true
+        }
+        break
+      case 1:
+        if (figure === 'Square') {
+          if (PingPongUtil.getSignedIntFromByteData(this.sensorG2['Sensor_Byte_16']) < -70)
+            return true
+        }
+        if (figure === 'Triangle') {
+          if (PingPongUtil.getSignedIntFromByteData(this.sensorG2['Sensor_Byte_15']) < -70)
+            return true
+        }
+        if (figure === 'Star') {
+          if (PingPongUtil.getSignedIntFromByteData(this.sensorG2['Sensor_Byte_16']) > 70)
+            return true
+        }
+        if (figure === 'Circle') {
+          if (PingPongUtil.getSignedIntFromByteData(this.sensorG2['Sensor_Byte_15']) > 70)
+            return true
+        }
+        if (figure === 'None') {
+          if (PingPongUtil.getSignedIntFromByteData(this.sensorG2['Sensor_Byte_16']) < -70)
+            return true
+        }
+        if (figure === 'Heart') {
+          if (PingPongUtil.getSignedIntFromByteData(this.sensorG2['Sensor_Byte_16']) < -70)
+            return true
+        }
+        break
+    }
+
+    return false
+  }
+
   /** __________ G2 Music __________ */
 
   setMetronome = async (metronome: number): Promise<void> => {
@@ -636,39 +698,46 @@ export class CommandRunnerG2 extends CommandRunnerBase {
         'ff ff ff aa 20 00 cd 02 43 02 03 00 00 ff ff ff 00 00 00 ca 01 1b 02 03 00 01 c5 17 fc a5 00 f8 03 5b 00 f8 fc 7c 00 f8 00 00 02 58 03 5b 00 f8 fc 7c 00 f8 00 00 02 58 03 5b 00 f8 00 00 02 58 00 00 03 20 fc a5 00 f8 00 00 02 58 03 84 00 f8 fc a5 00 f8 00 00 02 58 03 84 00 f8 fc a5 00 f8 00 00 02 58 03 5b 00 f8 00 00 03 20 fc 41 01 ef 03 97 01 ef 03 97 01 ef 01 1a 00 6e fc 48 02 5d 00 00 02 26 02 ff 00 a5 fd 5c 00 a5 00 00 03 20 fc f2 00 dc 02 b3 00 dc 01 1a 00 6e 03 3c 01 4a fc 80 01 b8 fc 23 01 ef 03 dd 01 ef 00 00 02 bc 00 00 03 20 fc 41 01 ef 03 97 01 ef 00 00 03 20 fc 23 01 ef 03 dd 01 ef 00 00 02 bc 00 00 03 20 02 b9 00 f8 fc 8d 00 8a 03 73 00 8a fc 8d 00 8a 03 73 00 8a fc 7d 01 f0 03 73 00 8a fc 8d 00 8a 03 73 00 8a fc 8d 00 8a fc 7e 00 f7 03 82 01 ef fc 7d 00 f8 03 ab 01 f0 fc 55 01 f0 03 ab 01 f0 fc 55 00 f8 fc 23 01 ef 03 dd 01 ef 00 00 02 bc 00 00 03 20 00 00 03 e8 ff ff ff 01 00 00 ca 01 1b 02 03 00 01 48 bf fc a5 00 f8 00 00 02 58 03 84 00 f8 fc a5 00 f8 00 00 02 58 03 84 00 f8 fc a5 00 f8 00 00 02 58 03 5b 00 f8 00 00 03 20 fc a5 00 f8 03 5b 00 f8 fc 7c 00 f8 00 00 02 58 03 5b 00 f8 fc 7c 00 f8 00 00 02 58 03 5b 00 f8 00 00 02 58 00 00 03 20 fc f2 00 dc 02 b3 00 dc 01 1a 00 6e 03 3c 01 4a fc 80 01 b8 fc 23 01 ef 03 dd 01 ef 00 00 02 bc 00 00 03 20 fc 41 01 ef 03 97 01 ef 03 97 01 ef 01 1a 00 6e fc 48 02 5d 00 00 02 26 02 ff 00 a5 fd 5c 00 a5 00 00 03 20 fc f2 00 dc 02 b3 00 dc 00 00 03 20 00 00 02 26 02 ff 00 a5 fd 5c 00 a5 00 00 03 20 02 b9 00 f8 fc 8d 00 8a 03 73 00 8a fc 8d 00 8a 03 73 00 8a fc 7d 01 f0 03 73 00 8a fc 8d 00 8a 03 73 00 8a fc 8d 00 8a fd 20 00 89 03 49 01 81 03 83 00 f8 fc 55 01 f0 03 ab 01 f0 fc 55 01 f0 03 ab 00 f8 00 00 02 26 02 ff 00 a5 fd 5c 00 a5 00 00 03 20 00 00 03 e8',
       ),
     )
+    await sleepAsync(5000)
   }
 
   sendStart = async (): Promise<void> => {
     this.enqueue(PingPongUtil.stringToByte('ff ff ff ff 00 00 c0 00 0a 02'))
+    await sleepAsync(1000)
   }
 
   sendFront = async (): Promise<void> => {
     this.enqueue(
       PingPongUtil.stringToByte('ff ff ff ff 00 00 cb 00 14 02 04 04 01 00 00 00 00 00 09 01'),
     )
+    await sleepAsync(7000)
   }
 
   sendBack = async (): Promise<void> => {
     this.enqueue(
       PingPongUtil.stringToByte('ff ff ff ff 00 00 cb 00 14 02 04 04 01 00 00 00 0a 00 13 01'),
     )
+    await sleepAsync(7000)
   }
 
   sendDumbFront = async (): Promise<void> => {
     this.enqueue(
       PingPongUtil.stringToByte('ff ff ff ff 00 00 cb 00 14 02 04 04 01 00 00 00 14 00 1c 01'),
     )
+    await sleepAsync(7000)
   }
 
   sendDumbBack = async (): Promise<void> => {
     this.enqueue(
       PingPongUtil.stringToByte('ff ff ff ff 00 00 cb 00 14 02 04 04 01 00 00 00 1d 00 25 01'),
     )
+    await sleepAsync(7000)
   }
 
   sendDance = async (): Promise<void> => {
     this.enqueue(
       PingPongUtil.stringToByte('ff ff ff ff 00 00 cb 00 14 02 04 04 01 00 00 00 2d 00 41 01'),
     )
+    await sleepAsync(12000)
   }
 }

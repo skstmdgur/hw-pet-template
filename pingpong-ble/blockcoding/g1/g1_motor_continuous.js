@@ -7,6 +7,6 @@ javascriptGenerator.forBlock['oz71_g1_motor_countinous'] = function (block, gene
     speed = number_speed * -1
   }
 
-  const code = `await makerKit.hw.run(routineContext, 'pingpong.setMotorContinuous', ${speed})`
+  const code = `await makerKit.hw.run(routineContext, 'pingpong.setMotorContinuous', ${speed});\n`
   return code
 }
