@@ -17,6 +17,8 @@ AltinoLite
 ## Build and Run
 
 ```sh
+cd saeonAltinoLite-ble/
+
 pnpm install
 
 # run dev mode
