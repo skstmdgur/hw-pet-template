@@ -40,10 +40,13 @@ export default function MainUi(props: Props) {
   }
 
   const handleChangeNumber1 = (e) => {
+    if (!selectGroupNumber) return
     const selectedValue = e.target.value
     setSelectGroupNumber(selectedValue + selectGroupNumber.charAt(1)) // 첫 번째 자리만 업데이트
   }
+
   const handleChangeNumber2 = (e) => {
+    if (!selectGroupNumber) return
     const selectedValue = e.target.value
     setSelectGroupNumber(selectGroupNumber.charAt(0) + selectedValue) // 두 번째 자리만 업데이트
   }
@@ -51,6 +54,7 @@ export default function MainUi(props: Props) {
   const [checked, setChecked] = useState(false)
 
   useEffect(() => {
+    if (!selectGroupNumber) return
     if (selectGroupNumber.charAt(0) == selectGroupNumber.charAt(1)) {
       if (selectGroupNumber.charAt(0) != '0') {
         setChecked(true)
