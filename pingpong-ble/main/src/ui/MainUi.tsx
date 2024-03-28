@@ -126,7 +126,7 @@ export default function MainUi(props: Props) {
                 background: '#ffd558',
                 borderRadius: '8px',
               }}
-              value={selectGroupNumber.charAt(0)}
+              value={selectGroupNumber?.charAt(0) ?? ''}
             >
               {[...Array(8).keys()].map((number) => (
                 <option key={number} value={number}>
@@ -143,7 +143,7 @@ export default function MainUi(props: Props) {
                 background: '#ffd558',
                 borderRadius: '8px',
               }}
-              value={selectGroupNumber.charAt(1)}
+              value={selectGroupNumber?.charAt(1) ?? ''}
             >
               {[...Array(8).keys()].map((number) => (
                 <option key={number} value={number}>
