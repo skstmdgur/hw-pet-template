@@ -193,7 +193,7 @@ export default function Page() {
               width: '170px',
               borderRadius: '10px',
             }}
-            src="pingpong_g1.png"
+            src="pingpong1.png"
           />
         </Link>
         <Link
@@ -205,7 +205,7 @@ export default function Page() {
               width: '170px',
               borderRadius: '10px',
             }}
-            src="pingpong_g2.png"
+            src="pingpong2.png"
           />
         </Link>
         <Link
@@ -217,7 +217,7 @@ export default function Page() {
               width: '170px',
               borderRadius: '10px',
             }}
-            src="pingpong_g3.png"
+            src="pingpong3.png"
           />
         </Link>
         <Link
@@ -229,7 +229,7 @@ export default function Page() {
               width: '170px',
               borderRadius: '10px',
             }}
-            src="pingpong_g4.png"
+            src="pingpong4.png"
           />
         </Link>
       </div>
