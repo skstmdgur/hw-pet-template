@@ -1,6 +1,6 @@
 import config from '@/config'
 import log from '@/log'
-import { errmsg } from '@/utls/misc'
+import { errmsg } from '@/util/misc'
 import type { RICConnector } from '@robotical/ricjs'
 import { RICChannelWebBLE } from '@robotical/ricjs'
 import martyConnector from './marty/MartyConnector'
@@ -83,7 +83,7 @@ export async function streamSoundFile(ricConnector: RICConnector, fileName: stri
     return
   }
 
-  let audioDuration
+  let audioDuration: number
   if (fileName === 'completed_tone_low_br.mp3') {
     audioDuration = 3000
   } else if (fileName === 'test440ToneQuietShort.mp3') {

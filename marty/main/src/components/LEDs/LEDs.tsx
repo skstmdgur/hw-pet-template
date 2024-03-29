@@ -1,4 +1,4 @@
-import styles from './styles.module.css'
+import styles from './LEDs.module.css'
 
 interface LEDsProps {
   coloursArr: string[]
