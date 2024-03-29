@@ -1,4 +1,4 @@
-javascriptGenerator.forBlock['oz71_g1_music_note'] = function (block, generator) {
+javascriptGenerator.forBlock['pingpong_g1_music_note'] = function (block, generator) {
   const dropdown_duration = block.getFieldValue('DURATION')
   const dropdown_pianokey = block.getFieldValue('PIANOKEY')
 

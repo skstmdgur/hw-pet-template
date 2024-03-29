@@ -3,12 +3,14 @@
   "compilerOptions": {
     "plugins": [
       {
-        "name": "next",
-      },
+        "name": "next"
+      }
     ],
     "baseUrl": ".",
     "paths": {
-      "@/*": ["src/*"],
+      "@/*": [
+        "src/*"
+      ]
     },
     "noImplicitReturns": false,
     "noImplicitThis": false,
@@ -21,7 +23,17 @@
     // The inferred type of 'X' cannot be named without a reference
     "declaration": false,
     "declarationMap": false,
+    // --jsx' 플래그를 제공하지 않으면 JSX를 사용할 수 없습니다.
+    "jsx": "preserve"
   },
-  "include": ["next-env.d.ts", "next.config.js", "**/*.ts", "**/*.tsx", ".next/types/**/*.ts"],
-  "exclude": ["node_modules"],
+  "include": [
+    "next-env.d.ts",
+    "next.config.js",
+    "**/*.ts",
+    "**/*.tsx",
+    ".next/types/**/*.ts"
+  ],
+  "exclude": [
+    "node_modules"
+  ]
 }
