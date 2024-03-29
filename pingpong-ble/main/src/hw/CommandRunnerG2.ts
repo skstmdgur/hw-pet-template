@@ -41,12 +41,12 @@ export class CommandRunnerG2 extends CommandRunnerBase {
     }
 
     this.modelSetting = {
-      DEFAULT: {
-        defaultSpeed: 900,
+      'DEFAULT': {
+        defaultSpeed: 50,
         metronome: 60,
       },
-      'AUTO CAR': {
-        defaultSpeed: 900,
+      'AUTOCAR': {
+        defaultSpeed: 50,
         defaultStepToCM: 24.44444,
       },
     }
@@ -326,9 +326,20 @@ export class CommandRunnerG2 extends CommandRunnerBase {
 
     this.enqueue(PingPongUtil.makeAggregateStep(cubeNum, innerData, method))
   }
+  /** Setting Default ____________________________________________________________________________________________________ */
+
+  setMotorDefaultSpeed = async (speed: number): Promise<void> => {
+    this.modelSetting['DEFAULT']['defaultSpeed'] = speed
+  }
+
+  setMotorAutoCarSpeed = async (speed: number): Promise<void> => {
+    this.modelSetting['AUTOCAR']['defaultSpeed'] = speed
+  }
+
 
   /** G2 ____________________________________________________________________________________________________ */
   /** __________ G2 Motor __________ */
+
 
   setMotorContinuous = async (speed0: number, speed1: number): Promise<void> => {
     const sps0 = PingPongUtil.changeSpeedToSps(speed0)

@@ -21,8 +21,13 @@ export default function MainUi(props: Props) {
   const { commandRunner, connectionState, pet } = usePet(HW_ID, commandRunnerClass)
 
   const [selectGroupNumber, setSelectGroupNumber] = useState(groupNumber) // 기본값은 두 자리의 0으로 설정
-  console.log(selectGroupNumber)
-  // Click handler for the Connect button
+  const [checked, setChecked] = useState(false)
+
+  const [firstDigit, setFirstDigit] = useState('0');
+  const [secondDigit, setSecondDigit] = useState('0');
+
+
+  // // Click handler for the Connect button
   const handleClickConnectBtn = () => {
     const runner = commandRunner
     if (!runner) return
@@ -39,19 +44,28 @@ export default function MainUi(props: Props) {
     runner.disconnect()
   }
 
-  const handleChangeNumber1 = (e) => {
-    if (!selectGroupNumber) return
+  const handleChangeNumber0 = (e) => {
+    if (!selectGroupNumber) {
+      setSelectGroupNumber('00')
+      return
+    }
     const selectedValue = e.target.value
     setSelectGroupNumber(selectedValue + selectGroupNumber.charAt(1)) // 첫 번째 자리만 업데이트
   }
 
-  const handleChangeNumber2 = (e) => {
-    if (!selectGroupNumber) return
+  const handleChangeNumber1 = (e) => {
+    if (!selectGroupNumber) {
+      setSelectGroupNumber('00')
+      return
+    }
     const selectedValue = e.target.value
     setSelectGroupNumber(selectGroupNumber.charAt(0) + selectedValue) // 두 번째 자리만 업데이트
   }
 
-  const [checked, setChecked] = useState(false)
+  const updateGroupNumber = (first, second) => {
+    const updatedGroupNumber = first + second;
+    setSelectGroupNumber(updatedGroupNumber);
+  }
 
   useEffect(() => {
     if (!selectGroupNumber) return
@@ -118,7 +132,7 @@ export default function MainUi(props: Props) {
             }}
           >
             <select
-              onChange={handleChangeNumber1}
+              onChange={handleChangeNumber0}
               style={{
                 border: 'none',
                 height: '30px',
@@ -126,7 +140,7 @@ export default function MainUi(props: Props) {
                 background: '#ffd558',
                 borderRadius: '8px',
               }}
-              value={selectGroupNumber?.charAt(0) ?? ''}
+              value={selectGroupNumber?.charAt(0) ?? '0'}
             >
               {[...Array(8).keys()].map((number) => (
                 <option key={number} value={number}>
@@ -135,7 +149,7 @@ export default function MainUi(props: Props) {
               ))}
             </select>
             <select
-              onChange={handleChangeNumber2}
+              onChange={handleChangeNumber1}
               style={{
                 border: 'none',
                 height: '30px',
@@ -143,7 +157,7 @@ export default function MainUi(props: Props) {
                 background: '#ffd558',
                 borderRadius: '8px',
               }}
-              value={selectGroupNumber?.charAt(1) ?? ''}
+              value={selectGroupNumber?.charAt(1) ?? '0'}
             >
               {[...Array(8).keys()].map((number) => (
                 <option key={number} value={number}>

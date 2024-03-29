@@ -38,12 +38,12 @@ export class CommandRunnerG1 extends CommandRunnerBase {
     }
 
     this.modelSetting = {
-      DEFAULT: {
-        defaultSpeed: 900,
+      'DEFAULT': {
+        defaultSpeed: 50,
         metronome: 60,
       },
-      MONO: {
-        defaultSpeed: 900,
+      'MONO': {
+        defaultSpeed: 50,
         defaultStepToCM: 49.5,
       },
     }
@@ -272,9 +272,20 @@ export class CommandRunnerG1 extends CommandRunnerBase {
     this.enqueue(PingPongUtil.makeContinuousStep(cubeNum, cubeID, speed))
   }
 
+  /** Setting Default ____________________________________________________________________________________________________ */
+
+  setMotorDefaultSpeed = async (speed: number): Promise<void> => {
+    this.modelSetting['DEFAULT']['defaultSpeed'] = speed
+  }
+
+  setMotorMonoSpeed = async (speed: number): Promise<void> => {
+    this.modelSetting['MONO']['defaultSpeed'] = speed
+  }
+
   /** G1 ____________________________________________________________________________________________________ */
 
   /** __________ G1 Motor __________ */
+
 
   /**
    * Cube = 1
