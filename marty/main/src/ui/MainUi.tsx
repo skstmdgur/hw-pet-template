@@ -22,8 +22,8 @@ const BLUETOOTH_IMG_URL = 'bluetooth.svg'
 
 const DEV_FRAME_VISIBLE = config.isDebug // false
 
-// 실제 iframe 창의 크기입니다.
-// 개발중에 표시한다면 유익할 것 같습니다.
+// This is the actual size of the iframe window.
+// It is displayed during development.
 const DEV_FRAME_CSS = DEV_FRAME_VISIBLE
   ? {
       maxWidth: 300,
