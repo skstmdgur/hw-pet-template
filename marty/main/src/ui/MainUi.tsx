@@ -1,11 +1,11 @@
 'use client'
 
 import { ConnectButton } from '@/components/ConnectButton'
+import { DevIframeContainer } from '@/components/DevIframeContainer'
 import { HardwareImageBox } from '@/components/HardwareImageBox'
 import { HardwareNameBox } from '@/components/HardwareNameBox'
 import { MartyNeedVerification } from '@/components/MartyNeedVerification'
 import { MediaIconBox } from '@/components/MediaIconBox'
-import config from '@/config'
 import { HW_ID, HW_NAME } from '@/constant'
 import { useConnectionVerifyingCorrectRIC } from '@/hooks/useConnectionVerifyingCorrectRIC'
 import { usePet } from '@/hooks/usePet'
@@ -19,19 +19,6 @@ import { useCallback } from 'react'
 
 const LOGO_IMG_URL = 'logo.png'
 const BLUETOOTH_IMG_URL = 'bluetooth.svg'
-
-const DEV_FRAME_VISIBLE = config.isDebug // false
-
-// This is the actual size of the iframe window.
-// It is displayed during development.
-const DEV_FRAME_CSS = DEV_FRAME_VISIBLE
-  ? {
-      maxWidth: 300,
-      height: 244,
-      margin: '0 auto',
-      border: '1px solid #ddd',
-    }
-  : {}
 
 export default function MainUi() {
   const searchParams = useSearchParams()
@@ -73,46 +60,47 @@ export default function MainUi() {
   }
 
   return (
-    <Box
-      sx={{
-        position: 'relative',
-        pt: 2,
-        bgcolor: '#fff',
-        ...DEV_FRAME_CSS,
-      }}
-    >
-      <HardwareImageBox src={LOGO_IMG_URL} />
-      <HardwareNameBox title={HW_NAME.en} />
-      <MediaIconBox mediaIcon={BLUETOOTH_IMG_URL} />
+    <DevIframeContainer hideDevOutline>
+      <Box
+        sx={{
+          position: 'relative',
+          pt: 2,
+          bgcolor: '#fff',
+        }}
+      >
+        <HardwareImageBox src={LOGO_IMG_URL} />
+        <HardwareNameBox title={HW_NAME.en} />
+        <MediaIconBox mediaIcon={BLUETOOTH_IMG_URL} />
 
-      {connectionState === 'verifying' ? (
-        <Box
-          sx={{
-            position: 'absolute',
-            top: 0,
-            left: 0,
-            right: 0,
-            bottom: 0,
-            pt: 1,
-            px: 2,
-            bgcolor: 'rgba(255, 255, 255, 1)',
-          }}
-        >
-          <MartyNeedVerification
-            randomColours={randomColours}
-            onClickYes={handleClickVerifyYesBtn}
-            onClickNo={handleClickDisconnectBtn}
+        {connectionState === 'verifying' ? (
+          <Box
+            sx={{
+              position: 'absolute',
+              top: 0,
+              left: 0,
+              right: 0,
+              bottom: 0,
+              pt: 1,
+              px: 2,
+              bgcolor: 'rgba(255, 255, 255, 1)',
+            }}
+          >
+            <MartyNeedVerification
+              randomColours={randomColours}
+              onClickYes={handleClickVerifyYesBtn}
+              onClickNo={handleClickDisconnectBtn}
+            />
+          </Box>
+        ) : (
+          <ConnectButton
+            connectionState={connectionState}
+            onClickConnectBtn={handleClickConnectBtn}
+            onClickDisconnectBtn={handleClickDisconnectBtn}
+            connectButtonTitle="Connect to Marty"
+            connectedButtonTitle="Connected"
           />
-        </Box>
-      ) : (
-        <ConnectButton
-          connectionState={connectionState}
-          onClickConnectBtn={handleClickConnectBtn}
-          onClickDisconnectBtn={handleClickDisconnectBtn}
-          connectButtonTitle="Connect to Marty"
-          connectedButtonTitle="Connected"
-        />
-      )}
-    </Box>
+        )}
+      </Box>
+    </DevIframeContainer>
   )
 }
