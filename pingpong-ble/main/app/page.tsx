@@ -2,9 +2,7 @@
 
 import Link from 'next/link'
 
-
 export default function Page() {
-
   return (
     <div
       style={{
@@ -12,10 +10,7 @@ export default function Page() {
         background: '#fff',
       }}
     >
-      <Link
-        href="/g1"
-        style={{ display: 'inline-block', padding: 16 }}
-      >
+      <Link href="/g1" style={{ display: 'inline-block', padding: 16 }}>
         <img
           style={{
             width: '170px',
@@ -24,10 +19,7 @@ export default function Page() {
           src="pingpong1.png"
         />
       </Link>
-      <Link
-        href="/g2"
-        style={{ display: 'inline-block', padding: 16 }}
-      >
+      <Link href="/g2" style={{ display: 'inline-block', padding: 16 }}>
         <img
           style={{
             width: '170px',
@@ -36,10 +28,7 @@ export default function Page() {
           src="pingpong2.png"
         />
       </Link>
-      <Link
-        href="/g3"
-        style={{ display: 'inline-block', padding: 16 }}
-      >
+      <Link href="/g3" style={{ display: 'inline-block', padding: 16 }}>
         <img
           style={{
             width: '170px',
@@ -48,10 +37,7 @@ export default function Page() {
           src="pingpong3.png"
         />
       </Link>
-      <Link
-        href="/g4"
-        style={{ display: 'inline-block', padding: 16 }}
-      >
+      <Link href="/g4" style={{ display: 'inline-block', padding: 16 }}>
         <img
           style={{
             width: '170px',

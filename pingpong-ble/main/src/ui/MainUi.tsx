@@ -28,7 +28,7 @@ export default function MainUi(props: Props) {
   /**
    * 이미지 변경
    */
-  const [connectChangeImage, setLogoImageUrl] = useState(logoImageUrl); // logoImageUrl 상태 추가
+  const [connectChangeImage, setLogoImageUrl] = useState(logoImageUrl) // logoImageUrl 상태 추가
 
   // // Click handler for the Connect button
   const handleClickConnectBtn = () => {
@@ -80,21 +80,19 @@ export default function MainUi(props: Props) {
   }
 
   useEffect(() => {
-    if (!commandRunner) return; // commandRunner 객체가 초기화되지 않았으면 아무 것도 하지 않음
-  
+    if (!commandRunner) return // commandRunner 객체가 초기화되지 않았으면 아무 것도 하지 않음
+
     const handleImageChange = (newSrc) => {
-      setLogoImageUrl(newSrc);
-    };
-  
-    commandRunner.uiEvents.on('connectChangeImage', handleImageChange);
-  
+      setLogoImageUrl(newSrc)
+    }
+
+    commandRunner.uiEvents.on('connectChangeImage', handleImageChange)
+
     // 컴포넌트가 언마운트될 때 이벤트 리스너를 제거합니다.
     return () => {
-      commandRunner.uiEvents.off('connectChangeImage', handleImageChange);
-    };
-  }, [commandRunner]); // commandRunner 객체가 변경될 때마다 이 코드를 실행
-
-
+      commandRunner.uiEvents.off('connectChangeImage', handleImageChange)
+    }
+  }, [commandRunner]) // commandRunner 객체가 변경될 때마다 이 코드를 실행
 
   return (
     <Suspense>

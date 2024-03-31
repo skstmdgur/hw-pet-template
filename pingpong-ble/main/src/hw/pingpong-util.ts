@@ -298,6 +298,10 @@ export const setInstantTorque = (cubeNum, torque): Uint8Array => {
 /** ____________________________________________________________________________________________________ */
 
 export const makeDelayTimeFromSpeedStep = (speed: number, step: number): number => {
+  if (speed == 0) {
+    return 0
+  }
+
   // 1회전당 걸리는 시간
   const oneRotationSecond = Math.pow(2, (1000 - speed) / 100)
   // 1980 = 1회전당 스텝
@@ -363,6 +367,8 @@ export const changeSpeedToSps = (speed: number): number => {
 
   if (speed < 0) {
     sps = 65536 - (Math.abs(speed) * 1100 - 10000) / Math.abs(speed)
+  } else if (speed == 0) {
+    sps = 0
   } else {
     sps = (speed * 1100 - 10000) / speed
   }

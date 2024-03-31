@@ -38,11 +38,11 @@ export class CommandRunnerG1 extends CommandRunnerBase {
     }
 
     this.modelSetting = {
-      'DEFAULT': {
+      DEFAULT: {
         defaultSpeed: 50,
         metronome: 60,
       },
-      'MONO': {
+      MONO: {
         defaultSpeed: 50,
         defaultStepToCM: 49.5,
       },
@@ -285,7 +285,6 @@ export class CommandRunnerG1 extends CommandRunnerBase {
   /** G1 ____________________________________________________________________________________________________ */
 
   /** __________ G1 Motor __________ */
-
 
   /**
    * Cube = 1

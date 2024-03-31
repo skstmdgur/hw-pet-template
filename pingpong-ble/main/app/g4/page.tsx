@@ -21,11 +21,7 @@ export default function Page() {
           bgcolor: '#fff',
         }}
       >
-        <MainUi
-          commandRunnerClass={CommandRunnerG4}
-          cubeType="g4"
-          logoImageUrl="G4.png"
-        />
+        <MainUi commandRunnerClass={CommandRunnerG4} cubeType="g4" logoImageUrl="G4.png" />
       </Box>
     </Suspense>
   )
