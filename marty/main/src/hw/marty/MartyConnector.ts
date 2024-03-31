@@ -292,6 +292,7 @@ export class MartyConnector {
 
   unsubscribe(observer: MartyObserver): void {
     for (const topic in this._observers) {
+      // eslint-disable-next-line no-prototype-builtins
       if (this._observers.hasOwnProperty(topic)) {
         const index = this._observers[topic].indexOf(observer)
         if (index !== -1) {
@@ -331,6 +332,7 @@ export class MartyConnector {
     eventName: string,
     eventData: string | object | null | undefined,
   ): void {
+    // eslint-disable-next-line no-prototype-builtins
     if (this._observers.hasOwnProperty(eventType)) {
       for (const observer of this._observers[eventType]) {
         observer.notify(eventType, eventEnum, eventName, eventData)
@@ -401,6 +403,8 @@ export class MartyConnector {
           })
       }, this._wifiScanDuration)),
     )
+
+    // eslint-disable-next-line no-prototype-builtins
     if ((results as RICWifiScanResults).hasOwnProperty('wifi')) {
       return results as RICWifiScanResults
     }

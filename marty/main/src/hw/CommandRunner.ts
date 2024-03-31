@@ -1,6 +1,6 @@
 import config from '@/config'
 import log from '@/log'
-import { errmsg, sleepAsync } from '@/utls/misc'
+import { errmsg, sleepAsync } from '@/util/misc'
 import {
   HPetNotifyEventKeys,
   type ConnectionState,
@@ -14,7 +14,7 @@ import type EventEmitter from 'eventemitter3'
 import * as helper from './marty-helper'
 import { MartyBlocks } from './marty/MartyBlocks'
 import martyConnector from './marty/MartyConnector'
-import type { MartyConnectionState } from './types'
+import type { CustomUiEvents, MartyConnectionState } from './types'
 
 const DEBUG = config.isDebug
 

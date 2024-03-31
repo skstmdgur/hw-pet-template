@@ -1,6 +1,6 @@
 export class FIFO {
   private items = [[]]
-  public length = 0
+  private length = 0
 
   enqueue = async(item: Array<number>): Promise<void> => {
     this.items.push(item)
@@ -15,6 +15,10 @@ export class FIFO {
     const buffer = this.items.shift()
     this.length = this.items.length
     return buffer ? buffer : []
+  }
+
+  count = (): number => {
+    return this.length;
   }
 
   clear = (): void => {
