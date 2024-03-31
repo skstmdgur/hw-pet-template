@@ -1,4 +1,4 @@
-javascriptGenerator.forBlock['pingpong2_g2_motor_degree'] = function(block, generator) {
+javascriptGenerator.forBlock['pingpong2_g2_motor_degree'] = function (block, generator) {
   const dropdown_direction0 = block.getFieldValue('DIRECTION0')
   const value_speed0 = generator.valueToCode(block, 'SPEED0', Order.ATOMIC)
   const value_angle0 = generator.valueToCode(block, 'ANGLE0', Order.ATOMIC)

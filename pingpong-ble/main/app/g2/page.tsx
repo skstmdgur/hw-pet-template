@@ -6,10 +6,9 @@ import { Box } from '@mui/material'
 import { Suspense } from 'react'
 
 import { useSearchParams } from 'next/navigation'
+
 export default function Page() {
   const params = useSearchParams()
-  const groupNumber = params.get('groupNumber')
-  // console.log('Query parameters:', groupNumber);
 
   return (
     <Suspense>
@@ -22,14 +21,7 @@ export default function Page() {
           bgcolor: '#fff',
         }}
       >
-        <Suspense>
-          <MainUi
-            commandRunnerClass={CommandRunnerG2}
-            cubeType="g2"
-            groupNumber={groupNumber}
-            logoImageUrl="G2.png"
-          />
-        </Suspense>
+        <MainUi commandRunnerClass={CommandRunnerG2} cubeType="g2" logoImageUrl="G2.png" />
       </Box>
     </Suspense>
   )

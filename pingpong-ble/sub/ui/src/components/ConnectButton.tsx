@@ -26,7 +26,7 @@ export function ConnectButton(props: Props) {
           style={style}
           sx={flatSx(rootSx, sx)}
         >
-          <span>Connected</span>
+          <span>Disconnect to Gcube</span>
         </ButtonBase>
       )}
 
@@ -38,7 +38,7 @@ export function ConnectButton(props: Props) {
           style={style}
           sx={flatSx(rootSx, sx)}
         >
-          <span>Disconnected</span>
+          <span>Connect to Gcube</span>
         </ButtonBase>
       )}
 
@@ -62,7 +62,7 @@ const rootSx: SxProps = {
   height: 40,
   mx: 'auto',
   mt: 1,
-  bgcolor: 'primary.main',
+  bgcolor: 'secondary.main',
   color: '#fff',
   boxShadow: 3,
   maxWidth: 200,
@@ -70,7 +70,7 @@ const rootSx: SxProps = {
   fontWeight: 400,
   fontSize: '1.1rem',
   '&.x_connected': {
-    bgcolor: 'primary.main',
+    bgcolor: 'secondary.main',
     borderRadius: '20px / 50%',
     fontWeight: 500,
     fontSize: '1.15rem',
@@ -80,19 +80,20 @@ const rootSx: SxProps = {
       top: '50%',
       right: 12,
       transform: 'translateY(-50%)',
-      content: '"×"',
+      // content: '"×"',
       fontSize: '0.9rem',
     },
   },
   '&.x_disconnected': {
-    bgcolor: 'secondary.main',
+    // bgcolor: 'secondary.main',
+    bgcolor: 'primary.main',
     position: 'relative',
     '&::before': {
       position: 'absolute',
       top: '50%',
       right: 12,
       transform: 'translateY(-50%)',
-      content: '"☝"',
+      // content: '"☝"',
       fontSize: '0.9rem',
     },
   },

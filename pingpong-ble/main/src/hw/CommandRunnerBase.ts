@@ -42,7 +42,7 @@ export class CommandRunnerBase implements IHPetCommandRunner {
   /**
    * iframe의 ui와 상호작용할 수 있는 이벤트, 필요한 경우에만 사용
    */
-    private uiEvents: EventEmitter<string | symbol>
+  uiEvents: EventEmitter<string | symbol>
 
   constructor(options: IHPetContext) {
     const { hwId, toParent, commandEvents, notifyEvents, uiEvents } = options
