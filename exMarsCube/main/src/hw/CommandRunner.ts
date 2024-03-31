@@ -201,7 +201,7 @@ export class CommandRunner extends ExMarsCubePacket implements IHPetCommandRunne
   private rxLoop = async(): Promise<void> => {
     while (this.rxLoopFlag) {
       // 서로 다른 패킷이 한 배열로 반환될 경우 패킷별로 분할 됨.
-      if (this.fifo.length >= 7) {
+      if (this.fifo.count() > 0) {
         const packet = await this.fifo.dequeue()
         let headerFlag = false
         let headerArr = 0
