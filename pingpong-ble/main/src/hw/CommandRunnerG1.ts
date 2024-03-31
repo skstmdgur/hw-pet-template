@@ -168,7 +168,7 @@ export class CommandRunnerG1 extends CommandRunnerBase {
           this.sensorG1[`Sensor_Byte_${i}`] = event.target.value.getUint8(i)
         }
       } else {
-        console.log(`Receive ${String(PingPongUtil.byteToStringReceive(event))}`)
+        // console.log(`Receive ${String(PingPongUtil.byteToStringReceive(event))}`)
       }
 
       /**

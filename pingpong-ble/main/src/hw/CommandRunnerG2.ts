@@ -51,7 +51,7 @@ export class CommandRunnerG2 extends CommandRunnerBase {
       },
     }
 
-    this.groupNumber = '0'
+    this.groupNumber = '00'
   }
 
   /**
@@ -83,7 +83,7 @@ export class CommandRunnerG2 extends CommandRunnerBase {
    * @returns The return value is meaningless.
    */
   connect = async (): Promise<boolean> => {
-    // console.log('connect', this.groupNumber)
+    console.log('connect', this.groupNumber)
     const device = await this.scan()
     if (!device) {
       // console.log('not device')
@@ -96,7 +96,6 @@ export class CommandRunnerG2 extends CommandRunnerBase {
     this.txCharacteristic = await service?.getCharacteristic(this.bleNusCharTXUUID)
     await this.txCharacteristic?.startNotifications()
     this.txCharacteristic?.addEventListener('characteristicvaluechanged', this.receivedBytes)
-    this.updateConnectionState_('connected')
 
     await this.connectToCubeWithNum(2, this.groupNumber)
 
@@ -114,7 +113,9 @@ export class CommandRunnerG2 extends CommandRunnerBase {
     this.enqueue(PingPongUtil.rebootMultiroleAggregator())
 
     // When changing the connection state, be sure to call updateConnectionState_()
+    this.connectChangeImage('G2.png')
     this.updateConnectionState_('disconnected')
+
   }
 
   scan = async (): Promise<BluetoothDevice | null> => {
@@ -159,6 +160,13 @@ export class CommandRunnerG2 extends CommandRunnerBase {
       // 데이터 LOG 확인용
       console.log(`Receive ${String(PingPongUtil.byteToStringReceive(event))}`)
 
+      if (
+        event.target.value.byteLength === 11 &&
+        event.target.value.getUint8(4) === 0x20 &&
+        event.target.value.getUint8(6) === 0xad 
+      ) {
+        this.connectChangeImage('G2_1.png')
+      }
       // 2개 연결 완료
       if (
         event.target.value.byteLength === 18 &&
@@ -168,6 +176,9 @@ export class CommandRunnerG2 extends CommandRunnerBase {
         event.target.value.getUint8(11) === 0x01
       ) {
         // console.log('Connect 2 Cube')
+        this.connectChangeImage('G2_2.png')
+        this.updateConnectionState_('connected')
+
         this.awaitStartSensor()
       }
 
@@ -206,9 +217,14 @@ export class CommandRunnerG2 extends CommandRunnerBase {
 
   /** ____________________________________________________________________________________________________ */
 
+  // 연결시 이미지 변경
+  connectChangeImage(newSrc: string) {
+    this.uiEvents.emit('connectChangeImage', newSrc);
+  }
+
   // 데이터를 큐에 추가하는 메소드
   async enqueue(data: Uint8Array) {
-    console.log(`Send : ${String(PingPongUtil.byteToString(data))}`)
+    // console.log(`Send : ${String(PingPongUtil.byteToString(data))}`)
     // 데이터를 20바이트씩 분할하여 큐에 추가
     for (let i = 0; i < data.length; i += 20) {
       const chunk = data.slice(i, i + 20)
@@ -377,8 +393,8 @@ export class CommandRunnerG2 extends CommandRunnerBase {
     const step0 = PingPongUtil.changeDegreeToStep(degree0)
     const step1 = PingPongUtil.changeDegreeToStep(degree1)
 
-    const delay0 = PingPongUtil.makeDelayTimeFromSpeedStep(sps0, step0)
-    const delay1 = PingPongUtil.makeDelayTimeFromSpeedStep(sps1, step1)
+    const delay0 = PingPongUtil.makeDelayTimeFromSpeedStep(PingPongUtil.changeSpeedToSps(Math.abs(speed0)), step0)
+    const delay1 = PingPongUtil.makeDelayTimeFromSpeedStep(PingPongUtil.changeSpeedToSps(Math.abs(speed1)), step1)
     const delayTime = delay0 > delay1 ? delay0 : delay1
 
     await this.sendAggregator(2, 1, sps0, step0, sps1, step1)

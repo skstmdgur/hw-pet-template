@@ -13,19 +13,22 @@ interface Props {
   cubeType: CubeType
   commandRunnerClass: HPetCommandRunnerClassType<any>
   logoImageUrl: string
-  groupNumber: string
 }
 
 export default function MainUi(props: Props) {
-  const { commandRunnerClass, cubeType, logoImageUrl, groupNumber } = props
+  const { commandRunnerClass, cubeType, logoImageUrl } = props
   const { commandRunner, connectionState, pet } = usePet(HW_ID, commandRunnerClass)
 
-  const [selectGroupNumber, setSelectGroupNumber] = useState(groupNumber) // 기본값은 두 자리의 0으로 설정
+  /**
+   * 그룹번호 설정
+   */
+  const [selectGroupNumber, setSelectGroupNumber] = useState('00') // 기본값은 두 자리의 0으로 설정
   const [checked, setChecked] = useState(false)
 
-  const [firstDigit, setFirstDigit] = useState('0');
-  const [secondDigit, setSecondDigit] = useState('0');
-
+  /**
+   * 이미지 변경
+   */
+  const [connectChangeImage, setLogoImageUrl] = useState(logoImageUrl); // logoImageUrl 상태 추가
 
   // // Click handler for the Connect button
   const handleClickConnectBtn = () => {
@@ -62,11 +65,6 @@ export default function MainUi(props: Props) {
     setSelectGroupNumber(selectGroupNumber.charAt(0) + selectedValue) // 두 번째 자리만 업데이트
   }
 
-  const updateGroupNumber = (first, second) => {
-    const updatedGroupNumber = first + second;
-    setSelectGroupNumber(updatedGroupNumber);
-  }
-
   useEffect(() => {
     if (!selectGroupNumber) return
     if (selectGroupNumber.charAt(0) == selectGroupNumber.charAt(1)) {
@@ -80,6 +78,23 @@ export default function MainUi(props: Props) {
   const handleCloseModal = () => {
     setChecked(false)
   }
+
+  useEffect(() => {
+    if (!commandRunner) return; // commandRunner 객체가 초기화되지 않았으면 아무 것도 하지 않음
+  
+    const handleImageChange = (newSrc) => {
+      setLogoImageUrl(newSrc);
+    };
+  
+    commandRunner.uiEvents.on('connectChangeImage', handleImageChange);
+  
+    // 컴포넌트가 언마운트될 때 이벤트 리스너를 제거합니다.
+    return () => {
+      commandRunner.uiEvents.off('connectChangeImage', handleImageChange);
+    };
+  }, [commandRunner]); // commandRunner 객체가 변경될 때마다 이 코드를 실행
+
+
 
   return (
     <Suspense>
@@ -167,7 +182,7 @@ export default function MainUi(props: Props) {
             </select>
           </div>
         </div>
-        <HardwareImageBox src={logoImageUrl} />
+        <HardwareImageBox src={connectChangeImage} />
         <HardwareNameBox title={HW_NAME.en} />
         <MediaIconBox mediaIcon={MEDIA_ICON} />
         <ConnectButton
