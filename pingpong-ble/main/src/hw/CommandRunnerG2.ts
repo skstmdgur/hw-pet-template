@@ -390,8 +390,8 @@ export class CommandRunnerG2 extends CommandRunnerBase {
     const step0 = PingPongUtil.changeDegreeToStep(degree0)
     const step1 = PingPongUtil.changeDegreeToStep(degree1)
 
-    console.log('speed0 : ', speed0)
-    console.log('speed1 : ', speed1)
+    // console.log('speed0 : ', speed0)
+    // console.log('speed1 : ', speed1)
 
     const delay0 = PingPongUtil.makeDelayTimeFromSpeedStep(
       PingPongUtil.changeSpeedToSps(Math.abs(speed0)),
@@ -403,9 +403,9 @@ export class CommandRunnerG2 extends CommandRunnerBase {
     )
     const delayTime = delay0 > delay1 ? delay0 : delay1
 
-    console.log('delay0 : ', delay0)
-    console.log('delay1 : ', delay1)
-    console.log('delayTime : ', delayTime)
+    // console.log('delay0 : ', delay0)
+    // console.log('delay1 : ', delay1)
+    // console.log('delayTime : ', delayTime)
 
     await this.sendAggregator(2, 1, sps0, step0, sps1, step1)
 
@@ -585,12 +585,33 @@ export class CommandRunnerG2 extends CommandRunnerBase {
     pianoKey: string,
     duration: string,
   ): Promise<void> => {
+    let cube0data: Uint8Array
+    let cube1data: Uint8Array
+    let musicData: Uint8Array
+
     const pianoKeyData = PingPongUtil.changeMusicPianoKey(pianoKey)
     const durationData = PingPongUtil.changeMusicDuration(
       duration,
       this.modelSetting['DEFAULT']['metronome'],
     )
 
+    // if (notesAndRests === 'note') {
+    //   if (cubeID === 0) {
+    //     cube0data = PingPongUtil.makeMusicData(0, 1, notesAndRests, pianoKeyData, durationData)
+    //     cube1data = PingPongUtil.makeMusicData(1, 1, notesAndRests, pianoKeyData, durationData)
+    //     musicData = new Uint8Array([...cube0data, ...cube1data]);
+    //   } else if (cubeID === 1) {
+    //     cube0data = PingPongUtil.makeMusicData(0, 1, notesAndRests, pianoKeyData, durationData)
+    //     cube1data = PingPongUtil.makeMusicData(1, 1, notesAndRests, pianoKeyData, durationData)
+    //     musicData = new Uint8Array([...cube0data, ...cube1data]);
+    //   }
+    // }
+
+    // if (musicData === undefined) {
+    //   return
+    // }
+
+    // this.enqueue(PingPongUtil.makeAggregateMusic(2, musicData))
     this.enqueue(PingPongUtil.makeMusicData(cubeID, 1, notesAndRests, pianoKeyData, durationData))
     await sleepAsync(durationData * 20)
   }

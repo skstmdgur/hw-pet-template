@@ -118,6 +118,32 @@ export const makeServoDegreeData = (cubeID, degree): Uint8Array => {
   return data
 }
 
+export const makeAggregateMusic = (cubeNum: number, musicData: Uint8Array): Uint8Array => {
+  const data = new Uint8Array(11 + musicData.length)
+
+  data[0] = 0xff
+  data[1] = 0xff
+  data[2] = 0xff
+  data[3] = 0xaa
+
+  data[4] = cubeNum << 4
+  data[5] = 0x00
+
+  data[6] = 0xe8
+
+  data[7] = 0x00
+  data[8] = 11 + musicData.byteLength
+
+  data[9] = 0x00
+  data[10] = 0x00
+
+  for (let i = 0; i < musicData.byteLength; i++) {
+    data[11 + i] = musicData[i]
+  }
+
+  return data
+}
+
 // playAndStop : play : 0x02, stop : 0x01
 // notesAndRests : note, rest
 export const makeMusicData = (
@@ -143,7 +169,7 @@ export const makeMusicData = (
   data[8] = 0x0e
 
   data[9] = 0x00
-  data[10] = 0x01
+  data[10] = 0x00
   // data[10] = playAndStop
 
   // Piano Key
@@ -188,7 +214,12 @@ export const makeMusicPlay = (playAndStop): Uint8Array => {
   return data
 }
 
-export const makeSingleStep = (cubeNum, cubeID, speed, step): Uint8Array => {
+export const makeSingleStep = (
+  cubeNum: number,
+  cubeID: number,
+  speed: number,
+  step: number,
+): Uint8Array => {
   const data = new Uint8Array(19)
 
   data[0] = 0xff
@@ -413,6 +444,8 @@ export const changeMusicNotesAndRests = (notesAndRests: string): number => {
 }
 
 export const changeMusicPianoKey = (pianoKey: string): number => {
+  // console.log(`pianoKey : ${pianoKey}`)
+
   let pianoKeyData = 0
 
   switch (pianoKey) {
