@@ -142,7 +142,6 @@ export const makeAggregateMusic = (cubeNum: number, musicData: Uint8Array): Uint
   }
 
   return data
-
 }
 
 // playAndStop : play : 0x02, stop : 0x01
@@ -215,7 +214,12 @@ export const makeMusicPlay = (playAndStop): Uint8Array => {
   return data
 }
 
-export const makeSingleStep = (cubeNum: number, cubeID: number, speed: number, step: number): Uint8Array => {
+export const makeSingleStep = (
+  cubeNum: number,
+  cubeID: number,
+  speed: number,
+  step: number,
+): Uint8Array => {
   const data = new Uint8Array(19)
 
   data[0] = 0xff
@@ -440,8 +444,7 @@ export const changeMusicNotesAndRests = (notesAndRests: string): number => {
 }
 
 export const changeMusicPianoKey = (pianoKey: string): number => {
-
-  console.log(`pianoKey : ${pianoKey}`)
+  // console.log(`pianoKey : ${pianoKey}`)
 
   let pianoKeyData = 0
 
@@ -538,11 +541,11 @@ export const changeMusicPianoKey = (pianoKey: string): number => {
 export const changeMusicDuration = (duration: string, metronome: number): number => {
   let durationData = 0
 
-  console.log(`duration : ${duration}`)
+  // console.log(`duration : ${duration}`)
 
   switch (duration) {
     case 'Whole':
-      console.log(`Whole`)
+      // console.log(`Whole`)
       switch (metronome) {
         case 60:
           return (durationData = 4 * 50)

@@ -223,7 +223,7 @@ export class CommandRunnerG2 extends CommandRunnerBase {
 
   // 데이터를 큐에 추가하는 메소드
   async enqueue(data: Uint8Array) {
-    console.log(`Send : ${String(PingPongUtil.byteToString(data))}`)
+    // console.log(`Send : ${String(PingPongUtil.byteToString(data))}`)
     // 데이터를 20바이트씩 분할하여 큐에 추가
     for (let i = 0; i < data.length; i += 20) {
       const chunk = data.slice(i, i + 20)
@@ -390,8 +390,8 @@ export class CommandRunnerG2 extends CommandRunnerBase {
     const step0 = PingPongUtil.changeDegreeToStep(degree0)
     const step1 = PingPongUtil.changeDegreeToStep(degree1)
 
-    console.log('speed0 : ', speed0)
-    console.log('speed1 : ', speed1)
+    // console.log('speed0 : ', speed0)
+    // console.log('speed1 : ', speed1)
 
     const delay0 = PingPongUtil.makeDelayTimeFromSpeedStep(
       PingPongUtil.changeSpeedToSps(Math.abs(speed0)),
@@ -403,9 +403,9 @@ export class CommandRunnerG2 extends CommandRunnerBase {
     )
     const delayTime = delay0 > delay1 ? delay0 : delay1
 
-    console.log('delay0 : ', delay0)
-    console.log('delay1 : ', delay1)
-    console.log('delayTime : ', delayTime)
+    // console.log('delay0 : ', delay0)
+    // console.log('delay1 : ', delay1)
+    // console.log('delayTime : ', delayTime)
 
     await this.sendAggregator(2, 1, sps0, step0, sps1, step1)
 
@@ -585,9 +585,9 @@ export class CommandRunnerG2 extends CommandRunnerBase {
     pianoKey: string,
     duration: string,
   ): Promise<void> => {
-    let cube0data : Uint8Array
-    let cube1data : Uint8Array
-    let musicData : Uint8Array
+    let cube0data: Uint8Array
+    let cube1data: Uint8Array
+    let musicData: Uint8Array
 
     const pianoKeyData = PingPongUtil.changeMusicPianoKey(pianoKey)
     const durationData = PingPongUtil.changeMusicDuration(
