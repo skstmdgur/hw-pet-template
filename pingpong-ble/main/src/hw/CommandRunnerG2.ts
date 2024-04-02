@@ -223,7 +223,7 @@ export class CommandRunnerG2 extends CommandRunnerBase {
 
   // 데이터를 큐에 추가하는 메소드
   async enqueue(data: Uint8Array) {
-    // console.log(`Send : ${String(PingPongUtil.byteToString(data))}`)
+    console.log(`Send : ${String(PingPongUtil.byteToString(data))}`)
     // 데이터를 20바이트씩 분할하여 큐에 추가
     for (let i = 0; i < data.length; i += 20) {
       const chunk = data.slice(i, i + 20)
@@ -585,12 +585,33 @@ export class CommandRunnerG2 extends CommandRunnerBase {
     pianoKey: string,
     duration: string,
   ): Promise<void> => {
+    let cube0data : Uint8Array
+    let cube1data : Uint8Array
+    let musicData : Uint8Array
+
     const pianoKeyData = PingPongUtil.changeMusicPianoKey(pianoKey)
     const durationData = PingPongUtil.changeMusicDuration(
       duration,
       this.modelSetting['DEFAULT']['metronome'],
     )
 
+    // if (notesAndRests === 'note') {
+    //   if (cubeID === 0) {
+    //     cube0data = PingPongUtil.makeMusicData(0, 1, notesAndRests, pianoKeyData, durationData)
+    //     cube1data = PingPongUtil.makeMusicData(1, 1, notesAndRests, pianoKeyData, durationData)
+    //     musicData = new Uint8Array([...cube0data, ...cube1data]);
+    //   } else if (cubeID === 1) {
+    //     cube0data = PingPongUtil.makeMusicData(0, 1, notesAndRests, pianoKeyData, durationData)
+    //     cube1data = PingPongUtil.makeMusicData(1, 1, notesAndRests, pianoKeyData, durationData)
+    //     musicData = new Uint8Array([...cube0data, ...cube1data]);
+    //   }
+    // }
+
+    // if (musicData === undefined) {
+    //   return
+    // }
+
+    // this.enqueue(PingPongUtil.makeAggregateMusic(2, musicData))
     this.enqueue(PingPongUtil.makeMusicData(cubeID, 1, notesAndRests, pianoKeyData, durationData))
     await sleepAsync(durationData * 20)
   }
