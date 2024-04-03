@@ -7,7 +7,7 @@ const nextConfig = {
   reactStrictMode: false,
   output: BASE_PATH === '/' ? 'standalone' : 'export',
   basePath: BASE_PATH === '/' ? '' : BASE_PATH,
-  transpilePackages: ['@repo/ui', '@repo/altinolite-ble'],
+  transpilePackages: ['@repo/ui', '@repo/custom-ble'],
 };
 
 module.exports = nextConfig;

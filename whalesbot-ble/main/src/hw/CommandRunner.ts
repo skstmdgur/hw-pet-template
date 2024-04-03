@@ -1,9 +1,8 @@
 import { clamp } from '@/util/misc';
-import { filter, firstValueFrom, map, take, merge, timer } from 'rxjs';
-import { CommandRunnerBase } from './CommandRunnerBase';
-import { LINE_MASKS, NOTE_OCT, NOTE_SCALE, STEERING } from './altino-lite-utils';
-import { packet, Respones, STATUS_DONE } from './Packet';
+import { filter, firstValueFrom, map, merge, take, timer } from 'rxjs';
 import logger from '../log';
+import { CommandRunnerBase } from './CommandRunnerBase';
+import { Respones, STATUS_DONE, packet } from './Packet';
 
 const log = logger('whalesbot-ble');
 log.enable(false);
