@@ -5,6 +5,7 @@ import { HW_ID, HW_NAME } from '@/constant';
 import { CommandRunner } from '@/hw/CommandRunner';
 import { Box } from '@mui/material';
 import { ConnectButton, HardwareImageBox, HardwareNameBox, MediaIconBox, usePet } from '@repo/ui';
+import proInfo from '../../package.json'
 
 const DEBUG = config.isDebug;
 
@@ -40,7 +41,7 @@ export default function Page() {
       }}
     >
       <HardwareImageBox src={LOGO_IMG_URL} />
-      <HardwareNameBox title={HW_NAME.en} />
+      <HardwareNameBox title={HW_NAME.en} version={'v'+proInfo.version} />
       <MediaIconBox mediaIcon={MEDIA_ICON} />
       <ConnectButton
         connectionState={connectionState}
