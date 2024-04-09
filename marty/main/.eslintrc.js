@@ -1,9 +1,9 @@
 module.exports = {
-  extends: ['custom/next'],
+  root: true,
+  extends: ['@repo/eslint-config/next.js'],
+  parser: '@typescript-eslint/parser',
   parserOptions: {
-    project: './tsconfig.json',
-    sourceType: 'module',
-    tsconfigRootDir: __dirname,
+    project: true,
   },
   rules: {
     'react-hooks/rules-of-hooks': 'error',
@@ -15,6 +15,7 @@ module.exports = {
     tsconfigRootDir: __dirname,
   },
   rules: {
+    'react/jsx-sort-props': 'off',
     'react/no-unstable-nested-components': 'off',
     'no-lonely-if': 'off',
     'no-empty': 'off',

@@ -8,11 +8,11 @@ Marty
 
 - @robotical/ricjs@1.6.4
 - nodejs@20
-- nextjs@13
+- nextjs@14
 - react@18
 - worspace with turborepo
 - pnpm
-- typescript@^5.2.2
+- typescript@^5.4
 - @mui/material@5
 
 ## Build and Run

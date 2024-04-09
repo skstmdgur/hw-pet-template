@@ -39,15 +39,20 @@ export class CommandRunnerBase implements IHPetCommandRunner {
    */
   private notifyEvents: EventEmitter<HPetNotifiyEventDefinition>
 
+  /**
+   * iframe의 ui와 상호작용할 수 있는 이벤트, 필요한 경우에만 사용
+   */
+  uiEvents: EventEmitter<string | symbol>
+
   constructor(options: IHPetContext) {
     const { hwId, toParent, commandEvents, notifyEvents, uiEvents } = options
 
     this.hwId = hwId
     this.toParent = toParent
     this.notifyEvents = notifyEvents
+    this.uiEvents = uiEvents
     // commandEvents: 부모 프레임에서 전달되는 명령의 이벤트들
     // notifyEvents: 부모 프레임에 전달하는 연결 상태등의 notification 이벤트들
-    // uiEvents: iframe의 ui와 상호작용할 수 있는 이벤트, 필요한 경우에만 사용
   }
 
   /**

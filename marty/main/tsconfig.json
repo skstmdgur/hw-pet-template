@@ -1,15 +1,7 @@
 {
-  "extends": "tsconfig/nextjs.json",
-  "include": [
-    "next-env.d.ts",
-    "**/*.ts",
-    "**/*.tsx",
-    ".next/types/**/*.ts"
-  ],
-  "exclude": [
-    "node_modules",
-    "../node_modules"
-  ],
+  "extends": "@repo/typescript-config/nextjs.json",
+  "include": ["next-env.d.ts", "**/*.ts", "**/*.tsx", ".next/types/**/*.ts"],
+  "exclude": ["node_modules", "../node_modules"],
   "compilerOptions": {
     "plugins": [
       {
@@ -30,13 +22,8 @@
     "isolatedModules": true,
     "baseUrl": ".",
     "paths": {
-      "@/*": [
-        "./src/*"
-      ]
+      "@/*": ["./src/*"]
     },
-    "typeRoots": [
-      "./node_modules/@types",
-      "../node_modules/@types"
-    ]
+    "typeRoots": ["./node_modules/@types", "../node_modules/@types"]
   }
 }

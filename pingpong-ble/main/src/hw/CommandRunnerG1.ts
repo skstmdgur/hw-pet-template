@@ -39,11 +39,11 @@ export class CommandRunnerG1 extends CommandRunnerBase {
 
     this.modelSetting = {
       DEFAULT: {
-        defaultSpeed: 900,
+        defaultSpeed: 50,
         metronome: 60,
       },
       MONO: {
-        defaultSpeed: 900,
+        defaultSpeed: 50,
         defaultStepToCM: 49.5,
       },
     }
@@ -168,7 +168,7 @@ export class CommandRunnerG1 extends CommandRunnerBase {
           this.sensorG1[`Sensor_Byte_${i}`] = event.target.value.getUint8(i)
         }
       } else {
-        console.log(`Receive ${String(PingPongUtil.byteToStringReceive(event))}`)
+        // console.log(`Receive ${String(PingPongUtil.byteToStringReceive(event))}`)
       }
 
       /**
@@ -270,6 +270,16 @@ export class CommandRunnerG1 extends CommandRunnerBase {
    */
   sendContinuousStep = async (cubeNum: number, cubeID: number, speed: number): Promise<void> => {
     this.enqueue(PingPongUtil.makeContinuousStep(cubeNum, cubeID, speed))
+  }
+
+  /** Setting Default ____________________________________________________________________________________________________ */
+
+  setMotorDefaultSpeed = async (speed: number): Promise<void> => {
+    this.modelSetting['DEFAULT']['defaultSpeed'] = speed
+  }
+
+  setMotorMonoSpeed = async (speed: number): Promise<void> => {
+    this.modelSetting['MONO']['defaultSpeed'] = speed
   }
 
   /** G1 ____________________________________________________________________________________________________ */

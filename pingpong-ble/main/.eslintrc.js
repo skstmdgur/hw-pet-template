@@ -35,5 +35,6 @@ module.exports = {
     'react/jsx-sort-props': 'off',
     'jsx-a11y/no-static-element-interactions': 'off',
     'jsx-a11y/alt-text': 'off',
+    'react/hook-use-state': 'off',
   },
 }

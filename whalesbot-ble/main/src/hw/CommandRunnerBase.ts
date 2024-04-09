@@ -8,25 +8,12 @@ import {
   type IHPetContext,
   type IParentSender,
 } from '@ktaicoder/hw-pet';
-import * as altinolite from '@repo/altinolite-ble';
+import * as customBle from '@repo/custom-ble';
 import { sleepAsync } from '@repo/ui';
 import type { EventEmitter } from 'eventemitter3';
 import type { Observable } from 'rxjs';
-import {
-  BehaviorSubject,
-  Subject,
-  Subscription,
-  concatMap,
-  filter,
-  from,
-  interval,
-  take,
-  takeUntil,
-} from 'rxjs';
+import { BehaviorSubject, Subject, Subscription, filter, take } from 'rxjs';
 import { PacketParser } from './PacketParser';
-import { AltinoLightOutput } from './altino-lite-utils';
-import { resolve } from 'path';
-import { rejects } from 'assert';
 
 const log = logger('');
 
@@ -70,7 +57,7 @@ export class CommandRunnerBase implements IHPetCommandRunner {
 
   protected bluetoothDevice: BluetoothDevice | undefined;
 
-  protected services: altinolite.Services | undefined;
+  protected services: customBle.Services | undefined;
 
   private deviceRawData$ = new Subject<Uint8Array>();
 
@@ -183,7 +170,7 @@ export class CommandRunnerBase implements IHPetCommandRunner {
     // connect bluetooth device
     let device: BluetoothDevice | undefined;
     try {
-      device = await altinolite.requestDevice(window.navigator.bluetooth);
+      device = await customBle.requestDevice(window.navigator.bluetooth);
     } catch (ignore) {
       // ignore
     }
@@ -196,7 +183,7 @@ export class CommandRunnerBase implements IHPetCommandRunner {
     this.stopped$.next(false);
     this.updateConnectionState_('connecting');
     this.bluetoothDevice = device;
-    const services = await altinolite.getServices(device);
+    const services = await customBle.getServices(device);
     this.services = services;
 
     await this.onConnected_(device, services);
@@ -204,10 +191,7 @@ export class CommandRunnerBase implements IHPetCommandRunner {
     return true;
   };
 
-  private onConnected_ = async (
-    bluetoothDevice: BluetoothDevice,
-    services: altinolite.Services,
-  ) => {
+  private onConnected_ = async (bluetoothDevice: BluetoothDevice, services: customBle.Services) => {
     this.bluetoothDevice = bluetoothDevice;
     this.services = services;
     this.updateConnectionState_('connected');
@@ -357,7 +341,7 @@ export class CommandRunnerBase implements IHPetCommandRunner {
     return this.stopped$.pipe(filter(Boolean), take(1));
   };
 
-  private rxLoop_ = (services: altinolite.Services) => {
+  private rxLoop_ = (services: customBle.Services) => {
     console.log('rxLoop_() start');
     // rxloop
     const subscription = new Subscription();

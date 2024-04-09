@@ -21,15 +21,15 @@
     "@types/react-dom": "^18.2.0",
     "clsx": "^2.1.0",
     "eslint": "^8.56.0",
-    "next": "^14.1.0",
+    "next": "^14.1.4",
     "react": "^18.2.0",
     "typescript": "^5.3.3"
   },
   "peerDependencies": {
-    "@ktaicoder/hw-pet": "^1.2.9",
+    "@ktaicoder/hw-pet": "^1",
     "@mui/icons-material": "^5",
     "@mui/material": "^5",
     "clsx": "^2",
-    "next": "^14.1.0"
+    "next": "^14"
   }
 }

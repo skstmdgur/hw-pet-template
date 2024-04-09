@@ -1,15 +1,15 @@
-# AltinoLite
+# Whalesbot
 
-![AltinoLite](./main/public/logo.png)
+![Whalesbot](./main/public/logo.png)
 
-AltinoLite
+Whalesbot
 
 ## Technical stacks
 
 - nodejs@20
 - nextjs@14
 - react@18
-- worspace with turborepo
+- workspace with turborepo
 - pnpm
 - typescript@5
 - @mui/material@5
@@ -48,7 +48,7 @@ await hw.echo('hello'); // response 'hello'
 
 - 기본적으로 `sub/` 폴더는 수정할 필요가 없습니다.
 - 하지만 규모가 큰 프로젝트의 경우 기능의 일부를 라이브러리로 만들어 `sub/` 폴더에 넣을 수 있습니다.
-  - 이 프로젝트는 `sub/alitinolite-ble` 라이브러리를 추가하였습니다.
+  - 이 프로젝트는 `sub/custom-ble` 라이브러리를 추가하였습니다.
 - `main/` 폴더의 소스코드에서 수정할 부분은 다음과 같습니다.
   - `main/public/logo.png` - 하드웨어 이미지 파일
   - `main/src/constants.ts` - 하드웨어 ID 설정
@@ -73,14 +73,14 @@ await hw.echo('hello'); // response 'hello'
 /**
  * hardware id
  */
-export const HW_ID = 'saeonAltinoLite-ble';
+export const HW_ID = 'whalesbot-ble';
 
 /**
  * hardware name
  */
 export const HW_NAME = {
-  en: 'Altino Lite',
-  ko: '알티노 라이트',
+  en: 'whalesbot EG1101',
+  ko: 'whalesbot EG1101',
 };
 ```
 
