@@ -24,15 +24,15 @@ export class PacketParser {
   // 중개 버퍼에 채워진 바이트수
   private bufferByteCount = 0;
 
-  private readonly startMark; // 0x77
-  private readonly start2Mark; // 0x68
+  private readonly startMark: number; // 0x77
+  private readonly start2Mark: number; // 0x68
 
-  private readonly packetLength; // ex) 20
+  private readonly packetLength: number; // ex) 20
 
   private packetCallback_: PacketHandlerFn;
 
   constructor(options: Options, packetCallback: PacketHandlerFn) {
-    this.buffer = new Array<number>(this.packetLength).fill(0);
+    this.buffer = new Array<number>(options.packetLength).fill(0);
     this.bufferByteCount = 0;
     this.startMark = options.startMark;
     this.start2Mark = options.start2Mark;
