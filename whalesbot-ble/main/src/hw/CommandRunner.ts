@@ -17,14 +17,17 @@ enum Key {
 }
 
 enum Direction {
-  UP = 1,
-  DOWN = 2,
-  FRONT = 3,
-  BACK = 4,
-  LEFT = 5,
-  RIGHT = 6,
-  TURN_LEFT = 7,
-  TURN_RIGHT = 8,
+  FRONT = 1,
+  BACK = 2,
+  LEFT = 3,
+  RIGHT = 4,
+  UP = 5,
+  DOWN = 6,
+}
+
+enum Rotation {
+  CW = 0,
+  CCW = 1,
 }
 
 enum State {
@@ -84,6 +87,12 @@ class Result {
  * and this class handles the remaining commands that are sent to the hardware.
  */
 export class CommandRunner extends CommandRunnerBase {
+
+  public async onDisconnected(): Promise<void> {
+    log.log('CommandRunner.onDisconnected');
+    await this.action_estop_eg1101();
+  }
+
   async log_enable(enable: boolean): Promise<void> {
     log.enable(enable);
   }
@@ -108,7 +117,7 @@ export class CommandRunner extends CommandRunnerBase {
    */
   async action_takeoff_eg1101(height: number): Promise<void> {
     height = clamp(height, 50, 100);
-    const buffer = packet.packCmd(0x14, [height]);
+    const buffer = packet.packCmd(0x13, [height]);
     const ret = await this.request(buffer);
   }
 
@@ -153,7 +162,7 @@ export class CommandRunner extends CommandRunnerBase {
    */
   async action_set_fly_speed_eg1101(speed: number): Promise<void> {
     speed = clamp(speed, 10, 100);
-    const buffer = packet.packCmd(0x1a, [speed]);
+    const buffer = packet.packCmd(0x1C, [speed]);
     const ret = await this.request(buffer);
   }
 
@@ -177,9 +186,9 @@ export class CommandRunner extends CommandRunnerBase {
    * 获取设置速度
    */
   async action_get_fly_speed_eg1101(): Promise<number> {
-    const buffer = packet.packCmd(0x1a, []);
-    const ret = await this.request(buffer);
-    return Promise.resolve(ret.length > 0 ? ret[0] : 0);
+    const ret = await this.fly_state(State.SETSPEED);
+    log.log(`sensor_flying_height_eg1101 ${ret} `);
+    return ret;
   }
 
   private async move_to(direction: Direction, speed: number): Promise<void> {
@@ -217,32 +226,37 @@ export class CommandRunner extends CommandRunnerBase {
     await this.move_to(Direction.BACK, speed);
   }
   /**
-   * 向后移动
+   * 向左移动
    */
   async action_fly_left_eg1101(speed: number): Promise<void> {
     speed = clamp(speed, 5, 500);
     await this.move_to(Direction.LEFT, speed);
   }
   /**
-   * 向后移动
+   * 向右移动
    */
   async action_fly_right_eg1101(speed: number): Promise<void> {
     speed = clamp(speed, 5, 500);
     await this.move_to(Direction.RIGHT, speed);
+  }
+
+  private async fly_turn(rotation: Rotation, angle: number): Promise<void> {
+    const buffer = packet.packCmd(0x2C, [rotation, angle]);
+    const ret = await this.request(buffer);
   }
   /**
    * 向左旋转
    */
   async action_fly_turnleft_eg1101(angle: number): Promise<void> {
     angle = clamp(angle, 1, 360);
-    await this.move_to(Direction.TURN_LEFT, angle);
+    await this.fly_turn(Rotation.CCW, angle);
   }
   /**
    * 向右旋转
    */
   async action_fly_turnright_eg1101(angle: number): Promise<void> {
     angle = clamp(angle, 1, 360);
-    await this.move_to(Direction.TURN_RIGHT, angle);
+    await this.fly_turn(Rotation.CW, angle);
   }
   /**
    * 向指定方向飞行
@@ -370,6 +384,12 @@ export class CommandRunner extends CommandRunnerBase {
     const buffer = packet.packCmd(0x48, [port, r, g, b]);
     const ret = await this.request(buffer);
   }
+
+  async led_wait(value: number): Promise<void> {
+
+    const buffer = packet.packCmd(0xA0, [value]);
+    const ret = await this.request(buffer);
+  }
   /**
    * 机载灯光
    */
@@ -389,7 +409,7 @@ export class CommandRunner extends CommandRunnerBase {
   }
 
   private async fly_state(type: number): Promise<number> {
-    const buffer = packet.packCmd(0x4e, [type]);
+    const buffer = packet.packCmd(0x1e, [type]);
     const ret = await this.request(buffer);
     return Promise.resolve(ret.length > 0 ? ret[0] : 0);
   }
@@ -436,7 +456,7 @@ export class CommandRunner extends CommandRunnerBase {
     return Promise.resolve(ret.length > 0 ? ret[0] : 0);
   }
   /**
-   * 电池电压
+   * 主板温度
    */
   async sensor_motherboard_temp_eg1101(): Promise<number> {
     const ret = await this.fly_state(State.STATE_TEMP);
@@ -479,7 +499,7 @@ export class CommandRunner extends CommandRunnerBase {
   }
 
   /**
-   * 飞行角速度
+   * 光流
    */
 
   OPType = [State.OPX, State.OPY];
@@ -608,6 +628,48 @@ export class CommandRunner extends CommandRunnerBase {
     return Promise.resolve(ret.length > 0 ? ret[0] : 0);
   }
 
+  /**
+   * AI 二维码识别
+   */
+  async ai_qrcode_recognition_eg1101(port: number, type: number): Promise<number> {
+      port = clamp(port, 1, 2);
+      type = clamp(type, 1, 5) - 1;
+      const buffer = packet.packCmd(0x6C, [port, 1, type]);
+      const ret = await this.request(buffer);
+      return Promise.resolve(ret.length > 0 ? ret[0] : 0);
+  }
+
+  /**
+   * AI 二维码地图模式
+   */
+    async ai_qrcode_map_init_eg1101(port: number, count: number, spacing: number): Promise<void> {
+      port = clamp(port, 1, 2);
+      count = clamp(count, 5, 50);
+      spacing = clamp(spacing, 10, 100);
+      console.log("ai_qrcode_map_init_eg1101", port, count, spacing);
+      const buffer = packet.packCmd(0x6E, [port, count, spacing]);
+      const ret = await this.request(buffer);
+  }
+  /**
+   * AI 飞往 ID 
+   */
+    async ai_goto_tag_eg1101(target: number, power: number): Promise<void> {
+      target = clamp(target, 0, 9999);
+      power = clamp(power, 10, 100);
+      const buffer = packet.packCmd(0x70, [target, power]);
+      const ret = await this.request(buffer);
+  }
+
+  /**
+   * AI 悬停 时间
+   */
+    async ai_hover_time_eg1101(target: number, time: number): Promise<void> {
+      target = clamp(target, 0, 9999);
+      time = clamp(time, 0.01, 100);
+      const buffer = packet.packCmd(0x74, [target, time]);
+      const ret = await this.request(buffer);
+  }
+
   async fly_RGB(color: number): Promise<void> {
     await this.set_RGB(color).catch((err) => {
       log.log('set_RGB error ', err);
@@ -632,10 +694,6 @@ export class CommandRunner extends CommandRunnerBase {
   }
 
   private async request(buf: Buffer): Promise<Array<number>> {
-    const now = Date.now();
-    const interval = 300; //ms
-
-    log.log('request: now ', `${now}`);
 
     let errorCount = 0;
     let noRespCount = 0;
@@ -644,12 +702,14 @@ export class CommandRunner extends CommandRunnerBase {
 
     log.log('request: send', `${buf.toString('hex')}`);
 
-    while (errorCount < 5 && noRespCount < 5 && count <= 50) {
+    while (errorCount < 5 
+      && noRespCount < 5 
+      /*&& count <= 50 */
+      ) {
       count += 1;
       log.log('request', `errorCount:${errorCount}, noRespCount:${noRespCount},count:${count}`);
 
-      const writetime = Date.now();
-
+      log.log('request writeOutput_', `${buf.toString('hex')}`);
       await this.writeOutput_(buf);
 
       const received = await this.readNext_().catch((err) => {
@@ -662,18 +722,26 @@ export class CommandRunner extends CommandRunnerBase {
         continue;
       }
 
+      noRespCount = 0;//连续5次无反馈数据,结束本次通信
+
       log.log('request', `received:${received.toString('hex')}`);
 
       const resp = this.parseCmd(received);
       log.log('request', `resp:${JSON.stringify(resp)} `);
-      if (resp.error != 0) {
-        log.log('request', `resp:${resp} `);
+
+      if (resp.error != 0 || resp.resp == null) {
+        log.log('request comm error', `resp:${resp} `);
         errorCount++;
       } else if (resp.resp != null && resp.resp.status == STATUS_DONE) {
         result = resp.resp.args;
         break;
+      } else if (resp.resp.err != 0) {
+        log.log('request aerocraft status error', `resp:${resp} `);
+        break;
       }
     }
+
+    log.log('request: end', `result:${result}, errorCount:${errorCount}, noRespCount:${noRespCount}`);
 
     return Promise.resolve(result);
   }
@@ -709,7 +777,7 @@ export class CommandRunner extends CommandRunnerBase {
           filter((it) => it.timestamp > now),
           take(1),
           map((it) => {
-            log.log('deviceData ==== ', `${Date.now() - now} `);
+            log.log('deviceData ==== ', `${Date.now() - now} timestamp:${it.timestamp}`);
             return Buffer.from(it.dataBuffer);
           }),
         ),

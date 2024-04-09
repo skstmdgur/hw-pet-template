@@ -216,10 +216,15 @@ export class CommandRunnerBase implements IHPetCommandRunner {
     this.rxLoop_(services);
   };
 
+  public async  onDisconnected(): Promise<void> {
+    log.log('CommandRunnerBase.onDisconnected');
+  }
+
   private onDisconnected_ = async () => {
     console.log('onDisconnected_');
     this.rxLoopDisposeFn_?.();
     this.rxLoopDisposeFn_ = undefined;
+    await this.onDisconnected();
 
     this.bluetoothDevice = undefined;
     const ioService = this.services?.basicIoService;
