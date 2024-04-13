@@ -316,4 +316,67 @@ export class CommandRunnerG4 extends CommandRunnerBase {
   sendStand = async (): Promise<void> => {
     this.sendTest('ff ff ff ff 00 00 cb 00 14 02 04 04 01 00 00 00 41 00 4b 01')
   }
+
+  // test lab
+  // have to test
+  // Matrix
+
+  // 1. 8x8 Matrix
+  // 2. 방향 왼쪽 오른쪽 위 아래
+  // 3. 속도
+  // 4. 시간
+
+  waveMatrix = async (speed: number, time: number): Promise<void> => {
+    const basicData =
+      '00000000' +
+      '00000000' +
+      '00000000' +
+      '00000000' +
+      '00000000' +
+      '00000000' +
+      '00000000' +
+      '00000000'
+
+    var matrix1: string[][] = basicData.match(/.{1,8}/g).map((row) => row.split(''))
+    var matrix2: string[][] = basicData.match(/.{1,8}/g).map((row) => row.split(''))
+    var matrix3: string[][] = basicData.match(/.{1,8}/g).map((row) => row.split(''))
+    var matrix4: string[][] = basicData.match(/.{1,8}/g).map((row) => row.split(''))
+
+    var combinedMatrix: string[][] = [...matrix1, ...matrix2, ...matrix3, ...matrix4]
+
+    const testData =
+      '10000001' +
+      '01000010' +
+      '00100100' +
+      '00011000' +
+      '00001000' +
+      '00000100' +
+      '00000010' +
+      '00000001'
+
+    for (var i = 0; i < 8; i++) {
+      matrix1[i] = testData.match(/.{1,8}/g).map((row) => row.split(''))[i]
+    }
+
+    // this.enqueue(PingPongUtil.stringToByte(packet))
+
+    // for (var i = 0; i < 8; i++) {
+    //     testmatrix[i] = testll[(7+i)%8]*128+testll[(7+i)%8+8]*64+testll[(7+i)%8+16]*32+testll[(7+i)%8+24]*16+testll[(7+i)%8+32]*8+testll[(7+i)%8+40]*4+testll[(7+i)%8+48]*2+testll[(7+i)%8+56]*1
+    // }
+
+    // console.log("displayMatrix : ", PingPongUtil.makeMatrixPictureData(0xe2, 0x00, this._peripheral.ledMatrixState));
+
+    // if (this.inActionC1 == true) return;
+    // this.inActionC1 = true;
+    // const symbol = cast.toString(args.MATRIX8).replace(/\s/g, '');
+
+    // if (symbol !== null) {
+
+    //     var ll = symbol.split("");
+
+    //     for (var i = 0; i < 8; i++) {
+    //         this._peripheral.ledMatrixState[i] = ll[(7+i)%8]*128+ll[(7+i)%8+8]*64+ll[(7+i)%8+16]*32+ll[(7+i)%8+24]*16+ll[(7+i)%8+32]*8+ll[(7+i)%8+40]*4+ll[(7+i)%8+48]*2+ll[(7+i)%8+56]*1
+    //     }
+    // }
+  }
 }

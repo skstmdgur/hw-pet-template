@@ -326,6 +326,23 @@ export const setInstantTorque = (cubeNum, torque): Uint8Array => {
   return data
 }
 
+export const makeMatrixPictureData = (cubeNum: number, pictureData: number): Uint8Array => {
+  const data = new Uint8Array(10)
+
+  data[0] = 0xff
+  data[1] = 0xff
+  data[2] = 0xff
+  data[3] = 0xff
+  data[4] = cubeNum << 4
+  data[5] = 0x00
+  data[6] = 0xc6
+  data[7] = 0x00
+  data[8] = 0x0a
+  // data[9] = torque
+
+  return data
+}
+
 /** ____________________________________________________________________________________________________ */
 
 export const makeDelayTimeFromSpeedStep = (speed: number, step: number): number => {
