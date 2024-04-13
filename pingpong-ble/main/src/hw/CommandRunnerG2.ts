@@ -19,6 +19,7 @@ export class CommandRunnerG2 extends CommandRunnerBase {
   queue: any
   isSending: boolean
   defaultDelay: number
+  wormBotDelay: number
 
   sensorG1: { [key: string]: number }
   sensorG2: { [key: string]: number }
@@ -29,7 +30,8 @@ export class CommandRunnerG2 extends CommandRunnerBase {
     super(options)
     this.queue = []
     this.isSending = false
-    this.defaultDelay = 50
+    this.defaultDelay = 64
+    this.wormBotDelay = 7000
 
     this.sensorG1 = {}
     for (let i = 0; i < 20; i++) {
@@ -160,6 +162,21 @@ export class CommandRunnerG2 extends CommandRunnerBase {
       // console.log(`Receive ${String(PingPongUtil.byteToStringReceive(event))}`)
 
       if (
+        event.target.value.byteLength === 20 &&
+        event.target.value.getUint8(0) === 0xa0 &&
+        event.target.value.getUint8(6) === 0xb8
+      ) {
+      } else if (
+        event.target.value.byteLength === 20 &&
+        event.target.value.getUint8(0) === 0xa1 &&
+        event.target.value.getUint8(6) === 0xb8
+      ) {
+      } else {
+        // 센서 X 데이터 값
+        // console.log(`Receive ${String(PingPongUtil.byteToStringReceive(event))}`)
+      }
+
+      if (
         event.target.value.byteLength === 11 &&
         event.target.value.getUint8(4) === 0x20 &&
         event.target.value.getUint8(6) === 0xad
@@ -211,6 +228,11 @@ export class CommandRunnerG2 extends CommandRunnerBase {
       ) {
         this.startMusic()
       }
+
+      // ScheduledPoints Start
+      if (event.target.value.byteLength === 15 && event.target.value.getUint8(6) === 0xcb) {
+        this.sendWormBotStart()
+      }
     }
   }
 
@@ -255,12 +277,12 @@ export class CommandRunnerG2 extends CommandRunnerBase {
   /** ____________________________________________________________________________________________________ */
 
   setInstantTorque = async (cubeNum: number, torque: number): Promise<void> => {
-    this.enqueue(PingPongUtil.setInstantTorque(cubeNum, torque))
+    await this.enqueue(PingPongUtil.setInstantTorque(cubeNum, torque))
   }
 
   // cubeNum : 큐브 총 갯수
   connectToCubeWithNum = async (cubeNum: number, groupID: string): Promise<void> => {
-    this.enqueue(PingPongUtil.getSetMultiroleInAction(cubeNum, groupID))
+    await this.enqueue(PingPongUtil.getSetMultiroleInAction(cubeNum, groupID))
     await sleepAsync(3000)
   }
 
@@ -270,7 +292,7 @@ export class CommandRunnerG2 extends CommandRunnerBase {
   }
 
   startSensor = async (): Promise<void> => {
-    this.enqueue(PingPongUtil.getSensor())
+    await this.enqueue(PingPongUtil.getSensor())
   }
 
   // cubeNum : 큐브 총 갯수
@@ -287,7 +309,7 @@ export class CommandRunnerG2 extends CommandRunnerBase {
       PingPongUtil.changeSpeedToSps(speed),
       Math.round(Math.abs(step)),
     )
-    this.enqueue(PingPongUtil.makeSingleStep(cubeNum, cubeID, speed, step))
+    await this.enqueue(PingPongUtil.makeSingleStep(cubeNum, cubeID, speed, step))
     await sleepAsync(delay)
   }
 
@@ -295,7 +317,7 @@ export class CommandRunnerG2 extends CommandRunnerBase {
   // cubeID : 큐브 순서 (0부터 시작)
   // speed : 속도 (100 ~ 1000)
   sendContinuousStep = async (cubeNum: number, cubeID: number, speed: number): Promise<void> => {
-    this.enqueue(PingPongUtil.makeContinuousStep(cubeNum, cubeID, speed))
+    await this.enqueue(PingPongUtil.makeContinuousStep(cubeNum, cubeID, speed))
     await sleepAsync(this.defaultDelay)
   }
 
@@ -339,7 +361,7 @@ export class CommandRunnerG2 extends CommandRunnerBase {
         break
     }
 
-    this.enqueue(PingPongUtil.makeAggregateStep(cubeNum, innerData, method))
+    await this.enqueue(PingPongUtil.makeAggregateStep(cubeNum, innerData, method))
   }
   /** Setting Default ____________________________________________________________________________________________________ */
 
@@ -572,7 +594,7 @@ export class CommandRunnerG2 extends CommandRunnerBase {
   }
 
   startMusic = async (): Promise<void> => {
-    this.enqueue(PingPongUtil.makeMusicPlay(2))
+    await this.enqueue(PingPongUtil.makeMusicPlay(2))
     await sleepAsync(this.defaultDelay)
   }
 
@@ -612,7 +634,9 @@ export class CommandRunnerG2 extends CommandRunnerBase {
     // }
 
     // this.enqueue(PingPongUtil.makeAggregateMusic(2, musicData))
-    this.enqueue(PingPongUtil.makeMusicData(cubeID, 1, notesAndRests, pianoKeyData, durationData))
+    await this.enqueue(
+      PingPongUtil.makeMusicData(cubeID, 1, notesAndRests, pianoKeyData, durationData),
+    )
     await sleepAsync(durationData * 20)
   }
 
@@ -653,7 +677,7 @@ export class CommandRunnerG2 extends CommandRunnerBase {
       )
     }
 
-    this.enqueue(PingPongUtil.makeAggregateStep(2, innerAutoCarData, 1))
+    await this.enqueue(PingPongUtil.makeAggregateStep(2, innerAutoCarData, 1))
     await sleepAsync(delay)
   }
 
@@ -693,7 +717,7 @@ export class CommandRunnerG2 extends CommandRunnerBase {
       )
     }
 
-    this.enqueue(PingPongUtil.makeAggregateStep(2, innerAutoCarData, 1))
+    await this.enqueue(PingPongUtil.makeAggregateStep(2, innerAutoCarData, 1))
     await sleepAsync(delay)
   }
 
@@ -720,7 +744,7 @@ export class CommandRunnerG2 extends CommandRunnerBase {
       innerAutoCarData[1] = PingPongUtil.makeSingleStep(2, 1, 0, 0)
     }
 
-    this.enqueue(PingPongUtil.makeAggregateStep(2, innerAutoCarData, 1))
+    await this.enqueue(PingPongUtil.makeAggregateStep(2, innerAutoCarData, 1))
   }
 
   // speed (0 ~ 100)
@@ -745,13 +769,13 @@ export class CommandRunnerG2 extends CommandRunnerBase {
       )
     }
 
-    this.enqueue(PingPongUtil.makeAggregateStep(2, innerAutoCarData, 1))
+    await this.enqueue(PingPongUtil.makeAggregateStep(2, innerAutoCarData, 1))
   }
 
   // Worm Bot ____________________________________________________________________________________________________
 
-  sendSchedule = async (): Promise<void> => {
-    this.enqueue(
+  selectWormBot = async (): Promise<void> => {
+    await this.enqueue(
       PingPongUtil.stringToByte(
         'ff ff ff aa 20 00 cd 02 43 02 03 00 00 ff ff ff 00 00 00 ca 01 1b 02 03 00 01 c5 17 fc a5 00 f8 03 5b 00 f8 fc 7c 00 f8 00 00 02 58 03 5b 00 f8 fc 7c 00 f8 00 00 02 58 03 5b 00 f8 00 00 02 58 00 00 03 20 fc a5 00 f8 00 00 02 58 03 84 00 f8 fc a5 00 f8 00 00 02 58 03 84 00 f8 fc a5 00 f8 00 00 02 58 03 5b 00 f8 00 00 03 20 fc 41 01 ef 03 97 01 ef 03 97 01 ef 01 1a 00 6e fc 48 02 5d 00 00 02 26 02 ff 00 a5 fd 5c 00 a5 00 00 03 20 fc f2 00 dc 02 b3 00 dc 01 1a 00 6e 03 3c 01 4a fc 80 01 b8 fc 23 01 ef 03 dd 01 ef 00 00 02 bc 00 00 03 20 fc 41 01 ef 03 97 01 ef 00 00 03 20 fc 23 01 ef 03 dd 01 ef 00 00 02 bc 00 00 03 20 02 b9 00 f8 fc 8d 00 8a 03 73 00 8a fc 8d 00 8a 03 73 00 8a fc 7d 01 f0 03 73 00 8a fc 8d 00 8a 03 73 00 8a fc 8d 00 8a fc 7e 00 f7 03 82 01 ef fc 7d 00 f8 03 ab 01 f0 fc 55 01 f0 03 ab 01 f0 fc 55 00 f8 fc 23 01 ef 03 dd 01 ef 00 00 02 bc 00 00 03 20 00 00 03 e8 ff ff ff 01 00 00 ca 01 1b 02 03 00 01 48 bf fc a5 00 f8 00 00 02 58 03 84 00 f8 fc a5 00 f8 00 00 02 58 03 84 00 f8 fc a5 00 f8 00 00 02 58 03 5b 00 f8 00 00 03 20 fc a5 00 f8 03 5b 00 f8 fc 7c 00 f8 00 00 02 58 03 5b 00 f8 fc 7c 00 f8 00 00 02 58 03 5b 00 f8 00 00 02 58 00 00 03 20 fc f2 00 dc 02 b3 00 dc 01 1a 00 6e 03 3c 01 4a fc 80 01 b8 fc 23 01 ef 03 dd 01 ef 00 00 02 bc 00 00 03 20 fc 41 01 ef 03 97 01 ef 03 97 01 ef 01 1a 00 6e fc 48 02 5d 00 00 02 26 02 ff 00 a5 fd 5c 00 a5 00 00 03 20 fc f2 00 dc 02 b3 00 dc 00 00 03 20 00 00 02 26 02 ff 00 a5 fd 5c 00 a5 00 00 03 20 02 b9 00 f8 fc 8d 00 8a 03 73 00 8a fc 8d 00 8a 03 73 00 8a fc 7d 01 f0 03 73 00 8a fc 8d 00 8a 03 73 00 8a fc 8d 00 8a fd 20 00 89 03 49 01 81 03 83 00 f8 fc 55 01 f0 03 ab 01 f0 fc 55 01 f0 03 ab 00 f8 00 00 02 26 02 ff 00 a5 fd 5c 00 a5 00 00 03 20 00 00 03 e8',
       ),
@@ -759,43 +783,63 @@ export class CommandRunnerG2 extends CommandRunnerBase {
     await sleepAsync(5000)
   }
 
-  sendStart = async (): Promise<void> => {
-    this.enqueue(PingPongUtil.stringToByte('ff ff ff ff 00 00 c0 00 0a 02'))
-    await sleepAsync(1000)
+  sendWormBotStart = async (): Promise<void> => {
+    await this.enqueue(PingPongUtil.stringToByte('ff ff ff ff 00 00 c0 00 0a 02'))
+    await sleepAsync(512)
   }
 
-  sendFront = async (): Promise<void> => {
-    this.enqueue(
+  sendWormBotFront = async (): Promise<void> => {
+    await this.enqueue(
       PingPongUtil.stringToByte('ff ff ff ff 00 00 cb 00 14 02 04 04 01 00 00 00 00 00 09 01'),
     )
     await sleepAsync(7000)
   }
 
-  sendBack = async (): Promise<void> => {
-    this.enqueue(
+  sendWormBotBack = async (): Promise<void> => {
+    await this.enqueue(
       PingPongUtil.stringToByte('ff ff ff ff 00 00 cb 00 14 02 04 04 01 00 00 00 0a 00 13 01'),
     )
     await sleepAsync(7000)
   }
 
-  sendDumbFront = async (): Promise<void> => {
-    this.enqueue(
+  sendWormBotDumbFront = async (): Promise<void> => {
+    await this.enqueue(
       PingPongUtil.stringToByte('ff ff ff ff 00 00 cb 00 14 02 04 04 01 00 00 00 14 00 1c 01'),
     )
     await sleepAsync(7000)
   }
 
-  sendDumbBack = async (): Promise<void> => {
-    this.enqueue(
+  sendWormBotDumbBack = async (): Promise<void> => {
+    await this.enqueue(
       PingPongUtil.stringToByte('ff ff ff ff 00 00 cb 00 14 02 04 04 01 00 00 00 1d 00 25 01'),
     )
     await sleepAsync(7000)
   }
 
-  sendDance = async (): Promise<void> => {
-    this.enqueue(
+  sendWormBotStand = async (): Promise<void> => {
+    await this.enqueue(
+      PingPongUtil.stringToByte('ff ff ff ff 00 00 cb 00 14 02 04 04 01 00 00 00 26 00 28 01'),
+    )
+    await sleepAsync(4000)
+  }
+
+  sendWormBotDown = async (): Promise<void> => {
+    await this.enqueue(
+      PingPongUtil.stringToByte('ff ff ff ff 00 00 cb 00 14 02 04 04 01 00 00 00 29 00 2c 01'),
+    )
+    await sleepAsync(4000)
+  }
+
+  sendWormBotDance = async (): Promise<void> => {
+    await this.enqueue(
       PingPongUtil.stringToByte('ff ff ff ff 00 00 cb 00 14 02 04 04 01 00 00 00 2d 00 41 01'),
     )
     await sleepAsync(12000)
   }
+
+  // // test lab
+
+  // sendTest = async (packet: string): Promise<void> => {
+  //   this.enqueue(PingPongUtil.stringToByte(packet))
+  // }
 }
