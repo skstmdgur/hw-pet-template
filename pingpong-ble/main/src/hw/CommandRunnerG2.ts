@@ -412,9 +412,6 @@ export class CommandRunnerG2 extends CommandRunnerBase {
     const step0 = PingPongUtil.changeDegreeToStep(degree0)
     const step1 = PingPongUtil.changeDegreeToStep(degree1)
 
-    // console.log('speed0 : ', speed0)
-    // console.log('speed1 : ', speed1)
-
     const delay0 = PingPongUtil.makeDelayTimeFromSpeedStep(
       PingPongUtil.changeSpeedToSps(Math.abs(speed0)),
       step0,
@@ -425,9 +422,20 @@ export class CommandRunnerG2 extends CommandRunnerBase {
     )
     const delayTime = delay0 > delay1 ? delay0 : delay1
 
-    // console.log('delay0 : ', delay0)
-    // console.log('delay1 : ', delay1)
-    // console.log('delayTime : ', delayTime)
+    console.log('speed0 : ', speed0)
+    console.log('speed1 : ', speed1)
+    console.log('sps1 : ', sps1)
+    console.log('sps0 : ', sps0)
+
+    console.log('step0 : ', step0)
+    console.log('step1 : ', step1)
+
+    console.log('delay0 : ', PingPongUtil.changeSpeedToSps(Math.abs(speed0)))
+    console.log('delay1 : ', PingPongUtil.changeSpeedToSps(Math.abs(speed1)))
+
+    console.log('delay0 : ', delay0)
+    console.log('delay1 : ', delay1)
+    console.log('delayTime : ', delayTime)
 
     await this.sendAggregator(2, 1, sps0, step0, sps1, step1)
 

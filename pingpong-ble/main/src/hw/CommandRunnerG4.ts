@@ -337,13 +337,6 @@ export class CommandRunnerG4 extends CommandRunnerBase {
       '00000000' +
       '00000000'
 
-    var matrix1: string[][] = basicData.match(/.{1,8}/g).map((row) => row.split(''))
-    var matrix2: string[][] = basicData.match(/.{1,8}/g).map((row) => row.split(''))
-    var matrix3: string[][] = basicData.match(/.{1,8}/g).map((row) => row.split(''))
-    var matrix4: string[][] = basicData.match(/.{1,8}/g).map((row) => row.split(''))
-
-    var combinedMatrix: string[][] = [...matrix1, ...matrix2, ...matrix3, ...matrix4]
-
     const testData =
       '10000001' +
       '01000010' +
@@ -354,8 +347,26 @@ export class CommandRunnerG4 extends CommandRunnerBase {
       '00000010' +
       '00000001'
 
-    for (var i = 0; i < 8; i++) {
-      matrix1[i] = testData.match(/.{1,8}/g).map((row) => row.split(''))[i]
+    var matrix0: string[][] = testData.match(/.{1,8}/g).map((row) => row.split(''))
+    var matrix1: string[][] = basicData.match(/.{1,8}/g).map((row) => row.split(''))
+    var matrix2: string[][] = basicData.match(/.{1,8}/g).map((row) => row.split(''))
+    var matrix3: string[][] = basicData.match(/.{1,8}/g).map((row) => row.split(''))
+    var matrix4: string[][] = basicData.match(/.{1,8}/g).map((row) => row.split(''))
+
+    var combinedMatrix: string[][] = [...matrix0, ...matrix1, ...matrix2, ...matrix3, ...matrix4]
+
+    combinedMatrix = combinedMatrix.map((row) => {
+      const lastItem = row.pop()
+      row.unshift(lastItem)
+      return row
+    })
+
+    console.log('waveMatrix : ', combinedMatrix)
+
+    for (let i = 0; i < 8; i++) {
+      // for (let j = 0; j < 8; j++) {
+      //   console.log('waveMatrix : ', combinedMatrix[i][j])
+      // }
     }
 
     // this.enqueue(PingPongUtil.stringToByte(packet))
