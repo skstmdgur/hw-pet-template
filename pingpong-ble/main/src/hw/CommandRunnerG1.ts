@@ -257,6 +257,7 @@ export class CommandRunnerG1 extends CommandRunnerBase {
     speed: number,
     step: number,
   ): Promise<void> => {
+    console.log('sendSingleStep', cubeNum, cubeID, speed, step)
     this.enqueue(PingPongUtil.makeSingleStep(cubeNum, cubeID, speed, step))
     await sleepAsync(1000)
   }
@@ -301,6 +302,8 @@ export class CommandRunnerG1 extends CommandRunnerBase {
       PingPongUtil.changeSpeedToSps(speed),
       PingPongUtil.changeDegreeToStep(degree),
     )
+
+    console.log('PingPongUtil.changeSpeedToSps(speed)', PingPongUtil.changeSpeedToSps(speed))
 
     this.enqueue(
       PingPongUtil.makeSingleStep(

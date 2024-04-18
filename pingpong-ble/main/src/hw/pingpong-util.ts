@@ -245,6 +245,12 @@ export const makeSingleStep = (
   data[17] = intToByte(step)[0]
   data[18] = intToByte(step)[1]
 
+  console.log(`data : ${data}`)
+  console.log(`data : ${data[13]}`)
+  console.log(`data : ${data[14]}`)
+  console.log(`data : ${data[17]}`)
+  console.log(`data : ${data[18]}`)
+
   return data
 }
 
@@ -351,15 +357,10 @@ export const makeDelayTimeFromSpeedStep = (speed: number, step: number): number 
   }
 
   // 1회전당 걸리는 시간
-  const oneRotationSecond = Math.pow(2, (1000 - speed) / 100)
-  // 1980 = 1회전당 스텝
-  const oneRotationStep = step / 1980
-  const delayTime = oneRotationSecond * oneRotationStep * 1000
+  const oneRotationSecond = Math.round(speed)
+  const delayTime = Math.round(((1100 - speed) / 99) * step)
 
-  // console.log(`oneRotationSecond : ${oneRotationSecond}, oneRotationStep : ${oneRotationStep}`)
-  // console.log(`delayTime : ${delayTime}`)
-
-  return delayTime + 1000
+  return delayTime
 }
 
 export const byteToString = (data: Uint8Array): String => {
