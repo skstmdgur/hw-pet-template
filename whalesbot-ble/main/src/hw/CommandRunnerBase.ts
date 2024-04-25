@@ -183,10 +183,14 @@ export class CommandRunnerBase implements IHPetCommandRunner {
     this.stopped$.next(false);
     this.updateConnectionState_('connecting');
     this.bluetoothDevice = device;
-    const services = await customBle.getServices(device);
-    this.services = services;
-
-    await this.onConnected_(device, services);
+    try {
+      const services = await customBle.getServices(device);
+      this.services = services;
+      await this.onConnected_(device, services);
+    } catch (err) {
+      console.warn('connect fail:', err);
+      this.updateConnectionState_('disconnected');
+    }
 
     return true;
   };
@@ -200,7 +204,7 @@ export class CommandRunnerBase implements IHPetCommandRunner {
     this.rxLoop_(services);
   };
 
-  public async  onDisconnected(): Promise<void> {
+  public async onDisconnected(): Promise<void> {
     log.log('CommandRunnerBase.onDisconnected');
   }
 
