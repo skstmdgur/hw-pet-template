@@ -107,7 +107,7 @@ export class CommandRunnerG3 extends CommandRunnerBase {
    * @returns The return value is meaningless.
    */
   disconnect = async () => {
-    this.enqueue(PingPongUtil.rebootMultiroleAggregator())
+    await this.enqueue(PingPongUtil.rebootMultiroleAggregator())
 
     // When changing the connection state, be sure to call updateConnectionState_()
     this.updateConnectionState_('disconnected')
@@ -160,11 +160,11 @@ export class CommandRunnerG3 extends CommandRunnerBase {
   }
 
   sendTest = async (packet: string): Promise<void> => {
-    this.enqueue(PingPongUtil.stringToByte(packet))
+    await this.enqueue(PingPongUtil.stringToByte(packet))
   }
 
   // 데이터를 큐에 추가하는 메소드
-  enqueue(data) {
+  async enqueue(data) {
     console.log(`Send : ${String(PingPongUtil.byteToString(data))}`)
     // 데이터를 20바이트씩 분할하여 큐에 추가
     for (let i = 0; i < data.length; i += 20) {
@@ -228,19 +228,14 @@ export class CommandRunnerG3 extends CommandRunnerBase {
   }
 
   setInstantTorque = async (cubeNum, torque): Promise<void> => {
-    this.enqueue(PingPongUtil.setInstantTorque(cubeNum, torque))
+    await this.enqueue(PingPongUtil.setInstantTorque(cubeNum, torque))
   }
   /** ____________________________________________________________________________________________________ */
 
   // cubeNum : 큐브 총 갯수
   connectToCubeWithNum = async (cubeNum: number, groupID: string): Promise<void> => {
-    this.enqueue(PingPongUtil.getSetMultiroleInAction(cubeNum, groupID))
-    return new Promise<void>((resolve) => {
-      setTimeout(() => {
-        console.log('connectToCubeWithNum 3 done')
-        resolve()
-      }, 1000)
-    })
+    await this.enqueue(PingPongUtil.getSetMultiroleInAction(cubeNum, groupID))
+    await sleepAsync(3000)
   }
 
   // cubeNum : 큐브 총 갯수
@@ -248,14 +243,14 @@ export class CommandRunnerG3 extends CommandRunnerBase {
   // speed : 속도 (100 ~ 1000)
   // step : 스텝 (0 ~ 1980)
   sendSingleStep = async (cubeNum, cubeID, speed, step): Promise<void> => {
-    this.enqueue(PingPongUtil.makeSingleStep(cubeNum, cubeID, speed, step))
+    await this.enqueue(PingPongUtil.makeSingleStep(cubeNum, cubeID, speed, step))
   }
 
   // cubeNum : 큐브 총 갯수
   // cubeID : 큐브 순서 (0부터 시작)
   // speed : 속도 (100 ~ 1000)
   sendContinuousStep = async (cubeNum, cubeID, speed): Promise<void> => {
-    this.enqueue(PingPongUtil.makeContinuousStep(cubeNum, cubeID, speed))
+    await this.enqueue(PingPongUtil.makeContinuousStep(cubeNum, cubeID, speed))
   }
 
   sendAggregator = async (

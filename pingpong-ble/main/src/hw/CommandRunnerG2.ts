@@ -114,7 +114,7 @@ export class CommandRunnerG2 extends CommandRunnerBase {
    * @returns The return value is meaningless.
    */
   disconnect = async () => {
-    this.enqueue(PingPongUtil.rebootMultiroleAggregator())
+    await this.enqueue(PingPongUtil.rebootMultiroleAggregator())
 
     // When changing the connection state, be sure to call updateConnectionState_()
     this.connectChangeImage('G2.png')
