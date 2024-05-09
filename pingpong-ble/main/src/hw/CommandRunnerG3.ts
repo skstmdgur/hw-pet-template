@@ -15,6 +15,8 @@ export class CommandRunnerG3 extends CommandRunnerBase {
   private rxCharacteristic: BluetoothRemoteGATTCharacteristic | undefined = undefined
   private txCharacteristic: BluetoothRemoteGATTCharacteristic | undefined = undefined
 
+  device: BluetoothDevice | null = null
+
   queue: any
   isSending: boolean
 
@@ -78,12 +80,12 @@ export class CommandRunnerG3 extends CommandRunnerBase {
    */
   connect = async (): Promise<boolean> => {
     console.log('connect', this.groupNumber)
-    const device = await this.scan()
-    if (!device) {
-      console.log('not device')
+    this.device = await this.scan()
+    if (!this.device) {
+      // console.log('not device')
       return false
     }
-    const server = await device.gatt?.connect()
+    const server = await this.device.gatt?.connect()
     const service = await server.getPrimaryService(this.bleNusServiceUUID)
 
     this.rxCharacteristic = await service?.getCharacteristic(this.bleNusCharRXUUID)
@@ -189,10 +191,40 @@ export class CommandRunnerG3 extends CommandRunnerBase {
   }
 
   async sendData(packet: Uint8Array) {
-    this.rxCharacteristic?.writeValue(packet)
-    await new Promise((resolve) => {
-      setTimeout(resolve, 500)
-    })
+    if (!this.rxCharacteristic) {
+      console.error('rxCharacteristic is null or undefined')
+      return
+    }
+
+    if (typeof this.rxCharacteristic.writeValue !== 'function') {
+      console.error('writeValue is not a function on rxCharacteristic')
+      return
+    }
+
+    // Check if the device is connected
+    if (!this.device?.gatt?.connected) {
+      console.error('Device is disconnected. Trying to reconnect...')
+      try {
+        if (this.device?.gatt) {
+          await this.device.gatt.connect()
+        }
+      } catch (error) {
+        console.error('Failed to reconnect to the device', error)
+        return
+      }
+    }
+
+    try {
+      await this.rxCharacteristic.writeValue(packet)
+    } catch (error) {
+      console.error('Failed to write value to rxCharacteristic', error)
+    }
+
+    try {
+      await this.rxCharacteristic.writeValue(packet)
+    } catch (error) {
+      console.error('Failed to write value to rxCharacteristic', error)
+    }
   }
 
   setInstantTorque = async (cubeNum, torque): Promise<void> => {

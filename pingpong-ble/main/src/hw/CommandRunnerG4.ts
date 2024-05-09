@@ -15,6 +15,8 @@ export class CommandRunnerG4 extends CommandRunnerBase {
   private rxCharacteristic: BluetoothRemoteGATTCharacteristic | undefined = undefined
   private txCharacteristic: BluetoothRemoteGATTCharacteristic | undefined = undefined
 
+  device: BluetoothDevice | null = null
+
   queue: any
   isSending: boolean
 
@@ -78,12 +80,12 @@ export class CommandRunnerG4 extends CommandRunnerBase {
    */
   connect = async (): Promise<boolean> => {
     console.log('connect', this.groupNumber)
-    const device = await this.scan()
-    if (!device) {
-      console.log('not device')
+    this.device = await this.scan()
+    if (!this.device) {
+      // console.log('not device')
       return false
     }
-    const server = await device.gatt?.connect()
+    const server = await this.device.gatt?.connect()
     const service = await server.getPrimaryService(this.bleNusServiceUUID)
 
     this.rxCharacteristic = await service?.getCharacteristic(this.bleNusCharRXUUID)
@@ -186,10 +188,40 @@ export class CommandRunnerG4 extends CommandRunnerBase {
   }
 
   async sendData(packet: Uint8Array) {
-    this.rxCharacteristic?.writeValue(packet)
-    await new Promise((resolve) => {
-      setTimeout(resolve, 500)
-    })
+    if (!this.rxCharacteristic) {
+      console.error('rxCharacteristic is null or undefined')
+      return
+    }
+
+    if (typeof this.rxCharacteristic.writeValue !== 'function') {
+      console.error('writeValue is not a function on rxCharacteristic')
+      return
+    }
+
+    // Check if the device is connected
+    if (!this.device?.gatt?.connected) {
+      console.error('Device is disconnected. Trying to reconnect...')
+      try {
+        if (this.device?.gatt) {
+          await this.device.gatt.connect()
+        }
+      } catch (error) {
+        console.error('Failed to reconnect to the device', error)
+        return
+      }
+    }
+
+    try {
+      await this.rxCharacteristic.writeValue(packet)
+    } catch (error) {
+      console.error('Failed to write value to rxCharacteristic', error)
+    }
+
+    try {
+      await this.rxCharacteristic.writeValue(packet)
+    } catch (error) {
+      console.error('Failed to write value to rxCharacteristic', error)
+    }
   }
 
   setInstantTorque = async (cubeNum, torque): Promise<void> => {
@@ -326,17 +358,7 @@ export class CommandRunnerG4 extends CommandRunnerBase {
   // 3. 속도
   // 4. 시간
 
-  waveMatrix = async (speed: number, time: number): Promise<void> => {
-    const basicData =
-      '00000000' +
-      '00000000' +
-      '00000000' +
-      '00000000' +
-      '00000000' +
-      '00000000' +
-      '00000000' +
-      '00000000'
-
+  waveMatrix = async (cubeNum: number, speed: number, time: number): Promise<void> => {
     const testData =
       '10000001' +
       '01000010' +
@@ -347,26 +369,61 @@ export class CommandRunnerG4 extends CommandRunnerBase {
       '00000010' +
       '00000001'
 
-    var matrix0: string[][] = testData.match(/.{1,8}/g).map((row) => row.split(''))
-    var matrix1: string[][] = basicData.match(/.{1,8}/g).map((row) => row.split(''))
-    var matrix2: string[][] = basicData.match(/.{1,8}/g).map((row) => row.split(''))
-    var matrix3: string[][] = basicData.match(/.{1,8}/g).map((row) => row.split(''))
-    var matrix4: string[][] = basicData.match(/.{1,8}/g).map((row) => row.split(''))
+    // var testmatrix: string[][] = new Array(8).fill(null).map(() => new Array(32).fill('0'));
+    var testmatrix: string[][] = testData
+      .match(/.{1,8}/g)
+      .map((row) => row.split(''))
+      .map((row) => row.concat(new Array(24).fill('0')))
 
-    var combinedMatrix: string[][] = [...matrix0, ...matrix1, ...matrix2, ...matrix3, ...matrix4]
-
-    combinedMatrix = combinedMatrix.map((row) => {
-      const lastItem = row.pop()
-      row.unshift(lastItem)
-      return row
-    })
-
-    console.log('waveMatrix : ', combinedMatrix)
+    let matrix1: string[][] = []
+    let matrix2: string[][] = []
+    let matrix3: string[][] = []
+    let matrix4: string[][] = []
 
     for (let i = 0; i < 8; i++) {
-      // for (let j = 0; j < 8; j++) {
-      //   console.log('waveMatrix : ', combinedMatrix[i][j])
-      // }
+      matrix1.push(testmatrix[i].slice(0, 8))
+      matrix2.push(testmatrix[i].slice(8, 16))
+      matrix3.push(testmatrix[i].slice(16, 24))
+      matrix4.push(testmatrix[i].slice(24, 32))
+    }
+
+    for (let i = 0; i < 8; i++) {
+      console.log('matrix1 : ', matrix1[i])
+    }
+    for (let i = 0; i < 8; i++) {
+      console.log('matrix2 : ', matrix2[i])
+    }
+    for (let i = 0; i < 8; i++) {
+      console.log('matrix3 : ', matrix3[i])
+    }
+    for (let i = 0; i < 8; i++) {
+      console.log('matrix4 : ', matrix4[i])
+    }
+
+    for (let i = 0; i < 8; i++) {
+      let lastItem = testmatrix[i].pop()
+      testmatrix[i].unshift(lastItem)
+      console.log('waveMatrix : ', testmatrix[i])
+    }
+
+    for (let i = 0; i < 8; i++) {
+      matrix1.push(testmatrix[i].slice(0, 8))
+      matrix2.push(testmatrix[i].slice(8, 16))
+      matrix3.push(testmatrix[i].slice(16, 24))
+      matrix4.push(testmatrix[i].slice(24, 32))
+    }
+
+    for (let i = 0; i < 8; i++) {
+      console.log('matrix1 : ', matrix1[i])
+    }
+    for (let i = 0; i < 8; i++) {
+      console.log('matrix2 : ', matrix2[i])
+    }
+    for (let i = 0; i < 8; i++) {
+      console.log('matrix3 : ', matrix3[i])
+    }
+    for (let i = 0; i < 8; i++) {
+      console.log('matrix4 : ', matrix4[i])
     }
 
     // this.enqueue(PingPongUtil.stringToByte(packet))
