@@ -15,6 +15,8 @@ export class CommandRunnerG3 extends CommandRunnerBase {
   private rxCharacteristic: BluetoothRemoteGATTCharacteristic | undefined = undefined
   private txCharacteristic: BluetoothRemoteGATTCharacteristic | undefined = undefined
 
+  device: BluetoothDevice | null = null
+
   queue: any
   isSending: boolean
 
@@ -78,12 +80,12 @@ export class CommandRunnerG3 extends CommandRunnerBase {
    */
   connect = async (): Promise<boolean> => {
     console.log('connect', this.groupNumber)
-    const device = await this.scan()
-    if (!device) {
-      console.log('not device')
+    this.device = await this.scan()
+    if (!this.device) {
+      // console.log('not device')
       return false
     }
-    const server = await device.gatt?.connect()
+    const server = await this.device.gatt?.connect()
     const service = await server.getPrimaryService(this.bleNusServiceUUID)
 
     this.rxCharacteristic = await service?.getCharacteristic(this.bleNusCharRXUUID)
@@ -105,7 +107,7 @@ export class CommandRunnerG3 extends CommandRunnerBase {
    * @returns The return value is meaningless.
    */
   disconnect = async () => {
-    this.enqueue(PingPongUtil.rebootMultiroleAggregator())
+    await this.enqueue(PingPongUtil.rebootMultiroleAggregator())
 
     // When changing the connection state, be sure to call updateConnectionState_()
     this.updateConnectionState_('disconnected')
@@ -158,11 +160,11 @@ export class CommandRunnerG3 extends CommandRunnerBase {
   }
 
   sendTest = async (packet: string): Promise<void> => {
-    this.enqueue(PingPongUtil.stringToByte(packet))
+    await this.enqueue(PingPongUtil.stringToByte(packet))
   }
 
   // 데이터를 큐에 추가하는 메소드
-  enqueue(data) {
+  async enqueue(data) {
     console.log(`Send : ${String(PingPongUtil.byteToString(data))}`)
     // 데이터를 20바이트씩 분할하여 큐에 추가
     for (let i = 0; i < data.length; i += 20) {
@@ -189,26 +191,51 @@ export class CommandRunnerG3 extends CommandRunnerBase {
   }
 
   async sendData(packet: Uint8Array) {
-    this.rxCharacteristic?.writeValue(packet)
-    await new Promise((resolve) => {
-      setTimeout(resolve, 500)
-    })
+    if (!this.rxCharacteristic) {
+      console.error('rxCharacteristic is null or undefined')
+      return
+    }
+
+    if (typeof this.rxCharacteristic.writeValue !== 'function') {
+      console.error('writeValue is not a function on rxCharacteristic')
+      return
+    }
+
+    // Check if the device is connected
+    if (!this.device?.gatt?.connected) {
+      console.error('Device is disconnected. Trying to reconnect...')
+      try {
+        if (this.device?.gatt) {
+          await this.device.gatt.connect()
+        }
+      } catch (error) {
+        console.error('Failed to reconnect to the device', error)
+        return
+      }
+    }
+
+    try {
+      await this.rxCharacteristic.writeValue(packet)
+    } catch (error) {
+      console.error('Failed to write value to rxCharacteristic', error)
+    }
+
+    try {
+      await this.rxCharacteristic.writeValue(packet)
+    } catch (error) {
+      console.error('Failed to write value to rxCharacteristic', error)
+    }
   }
 
   setInstantTorque = async (cubeNum, torque): Promise<void> => {
-    this.enqueue(PingPongUtil.setInstantTorque(cubeNum, torque))
+    await this.enqueue(PingPongUtil.setInstantTorque(cubeNum, torque))
   }
   /** ____________________________________________________________________________________________________ */
 
   // cubeNum : 큐브 총 갯수
   connectToCubeWithNum = async (cubeNum: number, groupID: string): Promise<void> => {
-    this.enqueue(PingPongUtil.getSetMultiroleInAction(cubeNum, groupID))
-    return new Promise<void>((resolve) => {
-      setTimeout(() => {
-        console.log('connectToCubeWithNum 3 done')
-        resolve()
-      }, 1000)
-    })
+    await this.enqueue(PingPongUtil.getSetMultiroleInAction(cubeNum, groupID))
+    await sleepAsync(3000)
   }
 
   // cubeNum : 큐브 총 갯수
@@ -216,14 +243,14 @@ export class CommandRunnerG3 extends CommandRunnerBase {
   // speed : 속도 (100 ~ 1000)
   // step : 스텝 (0 ~ 1980)
   sendSingleStep = async (cubeNum, cubeID, speed, step): Promise<void> => {
-    this.enqueue(PingPongUtil.makeSingleStep(cubeNum, cubeID, speed, step))
+    await this.enqueue(PingPongUtil.makeSingleStep(cubeNum, cubeID, speed, step))
   }
 
   // cubeNum : 큐브 총 갯수
   // cubeID : 큐브 순서 (0부터 시작)
   // speed : 속도 (100 ~ 1000)
   sendContinuousStep = async (cubeNum, cubeID, speed): Promise<void> => {
-    this.enqueue(PingPongUtil.makeContinuousStep(cubeNum, cubeID, speed))
+    await this.enqueue(PingPongUtil.makeContinuousStep(cubeNum, cubeID, speed))
   }
 
   sendAggregator = async (

@@ -16,6 +16,8 @@ export class CommandRunnerG1 extends CommandRunnerBase {
   private rxCharacteristic: BluetoothRemoteGATTCharacteristic | undefined = undefined
   private txCharacteristic: BluetoothRemoteGATTCharacteristic | undefined = undefined
 
+  device: BluetoothDevice | null = null
+
   queue: any
   isSending: boolean
   isSendingDone: boolean
@@ -81,12 +83,12 @@ export class CommandRunnerG1 extends CommandRunnerBase {
    */
   connect = async (): Promise<boolean> => {
     // console.log('connect', this.groupNumber)
-    const device = await this.scan()
-    if (!device) {
+    this.device = await this.scan()
+    if (!this.device) {
       // console.log('not device')
       return false
     }
-    const server = await device.gatt?.connect()
+    const server = await this.device.gatt?.connect()
     const service = await server.getPrimaryService(this.bleNusServiceUUID)
 
     this.rxCharacteristic = await service?.getCharacteristic(this.bleNusCharRXUUID)
@@ -109,7 +111,7 @@ export class CommandRunnerG1 extends CommandRunnerBase {
    * @returns The return value is meaningless.
    */
   disconnect = async () => {
-    this.enqueue(PingPongUtil.rebootMultiroleAggregator())
+    await this.enqueue(PingPongUtil.rebootMultiroleAggregator())
 
     // When changing the connection state, be sure to call updateConnectionState_()
     this.updateConnectionState_('disconnected')
@@ -215,7 +217,40 @@ export class CommandRunnerG1 extends CommandRunnerBase {
   }
 
   async sendData(packet: Uint8Array) {
-    await this.rxCharacteristic?.writeValue(packet)
+    if (!this.rxCharacteristic) {
+      console.error('rxCharacteristic is null or undefined')
+      return
+    }
+
+    if (typeof this.rxCharacteristic.writeValue !== 'function') {
+      console.error('writeValue is not a function on rxCharacteristic')
+      return
+    }
+
+    // Check if the device is connected
+    if (!this.device?.gatt?.connected) {
+      console.error('Device is disconnected. Trying to reconnect...')
+      try {
+        if (this.device?.gatt) {
+          await this.device.gatt.connect()
+        }
+      } catch (error) {
+        console.error('Failed to reconnect to the device', error)
+        return
+      }
+    }
+
+    try {
+      await this.rxCharacteristic.writeValue(packet)
+    } catch (error) {
+      console.error('Failed to write value to rxCharacteristic', error)
+    }
+
+    try {
+      await this.rxCharacteristic.writeValue(packet)
+    } catch (error) {
+      console.error('Failed to write value to rxCharacteristic', error)
+    }
   }
 
   /** ____________________________________________________________________________________________________ */
@@ -224,14 +259,14 @@ export class CommandRunnerG1 extends CommandRunnerBase {
    * 모터 토그 강도 설정
    */
   setInstantTorque = async (cubeNum: number, torque: number): Promise<void> => {
-    this.enqueue(PingPongUtil.setInstantTorque(cubeNum, torque))
+    await this.enqueue(PingPongUtil.setInstantTorque(cubeNum, torque))
   }
 
   /**
    * 1개 큐브 연결
    */
   connectToCube = async (): Promise<void> => {
-    this.enqueue(PingPongUtil.getOrangeForSoundData())
+    await this.enqueue(PingPongUtil.getOrangeForSoundData())
     await sleepAsync(3000)
   }
 
@@ -240,7 +275,7 @@ export class CommandRunnerG1 extends CommandRunnerBase {
    */
   startSensor = async (): Promise<void> => {
     // console.log('startSensor')
-    this.enqueue(PingPongUtil.getSensor())
+    await this.enqueue(PingPongUtil.getSensor())
     await sleepAsync(1000)
   }
 
@@ -258,7 +293,7 @@ export class CommandRunnerG1 extends CommandRunnerBase {
     step: number,
   ): Promise<void> => {
     console.log('sendSingleStep', cubeNum, cubeID, speed, step)
-    this.enqueue(PingPongUtil.makeSingleStep(cubeNum, cubeID, speed, step))
+    await this.enqueue(PingPongUtil.makeSingleStep(cubeNum, cubeID, speed, step))
     await sleepAsync(1000)
   }
 
@@ -270,7 +305,7 @@ export class CommandRunnerG1 extends CommandRunnerBase {
    * speed : 속도 (100 ~ 1000)
    */
   sendContinuousStep = async (cubeNum: number, cubeID: number, speed: number): Promise<void> => {
-    this.enqueue(PingPongUtil.makeContinuousStep(cubeNum, cubeID, speed))
+    await this.enqueue(PingPongUtil.makeContinuousStep(cubeNum, cubeID, speed))
   }
 
   /** Setting Default ____________________________________________________________________________________________________ */
@@ -293,7 +328,7 @@ export class CommandRunnerG1 extends CommandRunnerBase {
    */
 
   setMotorContinuous = async (speed: number): Promise<void> => {
-    this.enqueue(PingPongUtil.makeContinuousStep(1, 7, PingPongUtil.changeSpeedToSps(speed)))
+    await this.enqueue(PingPongUtil.makeContinuousStep(1, 7, PingPongUtil.changeSpeedToSps(speed)))
     await sleepAsync(this.defaultDelay)
   }
 
@@ -305,7 +340,7 @@ export class CommandRunnerG1 extends CommandRunnerBase {
 
     console.log('PingPongUtil.changeSpeedToSps(speed)', PingPongUtil.changeSpeedToSps(speed))
 
-    this.enqueue(
+    await this.enqueue(
       PingPongUtil.makeSingleStep(
         1,
         7,
@@ -317,7 +352,7 @@ export class CommandRunnerG1 extends CommandRunnerBase {
   }
 
   setMotorStop = async (): Promise<void> => {
-    this.enqueue(PingPongUtil.makeContinuousStep(1, 7, 0))
+    await this.enqueue(PingPongUtil.makeContinuousStep(1, 7, 0))
     await sleepAsync(this.defaultDelay)
   }
 
@@ -327,7 +362,9 @@ export class CommandRunnerG1 extends CommandRunnerBase {
       step,
     )
 
-    this.enqueue(PingPongUtil.makeSingleStep(1, 7, PingPongUtil.changeSpeedToSps(speed), step))
+    await this.enqueue(
+      PingPongUtil.makeSingleStep(1, 7, PingPongUtil.changeSpeedToSps(speed), step),
+    )
     await sleepAsync(delayTime)
   }
 
@@ -407,7 +444,7 @@ export class CommandRunnerG1 extends CommandRunnerBase {
   }
 
   startMusic = async (delay: number): Promise<void> => {
-    this.enqueue(PingPongUtil.makeMusicPlay(2))
+    await this.enqueue(PingPongUtil.makeMusicPlay(2))
     await sleepAsync(delay)
   }
 
@@ -417,7 +454,9 @@ export class CommandRunnerG1 extends CommandRunnerBase {
     pianoKeyData: number,
     durationData: number,
   ): Promise<void> => {
-    this.enqueue(PingPongUtil.makeMusicData(cubeID, 2, notesAndRests, pianoKeyData, durationData))
+    await this.enqueue(
+      PingPongUtil.makeMusicData(cubeID, 2, notesAndRests, pianoKeyData, durationData),
+    )
     await sleepAsync(this.defaultDelay)
   }
 
@@ -449,7 +488,7 @@ export class CommandRunnerG1 extends CommandRunnerBase {
    * 서브 모터 움직이기
    */
   setServoDegree = async (cubeID: number, degree: number): Promise<void> => {
-    this.enqueue(PingPongUtil.makeServoDegreeData(cubeID, degree))
+    await this.enqueue(PingPongUtil.makeServoDegreeData(cubeID, degree))
     await sleepAsync(this.defaultDelay)
   }
 
@@ -457,7 +496,7 @@ export class CommandRunnerG1 extends CommandRunnerBase {
 
   // 모노 거리 이동
   setDistance = async (speed: number, distance: number): Promise<void> => {
-    this.enqueue(
+    await this.enqueue(
       PingPongUtil.makeSingleStep(
         1,
         7,
