@@ -86,24 +86,54 @@ export class CommandRunnerG2 extends CommandRunnerBase {
    * An essential function that must be implemented.
    * @returns The return value is meaningless.
    */
+  // connect = async (): Promise<boolean> => {
+  //   console.log('connect', this.groupNumber)
+  //   this.device = await this.scan()
+  //   if (!this.device) {
+  //     // console.log('not device')
+  //     return false
+  //   }
+  //   const server = await this.device.gatt?.connect()
+  //   const service = await server.getPrimaryService(this.bleNusServiceUUID)
+
+  //   this.rxCharacteristic = await service?.getCharacteristic(this.bleNusCharRXUUID)
+  //   this.txCharacteristic = await service?.getCharacteristic(this.bleNusCharTXUUID)
+  //   await this.txCharacteristic?.startNotifications()
+  //   this.txCharacteristic?.addEventListener('characteristicvaluechanged', this.receivedBytes)
+
+  //   await this.connectToCubeWithNum(2, this.groupNumber)
+
+  //   return true
+  // }
+
   connect = async (): Promise<boolean> => {
-    console.log('connect', this.groupNumber)
-    this.device = await this.scan()
+    this.device = await this.scan();
     if (!this.device) {
-      // console.log('not device')
-      return false
+      console.log('No device found');
+      return false;
     }
-    const server = await this.device.gatt?.connect()
-    const service = await server.getPrimaryService(this.bleNusServiceUUID)
+  
+    try {
+      const server = await this.device.gatt?.connect();
+      const service = await server.getPrimaryService(this.bleNusServiceUUID);
 
-    this.rxCharacteristic = await service?.getCharacteristic(this.bleNusCharRXUUID)
-    this.txCharacteristic = await service?.getCharacteristic(this.bleNusCharTXUUID)
-    await this.txCharacteristic?.startNotifications()
-    this.txCharacteristic?.addEventListener('characteristicvaluechanged', this.receivedBytes)
-
-    await this.connectToCubeWithNum(2, this.groupNumber)
-
-    return true
+      this.rxCharacteristic = await service?.getCharacteristic(this.bleNusCharRXUUID);
+      this.txCharacteristic = await service?.getCharacteristic(this.bleNusCharTXUUID);
+  
+      if (!this.txCharacteristic) {
+        throw new Error("TX Characteristic not found");
+      }
+  
+      await this.txCharacteristic.startNotifications();
+      this.txCharacteristic.addEventListener('characteristicvaluechanged', this.receivedBytes);
+  
+      await this.connectToCubeWithNum(2, this.groupNumber)
+  
+      return true;
+    } catch (error) {
+      console.error('Failed to setup Bluetooth connection:', error);
+      return false;
+    }
   }
 
   /**
