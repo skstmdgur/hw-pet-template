@@ -86,24 +86,54 @@ export class CommandRunnerG2 extends CommandRunnerBase {
    * An essential function that must be implemented.
    * @returns The return value is meaningless.
    */
+  // connect = async (): Promise<boolean> => {
+  //   console.log('connect', this.groupNumber)
+  //   this.device = await this.scan()
+  //   if (!this.device) {
+  //     // console.log('not device')
+  //     return false
+  //   }
+  //   const server = await this.device.gatt?.connect()
+  //   const service = await server.getPrimaryService(this.bleNusServiceUUID)
+
+  //   this.rxCharacteristic = await service?.getCharacteristic(this.bleNusCharRXUUID)
+  //   this.txCharacteristic = await service?.getCharacteristic(this.bleNusCharTXUUID)
+  //   await this.txCharacteristic?.startNotifications()
+  //   this.txCharacteristic?.addEventListener('characteristicvaluechanged', this.receivedBytes)
+
+  //   await this.connectToCubeWithNum(2, this.groupNumber)
+
+  //   return true
+  // }
+
   connect = async (): Promise<boolean> => {
-    console.log('connect', this.groupNumber)
     this.device = await this.scan()
     if (!this.device) {
-      // console.log('not device')
+      console.log('No device found')
       return false
     }
-    const server = await this.device.gatt?.connect()
-    const service = await server.getPrimaryService(this.bleNusServiceUUID)
 
-    this.rxCharacteristic = await service?.getCharacteristic(this.bleNusCharRXUUID)
-    this.txCharacteristic = await service?.getCharacteristic(this.bleNusCharTXUUID)
-    await this.txCharacteristic?.startNotifications()
-    this.txCharacteristic?.addEventListener('characteristicvaluechanged', this.receivedBytes)
+    try {
+      const server = await this.device.gatt?.connect()
+      const service = await server.getPrimaryService(this.bleNusServiceUUID)
 
-    await this.connectToCubeWithNum(2, this.groupNumber)
+      this.rxCharacteristic = await service?.getCharacteristic(this.bleNusCharRXUUID)
+      this.txCharacteristic = await service?.getCharacteristic(this.bleNusCharTXUUID)
 
-    return true
+      if (!this.txCharacteristic) {
+        throw new Error('TX Characteristic not found')
+      }
+
+      await this.txCharacteristic.startNotifications()
+      this.txCharacteristic.addEventListener('characteristicvaluechanged', this.receivedBytes)
+
+      await this.connectToCubeWithNum(2, this.groupNumber)
+
+      return true
+    } catch (error) {
+      console.error('Failed to setup Bluetooth connection:', error)
+      return false
+    }
   }
 
   /**
@@ -628,6 +658,24 @@ export class CommandRunnerG2 extends CommandRunnerBase {
     }
 
     return false
+  }
+
+  /**
+   * 근접 센서 값
+   */
+  getProximitySensor = async (cubeID: number): Promise<number> => {
+    let proximitySensorData = 0
+
+    switch (cubeID) {
+      case 0:
+        proximitySensorData = this.sensorG1['Sensor_Byte_18']
+        break
+      case 1:
+        proximitySensorData = this.sensorG2['Sensor_Byte_18']
+        break
+    }
+
+    return proximitySensorData
   }
 
   getSoundSensor = async (cubeID: number): Promise<number> => {
