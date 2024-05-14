@@ -1,4 +1,4 @@
-import log from './log'
+import { logger } from './logger'
 
 const basePath: string = process.env.NEXT_PUBLIC_BASE_PATH ?? '/'
 const isProduction: boolean = process.env.NEXT_PUBLIC_PRODUCTION === 'true'
@@ -10,5 +10,5 @@ const config = {
   isDebug,
 }
 
-log.debug('config=', config)
+logger.debug('config=', config)
 export default config

@@ -12,12 +12,9 @@ import {
   take,
   timeout,
 } from 'rxjs'
+import type { BufferTimestamped } from './types'
 
 type HwDeviceState = 'opening' | 'opened' | 'closing' | 'closed'
-type BufferTimestamped = {
-  timestamp: number
-  dataBuffer: Uint8Array
-}
 
 export class WebSerialDevice {
   DEBUG = false
@@ -199,7 +196,7 @@ export class WebSerialDevice {
   }
 
   private doReadFromReader_ = async (reader: ReadableStreamDefaultReader<Uint8Array>) => {
-    console.log(`XXX WebSerialDevice.doReadFromReader_(): ${this.deviceState$.value}`)
+    // console.log(`XXX WebSerialDevice.doReadFromReader_(): ${this.deviceState$.value}`)
     while (this.deviceState$.value === 'opened') {
       const { value: dataBuffer, done } = await reader.read()
       // console.log(`XXX WebSerialDevice. reader.read(): ${done ? 'done' : ''}, ${dataBuffer?.byteLength ?? -1} bytes`)
