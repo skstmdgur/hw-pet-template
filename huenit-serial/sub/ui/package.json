@@ -10,19 +10,18 @@
   },
   "devDependencies": {
     "@ktaicoder/hw-pet": "^1.2.9",
-    "@mui/icons-material": "^5.15.3",
-    "@mui/material": "^5.15.3",
+    "@mui/icons-material": "^5.15.17",
+    "@mui/material": "^5.15.17",
     "@repo/eslint-config": "workspace:*",
     "@repo/typescript-config": "workspace:*",
-    "@turbo/gen": "^1.10.12",
     "@types/eslint": "^8.44.7",
     "@types/node": "^18.19.0",
-    "@types/react": "^18.2.0",
-    "@types/react-dom": "^18.2.0",
+    "@types/react": "^18.3.2",
+    "@types/react-dom": "^18.3.0",
     "clsx": "^2.1.0",
-    "eslint": "^8.56.0",
-    "next": "^14.1.0",
-    "react": "^18.2.0",
+    "eslint": "^8.57.0",
+    "next": "^14.2.3",
+    "react": "^18.3.1",
     "typescript": "^5.3.3"
   },
   "peerDependencies": {
@@ -30,6 +29,7 @@
     "@mui/icons-material": "^5",
     "@mui/material": "^5",
     "clsx": "^2",
-    "next": "^14.1.0"
+    "next": "^14",
+    "react": "^18"
   }
 }

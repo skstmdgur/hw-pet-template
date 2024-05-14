@@ -5,11 +5,20 @@ import { CommandRunner } from '@/hw/CommandRunner'
 import { Box } from '@mui/material'
 import { ConnectButton, HardwareImageBox, HardwareNameBox, MediaIconBox, usePet } from '@repo/ui'
 import { useSearchParams } from 'next/navigation'
+import { Suspense } from 'react'
 const LOGO_IMG_URL = 'logo.png'
 
 const MEDIA_ICON = 'usb.svg'
 
 export default function Page() {
+  return (
+    <Suspense>
+      <PageInternal />
+    </Suspense>
+  )
+}
+
+function PageInternal() {
   const { commandRunner, connectionState, pet } = usePet(HW_ID, CommandRunner, useSearchParams())
   // Click handler for the Connect button
   const handleClickConnectBtn = () => {
