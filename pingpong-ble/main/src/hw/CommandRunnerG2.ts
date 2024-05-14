@@ -630,6 +630,21 @@ export class CommandRunnerG2 extends CommandRunnerBase {
     return false
   }
 
+  getSoundSensor = async (cubeID: number): Promise<number> => {
+    let soundSensorData = 0
+
+    switch (cubeID) {
+      case 0:
+        soundSensorData = PingPongUtil.getSignedIntFromByteData(this.sensorG1['Sensor_Byte_19'])
+        break
+      case 1:
+        soundSensorData = PingPongUtil.getSignedIntFromByteData(this.sensorG2['Sensor_Byte_19'])
+        break
+    }
+
+    return soundSensorData
+  }
+
   /** __________ G2 Music __________ */
 
   setMetronome = async (metronome: number): Promise<void> => {
