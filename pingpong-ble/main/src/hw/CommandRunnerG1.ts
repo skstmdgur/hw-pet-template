@@ -104,35 +104,35 @@ export class CommandRunnerG1 extends CommandRunnerBase {
   // }
 
   connect = async (): Promise<boolean> => {
-    this.device = await this.scan();
+    this.device = await this.scan()
     if (!this.device) {
-      console.log('No device found');
-      return false;
+      console.log('No device found')
+      return false
     }
-  
-    try {
-      const server = await this.device.gatt?.connect();
-      const service = await server.getPrimaryService(this.bleNusServiceUUID);
 
-      this.rxCharacteristic = await service?.getCharacteristic(this.bleNusCharRXUUID);
-      this.txCharacteristic = await service?.getCharacteristic(this.bleNusCharTXUUID);
-  
+    try {
+      const server = await this.device.gatt?.connect()
+      const service = await server.getPrimaryService(this.bleNusServiceUUID)
+
+      this.rxCharacteristic = await service?.getCharacteristic(this.bleNusCharRXUUID)
+      this.txCharacteristic = await service?.getCharacteristic(this.bleNusCharTXUUID)
+
       if (!this.txCharacteristic) {
-        throw new Error("TX Characteristic not found");
+        throw new Error('TX Characteristic not found')
       }
-  
-      await this.txCharacteristic.startNotifications();
-      this.txCharacteristic.addEventListener('characteristicvaluechanged', this.receivedBytes);
-      this.updateConnectionState_('connected');
-  
-      await this.connectToCube();
-      await this.startSensor();
-  
-      return true;
+
+      await this.txCharacteristic.startNotifications()
+      this.txCharacteristic.addEventListener('characteristicvaluechanged', this.receivedBytes)
+      this.updateConnectionState_('connected')
+
+      await this.connectToCube()
+      await this.startSensor()
+
+      return true
     } catch (error) {
-      console.error('Failed to setup Bluetooth connection:', error);
-      this.updateConnectionState_('disconnected');
-      return false;
+      console.error('Failed to setup Bluetooth connection:', error)
+      this.updateConnectionState_('disconnected')
+      return false
     }
   }
 

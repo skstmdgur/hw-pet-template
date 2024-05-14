@@ -107,32 +107,32 @@ export class CommandRunnerG2 extends CommandRunnerBase {
   // }
 
   connect = async (): Promise<boolean> => {
-    this.device = await this.scan();
+    this.device = await this.scan()
     if (!this.device) {
-      console.log('No device found');
-      return false;
+      console.log('No device found')
+      return false
     }
-  
-    try {
-      const server = await this.device.gatt?.connect();
-      const service = await server.getPrimaryService(this.bleNusServiceUUID);
 
-      this.rxCharacteristic = await service?.getCharacteristic(this.bleNusCharRXUUID);
-      this.txCharacteristic = await service?.getCharacteristic(this.bleNusCharTXUUID);
-  
+    try {
+      const server = await this.device.gatt?.connect()
+      const service = await server.getPrimaryService(this.bleNusServiceUUID)
+
+      this.rxCharacteristic = await service?.getCharacteristic(this.bleNusCharRXUUID)
+      this.txCharacteristic = await service?.getCharacteristic(this.bleNusCharTXUUID)
+
       if (!this.txCharacteristic) {
-        throw new Error("TX Characteristic not found");
+        throw new Error('TX Characteristic not found')
       }
-  
-      await this.txCharacteristic.startNotifications();
-      this.txCharacteristic.addEventListener('characteristicvaluechanged', this.receivedBytes);
-  
+
+      await this.txCharacteristic.startNotifications()
+      this.txCharacteristic.addEventListener('characteristicvaluechanged', this.receivedBytes)
+
       await this.connectToCubeWithNum(2, this.groupNumber)
-  
-      return true;
+
+      return true
     } catch (error) {
-      console.error('Failed to setup Bluetooth connection:', error);
-      return false;
+      console.error('Failed to setup Bluetooth connection:', error)
+      return false
     }
   }
 
@@ -658,6 +658,24 @@ export class CommandRunnerG2 extends CommandRunnerBase {
     }
 
     return false
+  }
+
+  /**
+   * 근접 센서 값
+   */
+  getProximitySensor = async (cubeID: number): Promise<number> => {
+    let proximitySensorData = 0
+
+    switch (cubeID) {
+      case 0:
+        proximitySensorData = this.sensorG1['Sensor_Byte_18']
+        break
+      case 1:
+        proximitySensorData = this.sensorG2['Sensor_Byte_18']
+        break
+    }
+
+    return proximitySensorData
   }
 
   getSoundSensor = async (cubeID: number): Promise<number> => {
