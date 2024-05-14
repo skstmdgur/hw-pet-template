@@ -14,6 +14,7 @@
     "@emotion/styled": "^11.11.0",
     "@ktaicoder/hw-pet": "^1.2.9",
     "@mui/material": "^5.15.17",
+    "@mui/material-nextjs": "^5.15.11",
     "clsx": "^2.0.0",
     "eventemitter3": "^5.0.1",
     "next": "^14.2.3",

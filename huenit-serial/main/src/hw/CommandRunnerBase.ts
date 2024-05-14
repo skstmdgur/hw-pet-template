@@ -33,11 +33,11 @@ import { WebSerialDevice } from './WebSerialDevice'
 import { openSerialDevice } from './command-util'
 import type { BufferTimestamped } from './types'
 
-type WriteDataType = number[] | Uint8Array | string
-type WriteRequest = {
+type TxDataType = number[] | Uint8Array | string
+type TxRequest = {
   requestId: string
   debugCmd: string
-  data: WriteDataType
+  data: TxDataType
 }
 
 /**
@@ -96,17 +96,17 @@ export class CommandRunnerBase implements IHPetCommandRunner {
   /**
    * 디바이스 쓰기 큐의 리소스 해제 함수
    */
-  private writeRequestQueueDisposeFn_?: VoidFunction
+  private txRequestQueueDisposeFn_?: VoidFunction
 
   /**
    * 디바이스 쓰기 큐
    */
-  private writeRequest$ = new Subject<WriteRequest>()
+  private dataToDevice$ = new Subject<TxRequest>()
 
   /**
-   * 디바이스의 응답 큐
+   * 디바이스로부터 수신된 데이터
    */
-  private writeResponse$ = new Subject<{
+  private dataFromDevice$ = new Subject<{
     requestId: string
     returnData: Uint8Array | null
   }>()
@@ -253,14 +253,14 @@ export class CommandRunnerBase implements IHPetCommandRunner {
     // 하나씩 순차적으로 처리한다(concatMap)
     const subscription = new Subscription()
     subscription.add(
-      this.writeRequest$
+      this.dataToDevice$
         .pipe(
-          concatMap((request) => from(this.handleWriteRequest_(request))),
+          concatMap((request) => from(this.handleTxRequest_(request))),
           takeUntil(this.closeTrigger_()),
         )
         .subscribe(),
     )
-    this.writeRequestQueueDisposeFn_ = () => {
+    this.txRequestQueueDisposeFn_ = () => {
       subscription.unsubscribe()
     }
   }
@@ -310,7 +310,7 @@ export class CommandRunnerBase implements IHPetCommandRunner {
    * 하드웨어 쓰기 요청을 처리합니다.
    * 하드웨어에 데이터를 전송한 후, 하드웨어로부터 응답을 기다립니다.
    */
-  private handleWriteRequest_ = async (request: WriteRequest): Promise<Uint8Array | null> => {
+  private handleTxRequest_ = async (request: TxRequest): Promise<Uint8Array | null> => {
     const { debugCmd, data, requestId } = request
     const startTime = Date.now()
     const values = typeof data === 'string' ? new Uint8Array(data.split('').map(chr)) : data
@@ -327,7 +327,7 @@ export class CommandRunnerBase implements IHPetCommandRunner {
     }
     const diff = Date.now() - startTime
     logger.debug(`${debugCmd}: \t\texecution time: ${diff}ms, response: ${num2str(returnData)}`)
-    this.writeResponse$.next({
+    this.dataFromDevice$.next({
       requestId,
       returnData,
     })
@@ -349,7 +349,7 @@ export class CommandRunnerBase implements IHPetCommandRunner {
     const requestId = genId()
 
     // 요청을 enque하고
-    this.writeRequest$.next({
+    this.dataToDevice$.next({
       requestId,
       data: values,
       debugCmd,
@@ -358,7 +358,7 @@ export class CommandRunnerBase implements IHPetCommandRunner {
     // 응답을 기다리기
     try {
       const result = firstValueFrom(
-        this.writeResponse$.pipe(
+        this.dataFromDevice$.pipe(
           filter((it) => it.requestId === requestId),
           map((it) => it.returnData),
           takeUntil(this.closeTrigger_()),
@@ -450,9 +450,9 @@ export class CommandRunnerBase implements IHPetCommandRunner {
       this.rxLoopDisposeFn_ = undefined
     }
 
-    if (this.writeRequestQueueDisposeFn_) {
-      this.writeRequestQueueDisposeFn_()
-      this.writeRequestQueueDisposeFn_ = undefined
+    if (this.txRequestQueueDisposeFn_) {
+      this.txRequestQueueDisposeFn_()
+      this.txRequestQueueDisposeFn_ = undefined
     }
 
     if (this.device_) {
