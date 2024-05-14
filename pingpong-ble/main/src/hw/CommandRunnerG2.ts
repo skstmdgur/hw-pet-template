@@ -635,10 +635,10 @@ export class CommandRunnerG2 extends CommandRunnerBase {
 
     switch (cubeID) {
       case 0:
-        soundSensorData = PingPongUtil.getSignedIntFromByteData(this.sensorG1['Sensor_Byte_19'])
+        soundSensorData = this.sensorG1['Sensor_Byte_19']
         break
       case 1:
-        soundSensorData = PingPongUtil.getSignedIntFromByteData(this.sensorG2['Sensor_Byte_19'])
+        soundSensorData = this.sensorG2['Sensor_Byte_19']
         break
     }
 
