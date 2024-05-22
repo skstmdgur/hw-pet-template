@@ -303,41 +303,45 @@ export class CommandRunnerG2 extends CommandRunnerBase {
   }
 
   async sendData(packet: Uint8Array) {
-    if (!this.rxCharacteristic) {
-      console.error('rxCharacteristic is null or undefined')
-      return
-    }
-
-    if (typeof this.rxCharacteristic.writeValue !== 'function') {
-      console.error('writeValue is not a function on rxCharacteristic')
-      return
-    }
-
-    // Check if the device is connected
-    if (!this.device?.gatt?.connected) {
-      console.error('Device is disconnected. Trying to reconnect...')
-      try {
-        if (this.device?.gatt) {
-          await this.device.gatt.connect()
-        }
-      } catch (error) {
-        console.error('Failed to reconnect to the device', error)
-        return
-      }
-    }
-
-    try {
-      await this.rxCharacteristic.writeValue(packet)
-    } catch (error) {
-      console.error('Failed to write value to rxCharacteristic', error)
-    }
-
-    try {
-      await this.rxCharacteristic.writeValue(packet)
-    } catch (error) {
-      console.error('Failed to write value to rxCharacteristic', error)
-    }
+    await this.rxCharacteristic?.writeValue(packet)
   }
+
+  // async sendData(packet: Uint8Array) {
+  //   if (!this.rxCharacteristic) {
+  //     console.error('rxCharacteristic is null or undefined')
+  //     return
+  //   }
+
+  //   if (typeof this.rxCharacteristic.writeValue !== 'function') {
+  //     console.error('writeValue is not a function on rxCharacteristic')
+  //     return
+  //   }
+
+  //   // Check if the device is connected
+  //   if (!this.device?.gatt?.connected) {
+  //     console.error('Device is disconnected. Trying to reconnect...')
+  //     try {
+  //       if (this.device?.gatt) {
+  //         await this.device.gatt.connect()
+  //       }
+  //     } catch (error) {
+  //       console.error('Failed to reconnect to the device', error)
+  //       return
+  //     }
+  //   }
+
+  //   try {
+  //     await this.rxCharacteristic.writeValue(packet)
+  //   } catch (error) {
+  //     console.error('Failed to write value to rxCharacteristic', error)
+  //   }
+
+  //   try {
+  //     await this.rxCharacteristic.writeValue(packet)
+  //   } catch (error) {
+  //     console.error('Failed to write value to rxCharacteristic', error)
+  //   }
+  // }
 
   /** ____________________________________________________________________________________________________ */
 
