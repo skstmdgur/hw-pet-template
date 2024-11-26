@@ -1,0 +1,397 @@
+네, 모든 컴포넌트를 서버에서 실행하고 시리얼 통신만 클라이언트에서 처리하는 방식으로 구현할 수 있습니다. 이를 위해서는 웹시리얼 API를 활용해야 합니다.
+
+
+
+```javascript
+// server/index.js
+const express = require('express');
+const { Server } = require('ws');
+const http = require('http');
+const { spawn } = require('child_process');
+const cors = require('cors');
+
+const app = express();
+const server = http.createServer(app);
+const wss = new Server({ server });
+
+app.use(cors());
+app.use(express.json());
+
+// 로봇 연결 관리
+class RobotManager {
+  constructor() {
+    this.robots = new Map(); // robotId -> { pythonProcess, webSocket }
+    this.serialConnections = new Map(); // robotId -> webSocket (browser serial connection)
+  }
+
+  startPythonProcess(robotId) {
+    if (this.robots.has(robotId)) {
+      return;
+    }
+
+    const pythonProcess = spawn('python', ['robot_controller.py']);
+    
+    pythonProcess.stdout.on('data', (data) => {
+      const response = data.toString().trim();
+      // 시리얼 연결된 브라우저로 결과 전송
+      const serialWs = this.serialConnections.get(robotId);
+      if (serialWs) {
+        serialWs.send(JSON.stringify({ type: 'response', data: response }));
+      }
+    });
+
+    pythonProcess.stderr.on('data', (data) => {
+      console.error(`Python Error (${robotId}):`, data.toString());
+    });
+
+    this.robots.set(robotId, { pythonProcess });
+  }
+
+  stopPythonProcess(robotId) {
+    const robot = this.robots.get(robotId);
+    if (robot && robot.pythonProcess) {
+      robot.pythonProcess.kill();
+      this.robots.delete(robotId);
+    }
+  }
+
+  registerSerialConnection(robotId, ws) {
+    this.serialConnections.set(robotId, ws);
+    // Python 프로세스가 없다면 시작
+    if (!this.robots.has(robotId)) {
+      this.startPythonProcess(robotId);
+    }
+  }
+
+  removeSerialConnection(robotId) {
+    this.serialConnections.delete(robotId);
+    // 연결된 브라우저가 없으면 Python 프로세스도 종료
+    if (!this.serialConnections.has(robotId)) {
+      this.stopPythonProcess(robotId);
+    }
+  }
+
+  sendCommand(robotId, command) {
+    const robot = this.robots.get(robotId);
+    if (robot && robot.pythonProcess) {
+      robot.pythonProcess.stdin.write(JSON.stringify(command) + '\n');
+      return true;
+    }
+    return false;
+  }
+}
+
+const robotManager = new RobotManager();
+
+// WebSocket 연결 처리
+wss.on('connection', (ws, req) => {
+  const robotId = req.url.split('/')[2]; // /robot/{robotId}
+  
+  if (!robotId) {
+    ws.close();
+    return;
+  }
+
+  console.log(`Serial connection established for robot ${robotId}`);
+  robotManager.registerSerialConnection(robotId, ws);
+
+  // 시리얼 데이터 수신 처리
+  ws.on('message', (message) => {
+    try {
+      const data = JSON.parse(message);
+      if (data.type === 'serial') {
+        // 시리얼 데이터를 Python 프로세스로 전달
+        robotManager.sendCommand(robotId, { type: 'serial', data: data.data });
+      }
+    } catch (error) {
+      console.error(`Error processing message from robot ${robotId}:`, error);
+    }
+  });
+
+  ws.on('close', () => {
+    console.log(`Serial connection closed for robot ${robotId}`);
+    robotManager.removeSerialConnection(robotId);
+  });
+});
+
+// REST API 엔드포인트
+app.post('/api/robots/:robotId/command', (req, res) => {
+  const { robotId } = req.params;
+  const command = req.body;
+
+  if (robotManager.sendCommand(robotId, command)) {
+    res.json({ success: true });
+  } else {
+    res.status(404).json({ error: 'Robot not connected' });
+  }
+});
+
+const PORT = process.env.PORT || 3000;
+server.listen(PORT, () => {
+  console.log(`Server running on port ${PORT}`);
+});
+
+```
+
+```python
+# robot_controller.py
+import sys
+import json
+import asyncio
+from time import sleep
+
+class RobotController:
+    def __init__(self):
+        self.command_queue = asyncio.Queue()
+        self.serial_data = None
+
+    async def process_command(self, command):
+        try:
+            cmd_type = command.get('type')
+            
+            if cmd_type == 'serial':
+                # 시리얼 데이터 저장
+                self.serial_data = command.get('data')
+                return {'status': 'success', 'type': 'serial_stored'}
+            
+            if cmd_type == 'move':
+                # 시리얼 연결을 통해 로봇으로 명령 전송
+                if self.serial_data:
+                    # 실제로는 여기서 시리얼 데이터를 사용하여 로봇과 통신
+                    params = command.get('params', {})
+                    return {
+                        'status': 'success',
+                        'command': cmd_type,
+                        'params': params
+                    }
+                else:
+                    return {'status': 'error', 'message': 'No serial connection'}
+            
+            return {'status': 'error', 'message': 'Unknown command'}
+
+        except Exception as e:
+            return {'status': 'error', 'message': str(e)}
+
+    async def run(self):
+        while True:
+            try:
+                line = await self.get_input()
+                if not line:
+                    continue
+                
+                command = json.loads(line)
+                result = await self.process_command(command)
+                
+                print(json.dumps(result))
+                sys.stdout.flush()
+                
+            except Exception as e:
+                print(json.dumps({'status': 'error', 'message': str(e)}))
+                sys.stdout.flush()
+
+    async def get_input(self):
+        return await asyncio.get_event_loop().run_in_executor(None, sys.stdin.readline)
+
+if __name__ == '__main__':
+    controller = RobotController()
+    asyncio.get_event_loop().run_until_complete(controller.run())
+
+```
+
+```javascript
+// web-client/serial-client.js
+class DobotSerialClient {
+  constructor(serverUrl) {
+    this.serverUrl = serverUrl;
+    this.port = null;
+    this.reader = null;
+    this.writer = null;
+    this.ws = null;
+    this.robotId = null;
+  }
+
+  async connect(robotId) {
+    this.robotId = robotId;
+
+    // 웹시리얼 연결
+    try {
+      this.port = await navigator.serial.requestPort();
+      await this.port.open({ baudRate: 115200 });
+      
+      this.reader = this.port.readable.getReader();
+      this.writer = this.port.writable.getWriter();
+
+      // 서버와 웹소켓 연결
+      this.ws = new WebSocket(`${this.serverUrl}/robot/${robotId}`);
+      
+      // 시리얼 데이터 읽기 시작
+      this.startReading();
+
+      return true;
+    } catch (error) {
+      console.error('Connection failed:', error);
+      return false;
+    }
+  }
+
+  async startReading() {
+    while (true) {
+      try {
+        const { value, done } = await this.reader.read();
+        if (done) {
+          break;
+        }
+        // 시리얼 데이터를 서버로 전송
+        if (this.ws && this.ws.readyState === WebSocket.OPEN) {
+          this.ws.send(JSON.stringify({
+            type: 'serial',
+            data: Array.from(value)
+          }));
+        }
+      } catch (error) {
+        console.error('Error reading serial:', error);
+        break;
+      }
+    }
+  }
+
+  async writeToSerial(data) {
+    if (this.writer) {
+      await this.writer.write(new Uint8Array(data));
+    }
+  }
+
+  async disconnect() {
+    if (this.reader) {
+      await this.reader.cancel();
+      this.reader = null;
+    }
+    if (this.writer) {
+      await this.writer.close();
+      this.writer = null;
+    }
+    if (this.port) {
+      await this.port.close();
+      this.port = null;
+    }
+    if (this.ws) {
+      this.ws.close();
+      this.ws = null;
+    }
+  }
+
+  // Blockly 명령어 실행
+  async executeBlocklyCommand(blocklyCmd) {
+    const command = this.translateBlocklyCommand(blocklyCmd);
+    if (!command) return;
+
+    try {
+      const response = await fetch(
+        `${this.serverUrl}/api/robots/${this.robotId}/command`,
+        {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify(command),
+        }
+      );
+
+      if (!response.ok) {
+        throw new Error('Command failed');
+      }
+
+      return await response.json();
+    } catch (error) {
+      console.error('Failed to execute command:', error);
+      throw error;
+    }
+  }
+
+  translateBlocklyCommand(blocklyCmd) {
+    const commandMap = {
+      'move_forward': { type: 'move', params: { x: 10, y: 0, z: 0 } },
+      'move_backward': { type: 'move', params: { x: -10, y: 0, z: 0 } },
+      'grip_open': { type: 'grip', params: { grip: false } },
+      'grip_close': { type: 'grip', params: { grip: true } },
+    };
+
+    return commandMap[blocklyCmd] || null;
+  }
+}
+
+```
+
+이 구현의 주요 특징은 다음과 같습니다:
+
+1. **중앙 서버에서 실행되는 컴포넌트**:
+   - Node.js 서버
+   - Python 컨트롤러
+   - 로봇 관리자
+
+2. **클라이언트에서 실행되는 컴포넌트**:
+   - Web Serial API를 사용한 시리얼 통신
+   - WebSocket 클라이언트
+
+작동 방식:
+
+1. 브라우저에서 Web Serial API를 통해 로봇과 시리얼 연결
+2. 시리얼 연결 정보를 WebSocket을 통해 서버로 전송
+3. 서버는 해당 로봇을 위한 Python 프로세스 시작
+4. Blockly 명령어는 서버의 REST API를 통해 전송
+5. 서버의 Python 프로세스가 명령어를 처리하고 시리얼 데이터를 통해 로봇 제어
+
+사용 방법:
+
+1. 서버 설정:
+```bash
+# 서버 설치
+npm install express ws cors
+
+# Python 환경 설정
+pip install pyserial
+
+# 서버 실행
+node index.js
+```
+
+2. 클라이언트 연결:
+```html
+<script src="serial-client.js"></script>
+<script>
+// 클라이언트 초기화
+const client = new DobotSerialClient('ws://your-server:3000');
+
+// 로봇 연결
+async function connectRobot() {
+  await client.connect('robot1');
+}
+
+// Blockly 코드 실행
+async function runBlocklyCode(code) {
+  for (const cmd of code) {
+    await client.executeBlocklyCommand(cmd);
+  }
+}
+</script>
+```
+
+이 방식의 장점:
+1. 모든 로직이 서버에서 실행되어 관리가 용이
+2. 클라이언트는 시리얼 통신만 담당
+3. 여러 로봇을 중앙에서 제어 가능
+4. 업데이트와 유지보수가 쉬움
+
+단점:
+1. 서버 부하가 증가할 수 있음
+2. 네트워크 지연이 발생할 수 있음
+3. 서버 장애 시 전체 시스템 영향
+
+실제 구현 시 고려사항:
+1. 에러 처리 강화
+2. 재연결 로직 추가
+3. 로깅 시스템 구현
+4. 보안 설정 추가
+5. 모니터링 시스템 구축
+
+이 방식으로 구현하면 대부분의 로직을 서버에서 처리하면서도, Web Serial API를 통해 로봇과의 직접 통신이 가능합니다.

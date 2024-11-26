@@ -1,0 +1,37 @@
+{
+  "name": "web",
+  "version": "1.0.0",
+  "private": true,
+  "scripts": {
+    "dev": "next dev",
+    "build": "next build",
+    "start": "next start",
+    "lint": "next lint"
+  },
+  "dependencies": {
+    "@emotion/cache": "^11.11.0",
+    "@emotion/react": "^11.11.1",
+    "@emotion/styled": "^11.11.0",
+    "@ktaicoder/hw-pet": "^1.2.9",
+    "@mui/material": "^5.15.17",
+    "@mui/material-nextjs": "^5.15.11",
+    "clsx": "^2.0.0",
+    "eventemitter3": "^5.0.1",
+    "next": "^14.2.3",
+    "react": "^18.3.1",
+    "react-dom": "^18.3.1",
+    "rxjs": "^7.8.1"
+  },
+  "devDependencies": {
+    "@next/eslint-plugin-next": "^14.2.3",
+    "@repo/eslint-config": "workspace:*",
+    "@repo/typescript-config": "workspace:*",
+    "@repo/ui": "workspace:*",
+    "@types/node": "^17.0.12",
+    "@types/react": "^18.3.2",
+    "@types/react-dom": "^18.3.0",
+    "@types/w3c-web-serial": "^1.0.6",
+    "@types/web-bluetooth": "^0.0.20",
+    "typescript": "^5.3.3"
+  }
+}
